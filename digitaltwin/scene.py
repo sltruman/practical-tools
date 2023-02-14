@@ -10,7 +10,7 @@ class Scene:
     self.active_objs = dict()
     self.active_objs_by_name = dict()
     self.viewport_size = int(width),int(height),4
-    self.running = False
+    self.running = True
 
     self.id = p.connect(p.GUI,options=f'--width={width} --height={height} --headless')
     p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
@@ -24,7 +24,6 @@ class Scene:
     p.resetSimulation()
     p.setGravity(0, 0, -9.81)
     self.plane = p.loadURDF("./data/pybullet_data/plane.urdf", [0, 0, 0], useFixedBase=True)
-
     self.load(self.scene_path)
     pass
 
@@ -38,10 +37,10 @@ class Scene:
 
     self.scene_path = scene_path
     with open(scene_path,'r') as f:
-      scene_info = json.load(f)
+      self.profile = scene_info = json.load(f)
 
     from digitaltwin import Robot,Camera3D,Packer,Stacker
-    
+        
     for object_info in scene_info['active_objects']:
       print(object_info)
       kind = object_info['kind']
@@ -51,21 +50,18 @@ class Scene:
       self.active_objs[active_obj.id] = active_obj
       if 'name' in vars(active_obj): self.active_objs_by_name[active_obj.name] = active_obj
 
+
   def rtt(self):
     _,_,pixels,_,_ = p.getCameraImage(self.viewport_size[0],self.viewport_size[1],renderer=p.ER_BULLET_HARDWARE_OPENGL)
     return pixels.tobytes()
 
-  def start(self):
-    self.running = True
+  def play(self,run=True):
+    self.running = run
     pass
 
-  def stop(self):
-    self.running = False
-    self.reset()
-    pass
-  
   def update(self):
     if not self.running: return
+
     dt = time() - self.tick
     while dt >= 1./240:
       for obj in self.active_objs.values():

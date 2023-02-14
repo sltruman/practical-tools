@@ -76,8 +76,3 @@ class Camera3D:
                 depth_img[h, w] = [v,v,v]
 
         return pixels.tobytes() + depth_img.tobytes()
-
-    def result(self):
-        pass
-
-    

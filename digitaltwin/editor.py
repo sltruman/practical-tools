@@ -48,10 +48,10 @@ class Editor:
         rayInfo = p.rayTest(rayFrom, rayTo)
         p.addUserDebugLine(rayFrom,rayTo,[1,0,0],1,lifeTime=10)
         
-        if not rayInfo: return dict(id=-1,pos=[0.,0.,0.])
+        if not rayInfo: return dict(name='',id=-1,pos=[0.,0.,0.])
         id,linkindex,fraction,pos,norm = rayInfo[0]
-        if id not in self.scene.active_objs: return dict(id=-1,pos=[0.,0.,0.])
-        return dict(id=id,pos=pos)
+        if id not in self.scene.active_objs: return dict(name='',id=-1,pos=pos)
+        return dict(name=self.scene.active_objs[id].name,id=id,pos=pos)
         
     def move(self,id,pos : tuple[int,int,int]):
         pass
