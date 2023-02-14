@@ -293,7 +293,7 @@ flowchart LR
 
 ```python
 # 格式：json
-flowchart={
+workflow={
     "run":"1",
     "declare":{
         "1":{"kind":"Packer","fun":"generate","name":"packer",next:"2"},
@@ -320,7 +320,7 @@ flowchart LR
 
 ```python
 # 格式：json
-flowchart={
+workflow={
     "run":"1",
     "declare":{
         "1":{
