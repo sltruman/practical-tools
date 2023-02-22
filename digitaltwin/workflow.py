@@ -2,6 +2,7 @@ from .scene import Scene
 import pybullet as p
 from threading import Thread
 import json
+import time
 
 class Workflow():
     def __init__(self,scene: Scene):
@@ -10,10 +11,16 @@ class Workflow():
     
     def get_active_obj_nodes(self):
         nodes = [
-            dict(kind='Robot',funs=['move','pick','place'],names=[]),
-            dict(kind='Camera3D',funs=['capture'],names=[]),
-            dict(kind='Packer',funs=['generate'],names=[]),
-            dict(kind='Stacker',funs=['generate'],names=[]),
+            dict(kind='Robot',funs=[
+                dict(f='move',errs=[]),
+                dict(f='pick',errs=[]),
+                dict(f='place',errs=[])],names=[]),
+            dict(kind='Camera3D',funs=[
+                dict(f='capture',errs=[])],names=[]),
+            dict(kind='Placer',funs=[
+                dict(f='generate',errs=["out of amount"])],names=[]),
+            dict(kind='Stacker',funs=[
+                dict(f='generate',errs=[])],names=[]),
             dict(kind='ActiveObj',funs=[],names=[])
         ]
 
@@ -25,31 +32,39 @@ class Workflow():
 
     def start(self):
         self.task = Thread(target=self.run)
+        self.task.start()
         pass
 
     def stop(self):
+        self.task.join()
         pass
     
     def run(self):
         wf = self.scene.profile['workflow']
         declare = wf['declare']
         next = wf['run']
-        result = ()
-        
+        val = ()
+
         while next:
             act = declare[next]
             kind = act['kind']
             name = act['name']
             fun = act['fun']
-            result = eval(f'self.scene.active_objs[{name}].{fun}(*result)')
 
+            print('signal',fun)
+            obj = self.scene.active_objs_by_name[name]
+            eval(f'obj.signal_{fun}(*val)')
+            while not obj.idle(): time.sleep(0.5)
+
+            res = obj.result
+            err,val = res[0],res[1:]
+            
             next=None
             if 'next' in act:
                 next = act['next']
             elif 'alt' in act:
                 for opt in act['alt']:
-                    condition = opt['cond']
-                    if not eval(f'{condition}'): continue
+                    if err != opt['err']: continue
                     next = opt['next']
                     break
         pass

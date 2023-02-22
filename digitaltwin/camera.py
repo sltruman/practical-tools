@@ -1,30 +1,19 @@
 import pybullet as p
 from scipy.spatial.transform import Rotation
+from .active_obj import ActiveObject
 
-class Camera3D:
+class Camera3D(ActiveObject):
     def __init__(self,scene,**kwargs):
-        self.name = kwargs['name']
-        self.pos = kwargs['pos']
-        self.rpy = kwargs['rpy']
-        self.set_base(kwargs['base'])
+        super().__init__(scene, **kwargs)
         self.image_size = kwargs['image_size']
         self.forcal = kwargs['forcal']
         self.fov = kwargs['fov']
         pass
     
-    def update(self,dt):
-        pass
-
-    def set_base(self,base):
-        self.base = base
-        if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(self.base, self.pos, p.getQuaternionFromEuler(self.rpy),useFixedBase=True)
-        return self.id
-
     def properties(self):
-        pos, orn = p.getBasePositionAndOrientation(self.id)
-        rpy = p.getEulerFromQuaternion(orn)
-        return dict(id=self.id,kind='Camera3D', base=self.base,pos=pos,rpy=rpy,image_size=self.image_size,fov=self.fov,forcal=self.forcal)
+        info = super().properties()
+        info.update(dict(kind='Camera3D',image_size=self.image_size,fov=self.fov,forcal=self.forcal))
+        return info
     
     def rtt(self):
         import numpy as np
@@ -53,7 +42,7 @@ class Camera3D:
                 l = np.linalg.norm(target - origin)
                 dr = (target - origin) / l * far
 
-                p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=5)
+                p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=1)
                 rayInfo = p.rayTest(origin, target + dr)
                 if not rayInfo: continue
                 
@@ -62,7 +51,6 @@ class Camera3D:
                 if depth_far < distance: depth_far = distance
         depth_far -= near
 
-        
         vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch,180 / np.pi * roll,2)
         pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
         _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
@@ -75,4 +63,93 @@ class Camera3D:
                 v = far * near / (far - (far - near) * depth_pixels[h, w]) / depth_far * 255
                 depth_img[h, w] = [v,v,v]
 
-        return pixels.tobytes() + depth_img.tobytes()
+        return pixels.tobytes(),depth_img.tobytes()
+
+    def update(self,dt):
+        if not self.actions: return
+        fun,args = act = self.actions[0]
+        fun(*args)
+        self.actions.remove(act)
+
+    def signal_capture(self,*args):
+        def output(): self.result = (None,) + self.rtt()
+        self.actions.append((output, ()))
+        pass
+
+    def signal_pose_recognize(self,*args):
+        import numpy as np
+        num_joints = p.getNumJoints(self.id)
+        pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        pitch,roll,yaw = p.getEulerFromQuaternion(orn)
+
+        near = self.forcal
+        far = 1000
+        origin = np.array(pos)
+        viewport_length = np.tan(np.pi / 180 * self.fov / 2) * near * 2
+
+        horizontal = np.array([viewport_length, 0, 0])
+        vertical = np.array([0, 0, viewport_length])
+        lower_left_corner = [0, near, 0] - horizontal/2 - vertical/2
+        ids = set()
+
+        for j in range(self.image_size[1]-1,0,-1):
+            for i in range(self.image_size[0]):
+                u = float(i) / (self.image_size[0]-1)
+                v = float(j) / (self.image_size[1]-1)
+                target = lower_left_corner + u*horizontal + v*vertical
+                target = origin + Rotation.from_quat(orn).apply(target)
+                
+                l = np.linalg.norm(target - origin)
+                dr = (target - origin) / l * far
+
+                def ray(origin,target):
+                    p.addUserDebugLine(origin, target,[1,0,0],1,lifeTime=0.1)
+                    rayInfo = p.rayTest(origin, target)
+                    if not rayInfo: return
+                    
+                    id,linkindex,fraction,pos,norm = rayInfo[0]
+                    ids.add(id)
+
+                self.actions.append((ray, (origin,target + dr)))
+        
+        def output():
+            val = list()
+            p.removeAllUserDebugItems()
+            
+            avg_length = 0
+            for id in ids:
+                min,max = p.getAABB(id)
+                min,max = np.array(min),np.array(max)
+                center = (max - min)
+                length = np.max(center)
+                avg_length += length
+            avg_length /= len(ids)
+
+            for id in ids:
+                min,max = p.getAABB(id)
+                min,max = np.array(min),np.array(max)
+                center = (max - min) / 2 
+                length = np.max(center)
+                if length > avg_length: continue
+
+                pos,orn = p.getBasePositionAndOrientation(id)
+                rot = p.getEulerFromQuaternion(orn)
+                # mesh = p.getMeshData(id,flags=p.MESH_DATA_SIMULATION_MESH)
+                
+                axis_x = Rotation.from_quat(orn).apply(np.array([length,0,0])) + pos
+                axis_y = Rotation.from_quat(orn).apply(np.array([0,length,0])) + pos
+                axis_z = Rotation.from_quat(orn).apply(np.array([0,0,length])) + pos
+                p.addUserDebugLine(pos,axis_x,[1,0,0],2)
+                p.addUserDebugLine(pos,axis_y,[0,1,0],2)
+                p.addUserDebugLine(pos,axis_z,[0,0,1],2)
+
+                val.append((pos,rot))
+            
+            vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch,180 / np.pi * roll,2)
+            pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
+            _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
+            self.result = (None,(self.pos,self.rot,self.fov,self.forcal,depth_pixels,pixels),val) if val else ('Nothing was recognized',)
+            
+        self.actions.append((output, ()))
+        pass
+    
