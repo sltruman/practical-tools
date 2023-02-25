@@ -1,7 +1,7 @@
 import pybullet as p
 import numpy as np
 from scipy.spatial.transform import Rotation
-from time import time
+from time import time,sleep
 import json
 
 class Scene:
@@ -71,7 +71,9 @@ class Scene:
     while dt >= self.timestep:
       for obj in self.active_objs.values():
         obj.update(self.timestep)
+      
       p.stepSimulation()
+      
       dt -= self.timestep
 
   def update(self):

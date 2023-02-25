@@ -10,37 +10,33 @@
 
 # 2 工作计划
 
-| 目标   | 任务     | 问题      | 备注      |
-| ---- | ------ | ------- | ------- |
-| 接口定义 | 场景查看   | 载入      | 路径过长的问题 |
-|      |        | 重置      |         |
-|      |        | 获取物体标识  |         |
-|      |        | 获取场景画面  |         |
-|      |        | 继续/暂停仿真 |         |
-|      |        | 平移      |         |
-|      |        | 旋转      |         |
-|      |        | 缩放      |         |
-|      |        | 焦点      |         |
-|      | 场景编辑   | 坐标检测    |         |
-|      |        | 选择      |         |
-|      |        | 添加      |         |
-|      |        | 移动      |         |
-|      |        | 旋转      |         |
-|      |        | 缩放      |         |
-|      |        | 删除      |         |
-|      |        | 保存      |         |
-|      | 物体     | 属性      |         |
-|      |        | 模型更换    |         |
-|      | 物体.机械臂 | 抓手更换    |         |
-|      | 物体.相机  | 获取相机画面  |         |
-|      | 物体.码垛器 | 区域参数    |         |
-|      |        | 工件更换    |         |
-|      | 物体.堆叠器 | 区域参数    |         |
-|      |        | 工件更换    |         |
-|      | 工作流    | 获取可用节点  |         |
-|      |        | 设置/获取   |         |
-|      |        | 启动/停止   |         |
-|      |        |         |         |
+| 目标   | 任务     | 问题                | 备注     |
+| ---- | ------ | ----------------- | ------ |
+| 接口定义 | 场景查看   | 载入/重置             |        |
+|      |        | 获取物体标识            |        |
+|      |        | 获取场景画面            |        |
+|      |        | 暂停/继续仿真           |        |
+|      |        | 平移/旋转/缩放/焦点       |        |
+|      |        | 视图切换              |        |
+|      |        | 点云/抓取点/轨迹/碰撞高亮    | 实现时间太长 |
+|      |        |                   |        |
+|      | 场景编辑   | 坐标检测              |        |
+|      |        | 选择/添加/移动/旋转/缩放/删除 |        |
+|      |        | 保存                |        |
+|      |        |                   |        |
+|      | 物体     | 属性                |        |
+|      |        | 模型更换              |        |
+|      | 物体.机械臂 | 抓手更换              |        |
+|      |        | 拾取姿态              |        |
+|      | 物体.相机  | 获取相机画面            |        |
+|      | 物体.码垛器 | 区域参数              |        |
+|      |        | 工件更换              |        |
+|      | 物体.放置器 | 区域参数              |        |
+|      |        | 工件更换              |        |
+|      | 工作流    | 获取可用节点            |        |
+|      |        | 设置/获取             |        |
+|      |        | 启动/停止             |        |
+|      |        |                   |        |
 
 # 3 业务流程
 
@@ -58,24 +54,24 @@ scene_profile = {
             "name":"robot",
             "base":"./data/robots/ur5.urdf",
             "pos":[0,0,0],
-            "rpy":[0,0,1.57],
-            "end_effector":"./data/end_effectors/magnet.urdf",
-            "end_effector_kind": "Gripper" # 夹爪：Gripper，吸盘：Suction
+            "rot":[0,0,1.57],
+            "end_effector":"./data/end_effectors/magnet.urdf"+
         },
         {
-            "kind":"Stacker",
-            "name":"stacker",
-            "base":"./data/workpieces/bin.urdf",
-            "pos":[-0.249507,-0.842426,0.001],
-            "rpy":[0,0,0],
-            "size":[0.5, 0.5, 0.1]
+            "kind":"Packer",
+            "name":"packer",
+            "base":"./data/pybullet_objects/tray/traybox.urdf",
+            "pos":[0,-0.5,0.001],
+            "rot":[0,0,0],
+            "size":[0.0,-0.5,0.5],
+            "workpiece":"./data/pybullet_objects/lego/lego.urdf"
         }, 
         {
             "kind":"Camera3D",
             "name":"camera",
             "base":"./data/objects/camera3d.urdf",
             "pos":[-0.492021,-0.593407,0.0],
-            "rpy":[0.0,0.0,-1.57],
+            "rot":[0.0,0.0,-1.57],
             "image_size": [300,300],
             "fov": 45,
             "forcal": 0.01
@@ -257,7 +253,7 @@ sequenceDiagram
     note left of bullet: 相关函数：removeBody，loadURDF，resetBasePositionAndOrientation
 ```
 
-## 3.9 物体.堆叠器
+## 3.9 物体.放置器
 
         用于生成码放无序的工件。
 
@@ -276,18 +272,18 @@ sequenceDiagram
     note left of bullet: 相关函数：removeBody，loadURDF，resetBasePositionAndOrientation
 ```
 
-## 3.10 工作流-示例-RGBD图/姿态估计/混合拆垛/无序抓取
+## 3.10 工作流-示例-深度图/姿态估计/混合拆垛/无序抓取
 
-        通过简单的两个节点来实现获取RGBD图的工作流，如下：
+        通过简单的两个节点来实现获取深度图的工作流，如下：
 
 ```mermaid
 flowchart LR
-    packer.generate[堆叠器.生成]
+    palcer.generate[放置器.生成]
     camera.capture[相机.拍照]
     start([开始])
     finish([结束])
-    start-->packer.generate
-    packer.generate-->camera.capture
+    start-->palcer.generate
+    palcer.generate-->camera.capture
     camera.capture-->finish
 ```
 
@@ -296,25 +292,25 @@ flowchart LR
 workflow={
     "run":"1",
     "declare":{
-        "1":{"kind":"Packer","fun":"generate","name":"packer",next:"2"},
-        "2":{"kind":"Camera","fun":"capture","name":"camera"},
+        "1":{"kind":"Placer","fun":"generate","name":"placer","next":"2"},
+        "2":{"kind":"Camera","fun":"capture","name":"camera"}
     }
 }
 ```
 
-        假设工件生成失败，就只拍照，否则对工件进行姿态估计，如下：
+        节点有时因为一些限制参数会返回失败，为应对于不同情况，可以采用分支来进行控制。假设工件生成成功，就拍照，否则对工件进行姿态估计，如下：
 
 ```mermaid
 flowchart LR
     start([开始])
     finish([结束])
-    packer.generate[堆叠器.生成]
+    palcer.generate[放置器.生成]
     camera.capture[相机.拍照]
     camera.pose_recognize[相机.姿态估计]
-    start-->packer.generate
-    packer.generate--条件 假-->camera.capture-->finish
+    start-->palcer.generate
+    palcer.generate--条件 真-->camera.capture-->finish
 
-    packer.generate--条件 真-->camera.pose_recognize
+    palcer.generate--条件 假-->camera.pose_recognize
     camera.pose_recognize-->finish
 ```
 
@@ -324,10 +320,9 @@ workflow={
     "run":"1",
     "declare":{
         "1":{
-            "kind":"Packer","fun":"generate","name":"packer",
+            "kind":"Placer","fun":"generate","name":"placer","next":"2"
             "alt":[
-                 {"next":"2","cond":"result == False"},
-                 {"next":"3","cond":"result == True"},
+                 {"next":"3","err":"failed"}
             ]
         },
         "2":{"kind":"Camera","fun":"capture","name":"camera"},
@@ -336,53 +331,76 @@ workflow={
 }
 ```
 
-        接着，加入机器人进行分拣的工作，如下：
+        接着，设计一个混合拆垛工作流，加入机器人进行分拣工作，如下：
 
 ```mermaid
-flowchart LR
+flowchart TB
     start([开始])
     finish([结束])
-    packer.generate[堆叠器.生成]
-    camera.capture[相机.拍照]
+    stacker.generate[堆垛器.生成]
     camera.pose_recognize[相机.姿态估计]
+    robot.pick_plan["机器人.路径规划\n(物体,机械臂位置:姿态)"]
+    robot.move1["机器人.移动\n(相对移动,位置偏移)"]
+    robot.move2["机器人.移动\n(绝对移动,位置)"]
     robot.pick[机器人.拾取]
     robot.place[机器人.放置]
-    start-->packer.generate
+    robot.home[机器人.休息点]
+    start-->stacker.generate
 
-    packer.generate--条件 假-->camera.capture
-    camera.capture-->finish
-
-    packer.generate--条件 真-->camera.pose_recognize
-    camera.pose_recognize--条件 真-->robot.pick
-    robot.pick-->robot.place
+    stacker.generate-->camera.pose_recognize
+    camera.pose_recognize--"物体[位置,姿态,网格数据]\n"-->robot.pick_plan
+    robot.pick_plan--"路径[末端位置:姿态,...N]"-->robot.pick
+    robot.pick-->robot.move1-->robot.move2-->robot.place
     robot.place-->camera.pose_recognize
 
-    camera.pose_recognize--条件 假-->finish
+    camera.pose_recognize--没有识别到物体-->robot.home-->finish
 ```
 
 ```python
 # 格式：json
-flowchart={
+workflow={
     "run":"1",
     "declare":{
-        "1":{
-            "kind":"Packer","fun":"generate","name":"packer",
+        "1":{"kind":"Packer","fun":"generate","name":"packer", "next":"2","args":{}},
+        "2":{
+            "kind":"Camera3D","fun":"pose_recognize","name":"camera", "next":"3","args":{},
             "alt":[
-                 {"next":"2","cond":"result == False"},
-                 {"next":"3","cond":"result == True"},
+                {"next":"7","err": "failed"}
             ]
         },
-        "2":{"kind":"Camera","fun":"capture","name":"camera"}
-        "3":{
-            "kind":"Camera","fun":"pose_recognize","name":"camera",
-            "alt":[
-                 {"next":"4","cond":"result == True"}
-            ]
-        },
-        "4":{"kind":"Robot","fun":"pick","name":"robot","next":"5"},
-        "5":{"kind":"Robot","fun":"place","name":"robot","next":"3"}
+        "3":{"kind":"Robot","fun":"pick_plan","name":"robot","next":"4","args":{}},
+        "4":{"kind":"Robot","fun":"move","name":"robot","next":"5","args":{"mode":"plan"}},
+        "5":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": true},"next":"6"},
+        "6":{"kind":"Robot","fun":"move","name":"robot","args":{"mode":"relative","pos":[0.0,0.0,0.1]},"next":"7"},
+        "7":{"kind":"Robot","fun":"move","name":"robot","args":{"mode":"absolute","pos":[0.5,0.0,0.5]},"next":"8"},  
+        "8":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": false},"next":"2"}
     }
 }
+```
+
+        最后，设计一个无序抓取的工作流，因为内置算法太垃圾，在此加入第三方路径规划算法，如下：
+
+```mermaid
+flowchart TB
+    start([开始])
+    finish([结束])
+    stacker.generate[放置器.生成]
+    camera.pose_recognize[相机.姿态估计]
+    robot.pick_plan["机器人.PlanAlgo路径规划\n(物体,机械臂位置:姿态)"]
+    robot.move1["机器人.移动\n(相对移动,位置偏移)"]
+    robot.move2["机器人.移动\n(绝对移动,位置)"]
+    robot.pick[机器人.拾取]
+    robot.place[机器人.放置]
+    robot.home[机器人.休息点]
+    start-->stacker.generate
+
+    stacker.generate-->camera.pose_recognize
+    camera.pose_recognize--"物体[位置,姿态,网格数据]\n"-->robot.pick_plan
+    robot.pick_plan--"路径[末端位置:姿态,...N]"-->robot.pick
+    robot.pick-->robot.move1-->robot.move2-->robot.place
+    robot.place-->camera.pose_recognize
+
+    camera.pose_recognize--没有识别到物体-->robot.home-->finish
 ```
 
 ## 3.11 工作流-获取活动节点
@@ -391,34 +409,36 @@ flowchart={
 
 ```python
 #输入
-get_active_obj_nodes()
+workflow.get_active_obj_nodes(
+    #无参
+)\n
 
 #输出
 [
     {
         "kind": "Robot", #机器人节点
         "funs": [   #可用功能
-            "move",
-            "pick",
-            "place"
+            {"f":"move","errs":[]},
+            {"f":"pick","errs":[]},
+            {"f":"place","errs":[]}
         ],
-        "names": [ #场景实体名
+        "names": [ #实例名
             "robot_1",
             "robot_2"
         ]
     },
     {
         "kind": "Camera3D", #相机节点
-        "funs": [   #可用功能
-            "capture",
-            "pose_recognize"
+        "funs": [
+            {"f":"capture","errs":[]},
+            {"f":"pose_recognize","errs":["failed"]}
         ],
-        "names": [ #场景实体名
+        "names": [ 
             "camera_1",
             "camera_2"
         ]
     }
-]
+]\n
 ```
 
 ## 3.12 工作流-获取/设置

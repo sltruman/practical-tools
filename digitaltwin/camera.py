@@ -111,7 +111,7 @@ class Camera3D(ActiveObject):
                     ids.add(id)
 
                 self.actions.append((ray, (origin,target + dr)))
-        
+         
         def output():
             val = list()
             p.removeAllUserDebugItems()
@@ -139,9 +139,9 @@ class Camera3D(ActiveObject):
                 axis_x = Rotation.from_quat(orn).apply(np.array([length,0,0])) + pos
                 axis_y = Rotation.from_quat(orn).apply(np.array([0,length,0])) + pos
                 axis_z = Rotation.from_quat(orn).apply(np.array([0,0,length])) + pos
-                p.addUserDebugLine(pos,axis_x,[1,0,0],2)
-                p.addUserDebugLine(pos,axis_y,[0,1,0],2)
-                p.addUserDebugLine(pos,axis_z,[0,0,1],2)
+                p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=5)
+                p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=5)
+                p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=5)
 
                 val.append((pos,rot))
             

@@ -21,6 +21,7 @@ class Stacker(ActiveObject):
             item_width = avgItemSize[0] + random.randint(-itemChangeSize[0]*100,itemChangeSize[0]*100) / 100 * avgItemSize[0] 
             item_height = avgItemSize[1] + random.randint(-itemChangeSize[1]*100,itemChangeSize[1]*100) / 100 * avgItemSize[1] 
             item_depth = avgItemSize[2] + random.randint(-itemChangeSize[2]*100,itemChangeSize[2]*100) / 100 * avgItemSize[2] 
+            print(item_depth)
             item_weight = 0.1
             self.packer.add_item(bp.Item('item'+str(idx), item_width, item_height, item_depth, item_weight))
         
@@ -36,7 +37,7 @@ class Stacker(ActiveObject):
     
     def signal_generate(self):
         
-        def task(item):
+        def task(item:bp.Item):
             item_width, item_height, item_depth = item.get_dimension()
             item_pos = self.lower_left + [float(item.position[0] + item_width / 2), float(item.position[1] + item_height / 2), float(item.position[2] + item_depth / 2)]
             item_shape = p.createCollisionShape(p.GEOM_BOX, halfExtents=[item_width/2, item_height/2, item_depth/2])
@@ -45,8 +46,7 @@ class Stacker(ActiveObject):
         for item in self.packer.bins[0].bin_fitted_items:
             self.actions.append([task,(item,)])
 
-        def output():
-            self.result = None,
+        def output(): self.result = None,
 
         self.actions.append([output,()])
         pass

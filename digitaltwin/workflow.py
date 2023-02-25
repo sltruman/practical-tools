@@ -50,10 +50,11 @@ class Workflow():
             kind = act['kind']
             name = act['name']
             fun = act['fun']
+            args = act['args']
 
             print('signal',fun)
             obj = self.scene.active_objs_by_name[name]
-            eval(f'obj.signal_{fun}(*val)')
+            eval(f'obj.signal_{fun}(*val,**args)')
             while not obj.idle(): time.sleep(0.5)
 
             res = obj.result
