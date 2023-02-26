@@ -28,5 +28,5 @@ class ActiveObject:
     def set_base(self,base):
         self.base = base
         if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(self.base, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
+        self.id = p.loadURDF(self.base, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True,flags=p.URDF_ENABLE_SLEEPING)
         return self.id

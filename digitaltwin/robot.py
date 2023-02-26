@@ -38,6 +38,9 @@ class Robot(ActiveObject):
         f = tempfile.NamedTemporaryFile("w")
         base_temp = f.name
 
+        ee_kind = ""
+        mimic_name = ''
+        gears = []
         with xml.parse(self.base) as doc_robot:
             node_robot = doc_robot.getElementsByTagName('robot')[0]
             
@@ -50,6 +53,7 @@ class Robot(ActiveObject):
                 link_ee_name = link_ee.getAttribute('name')
                 with xml.parse(self.end_effector) as doc_ee:
                     node_ee = doc_ee.getElementsByTagName('robot')[0]
+                    ee_kind = node_ee.getAttribute("kind")
                     for mesh in node_ee.getElementsByTagName('mesh'):
                         filename = mesh.getAttribute('filename')
                         mesh.setAttribute('filename',os.path.join(os.getcwd(),os.path.dirname(self.end_effector),filename))
@@ -59,23 +63,31 @@ class Robot(ActiveObject):
                     for i,joint in enumerate(node_ee.getElementsByTagName('joint')): 
                         if i == 0: joint.getElementsByTagName('parent')[0].setAttribute('link',link_ee_name)
                         node_robot.appendChild(joint)
+                        node_mimics = joint.getElementsByTagName('mimic')
+                        if not node_mimics: continue
+                        node_mimic = node_mimics[0]
+                        mimic_name = node_mimic.getAttribute('joint')
+                        joint_name = joint.getAttribute('name')
+                        multiplier =  node_mimic.getAttribute('multiplier')
+                        offset = node_mimic.getAttribute('offset')
+                        gears.append((mimic_name,joint_name,multiplier))
 
-                    if node_ee.getAttribute("kind") == 'Gripper': self.end_effector_obj = Gripper(self.end_effector)
-                    else: self.end_effector_obj = Suction(self.end_effector)
                 node_robot.removeChild(link_ee).unlink()
             f.write(node_robot.toxml())
 
         if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
+        self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuyher(self.rot),useFixedBase=True)
         f.close()
 
-        for j in range(p.getNumJoints(self.id)):
+        if ee_kind == 'Gripper': self.end_effector_obj = Gripper(self.id,gears)
+        else: self.end_effector_obj = Suction(self.id)
+
+        for j in range(7):
             ji = p.getJointInfo(self.id, j)
             jointName,jointType = ji[1],ji[2]
             if (jointType == p.JOINT_REVOLUTE):
                 p.resetJointState(self.id, j, self.reset_joint_poses[j])
                 i+=1
-        
         
         return self.id
 
