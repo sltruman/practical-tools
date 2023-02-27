@@ -3,35 +3,33 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 class Gripper:
-    def __init__(self,robot_id,gears,open=0,close=0.62):
-        for mimic_name, joint_name, ratio in gears:
-            mimic_id = None
-            joint_id = None
-            for j in p.getNumJoints(self.robot_id):
-                ji = p.getJointInfo(self.robot_id, j)
-                id,name,type = ji[0],ji[1],ji[2]
-                if mimic_name == name: mimic_id = id
-                if joint_name == name: joint_id = id
+    def __init__(self,robot_id,gears):
+        self.robot_id = robot_id
+        self.gears = gears
+        self.joints = dict()
+        for j in range(p.getNumJoints(robot_id)):
+            ji = p.getJointInfo(robot_id, j)
+            id,name,type,lower,upper,max_force,max_velocity = ji[0],ji[1],ji[2],ji[8],ji[9],ji[10],ji[11]
+            self.joints[name.decode()] = id,name.decode(),type,lower,upper,max_force,max_velocity
             
-            if not (mimic_id and joint_id): continue
-            c = p.createConstraint(self.robot_id, mimic_id, self.robot_id, id, jointType=p.JOINT_GEAR,jointAxis=[0, 1, 0], parentFramePosition=[0, 0, 0], childFramePosition=[0, 0, 0])
-            p.changeConstraint(c, gearRatio=-ratio, maxForce=100, erp=1)
+        for mimic_name, joint_name, ratio in gears:
+            mimic_id = self.joints[mimic_name][0]
+            joint_id,name,type,lower,upper,max_force,max_velocity = self.joints[joint_name]
+            c = p.createConstraint(robot_id, mimic_id, robot_id, joint_id, jointType=p.JOINT_GEAR,jointAxis=[0, 1, 0], parentFramePosition=[0, 0, 0], childFramePosition=[0, 0, 0])
+            p.changeConstraint(c, gearRatio=-ratio, maxForce=max_force, erp=1)
         pass
+
+    def update(self,dt):
+        pass
+        
     
-    def do(self):
-        close = 0.6273989381446866
-        open = 0
-        p.setJointMotorControl2(self.robot_id, 
-                                self.mimic_parent_id, 
-                                p.POSITION_CONTROL, 
-                                targetPosition=open_angle,
-                                force=self.joints[self.mimic_parent_id]['max_force'], 
-                                maxVelocity=self.joints[self.mimic_parent_id]['max_velocity'])
-        for joint_id, multiplier in self.mimic_child_multiplier.items():
-            p.setJointMotorControl2(self.robot_id, 
-                                    joint_id,
-                                    p.POSITION_CONTROL,
-                                    targetPosition=open_angle * multiplier,
-                                    force=self.joints[joint_id]['max_force'],
-                                    maxVelocity=self.joints[joint_id]['max_velocity'])
-        pass 
+    def do(self,pickup=True):
+        for mimic_name, joint_name, ratio in self.gears:
+            id,name,type,lower,upper,max_force,max_velocity = self.joints[mimic_name]
+            value = 0
+            if pickup: value = upper - lower
+            p.setJointMotorControl2(self.robot_id, id, p.POSITION_CONTROL, targetPosition=value,force=max_force,maxVelocity=max_velocity)
+            id,name,type,lower,upper,max_force,max_velocity = self.joints[joint_name]
+            value = 0
+            if pickup: value = upper - lower
+            p.setJointMotorControl2(self.robot_id, id, p.POSITION_CONTROL, targetPosition=value * ratio,force=max_force,maxVelocity=max_velocity)

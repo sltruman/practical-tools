@@ -25,10 +25,7 @@ class Robot(ActiveObject):
     
     def update(self,dt):
         super().update(dt)
-
-        if self.pickup:
-            f,args = self.pickup_task
-            f(args)
+        self.end_effector_obj.update(dt)
         pass
 
     def set_base(self,base):
@@ -68,7 +65,7 @@ class Robot(ActiveObject):
                         node_mimic = node_mimics[0]
                         mimic_name = node_mimic.getAttribute('joint')
                         joint_name = joint.getAttribute('name')
-                        multiplier =  node_mimic.getAttribute('multiplier')
+                        multiplier = int(node_mimic.getAttribute('multiplier'))
                         offset = node_mimic.getAttribute('offset')
                         gears.append((mimic_name,joint_name,multiplier))
 
@@ -76,8 +73,9 @@ class Robot(ActiveObject):
             f.write(node_robot.toxml())
 
         if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuyher(self.rot),useFixedBase=True)
+        self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
         f.close()
+
 
         if ee_kind == 'Gripper': self.end_effector_obj = Gripper(self.id,gears)
         else: self.end_effector_obj = Suction(self.id)
@@ -132,7 +130,7 @@ class Robot(ActiveObject):
             o_pos,e_pos = np.array(o_pos),np.array(e_pos)
 
             distance = abs(np.linalg.norm(o_pos - e_pos))
-            return o_pos[2] * 10 + distance
+            return o_pos[2] * 10 - distance
 
         o = max(objs,key=key)
         o_pos,o_rot = o
@@ -203,42 +201,8 @@ class Robot(ActiveObject):
         pass
     
     def signal_do(self,**kwargs):
-        if kwargs['pickup']:
-            num_joints = p.getNumJoints(self.id)
-            ee_index = num_joints-1
-            ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            radius = 0.01
-            axis_z = Rotation.from_quat(ee_orn).apply(np.array([0,0,-radius])) + ee_pos
-            rayInfo = p.rayTest(ee_pos, axis_z)
-            p.addUserDebugLine(ee_pos,axis_z,[0,1,0],2,lifeTime=1)
-
-            if rayInfo: 
-                self.pickup = kwargs['pickup']
-                o_id,linkindex,fraction,o_pos,norm = rayInfo[0]
-                
-                def task(o_id):
-                    o_pos = p.getBasePositionAndOrientation(o_id)[0]
-                    ee_pos,_,_,_,_,_ = p.getLinkState(self.id,ee_index)
-                    ee_pos,o_pos = np.array(ee_pos),np.array(o_pos)
-                    direction = ee_pos - o_pos
-                    direction = direction / np.linalg.norm(direction)
-                    p.applyExternalForce(o_id,-1,direction * 9.81 ,o_pos,p.WORLD_FRAME)
-                    pass
-
-                if o_id == -1:
-                    self.pickup = False
-                else:
-                    self.pickup_task = (task,(o_id))
-                    self.pickup = True
-            else:
-                self.pickup = False
-            # self.end_effector_obj.pickup(pickup)
-        else:
-            self.pickup = False
-            self.pickup_task = None
-
-        def output(): 
-            self.result = None,
+        self.end_effector_obj.do(kwargs['pickup'])
+        def output(): self.result = None,
         self.actions.append((output,()))
         pass
 
