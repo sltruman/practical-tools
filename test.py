@@ -1,20 +1,11 @@
-import pybullet_data as pd
-import pybullet as p
 import numpy as np
 from scipy.spatial.transform import Rotation
-import time
-import asyncio
-import random
-from py3dbp import Bin,Item,Packer
 
-p.connect(p.GUI)
-p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
-p.setAdditionalSearchPath(pd.getDataPath())
-p.setGravity(0, 0, -9.81)
-p.setRealTimeSimulation(1)
+a = Rotation.from_euler('xyz',[0,0,0])
+b = Rotation.from_euler('xyz',[1.57,0,0])
 
-floor = p.loadURDF("plane.urdf", [0, 0, 0], useFixedBase=True)
+c = a * b
+print(c.as_euler("xyz"))
 
-conveyor_forward1 = p.loadURDF("/home/truman/Desktop/digital-twin/data/end_effectors/gripper/gripper.urdf")
-
-input()
+# c=np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b)) #旋转弧度
+# print(c)

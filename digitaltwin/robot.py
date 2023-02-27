@@ -12,7 +12,6 @@ class Robot(ActiveObject):
     def __init__(self,scene,**kwargs):
         self.reset_joint_poses = kwargs['reset_joint_poses']
         self.joint_damping = kwargs['joint_damping']
-        self.pick_pose = kwargs['pick_pose']
         self.end_effector = kwargs['end_effector']
         super().__init__(scene, **kwargs)
         self.pickup = False
@@ -76,7 +75,6 @@ class Robot(ActiveObject):
         self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
         f.close()
 
-
         if ee_kind == 'Gripper': self.end_effector_obj = Gripper(self.id,gears)
         else: self.end_effector_obj = Suction(self.id)
 
@@ -86,7 +84,15 @@ class Robot(ActiveObject):
             if (jointType == p.JOINT_REVOLUTE):
                 p.resetJointState(self.id, j, self.reset_joint_poses[j])
                 i+=1
-        
+         
+        num_joints = p.getNumJoints(self.id)
+        pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        axis_x = Rotation.from_quat(orn).apply(np.array([0.05,0,0])) + pos
+        axis_y = Rotation.from_quat(orn).apply(np.array([0,0.05,0])) + pos
+        axis_z = Rotation.from_quat(orn).apply(np.array([0,0,0.05])) + pos
+        p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0)
+        p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0)
+        p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0)
         return self.id
 
     def set_end_effector(self,base):        
@@ -98,6 +104,7 @@ class Robot(ActiveObject):
         pass
 
     def plan(self,origin,target,rot,dt=1):
+        p.removeAllUserDebugItems()
         ee_pos = origin
         o_pos,o_rot = target,rot
 
@@ -121,7 +128,8 @@ class Robot(ActiveObject):
                 points.append((np.array(ee_pos),np.array(o_rot)))
         return points
 
-    def signal_pick_plan(self,camera,objs):
+    def signal_pick_plan(self,*args,**kwargs):
+        camera,objs = args,
         c_pos,c_rot,fov,focal,d_piexls,pixels = camera
 
         def key(o):
@@ -136,8 +144,12 @@ class Robot(ActiveObject):
         o_pos,o_rot = o
         o_pos = np.array(o_pos)
         
-        pick_pos,pick_rot = self.pick_pose['pos'],self.pick_pose['rot']
-        pick_rot = Rotation.from_euler("xyz",o_rot).apply(Rotation.from_euler("xyz",pick_rot).as_rotvec())
+
+        for pick_pose in kwargs['pick_poses']:
+            pick_pos,pick_rot = pick_pose['pos'],pick_pose['rot']
+
+        pick_rot = Rotation.from_euler("xyz",o_rot) * Rotation.from_euler("xyz",pick_rot)
+        pick_rot = pick_rot.as_euler('xyz')
 
         num_joints = p.getNumJoints(self.id)
         ee_index = num_joints-1
@@ -151,16 +163,10 @@ class Robot(ActiveObject):
 
     def signal_move(self,*args,**kwargs):
         def task(ee_pos,ee_rot):
-            pandaNumDofs = len(self.reset_joint_poses)
-            ll = [-7]*pandaNumDofs
-            #upper limits for null space (todo: set them to proper range)
-            ul = [7]*pandaNumDofs
-            #joint ranges for null space (todo: set them to proper range)
-            jr = [7]*pandaNumDofs
-            ee_orn = p.getQuaternionFromEuler(ee_rot)
             num_joints = p.getNumJoints(self.id)
             ee_index = num_joints-1
-            poses = p.calculateInverseKinematics(self.id, ee_index, ee_pos, ee_orn,lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,jointDamping=self.joint_damping,maxNumIterations=20)
+            ee_orn = p.getQuaternionFromEuler(ee_rot)
+            poses = p.calculateInverseKinematics(self.id, ee_index, ee_pos, ee_orn,jointDamping=self.joint_damping,maxNumIterations=20)
             i = 0
             for j in range(num_joints):
                 ji = p.getJointInfo(self.id, j)
@@ -173,9 +179,9 @@ class Robot(ActiveObject):
             axis_x = Rotation.from_quat(orn).apply(np.array([0.05,0,0])) + pos
             axis_y = Rotation.from_quat(orn).apply(np.array([0,0.05,0])) + pos
             axis_z = Rotation.from_quat(orn).apply(np.array([0,0,0.05])) + pos
-            # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=5)
-            # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=5)
-            # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=5)
+            p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=5)
+            p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=5)
+            p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=5)
 
         num_joints = p.getNumJoints(self.id)
         ee_index = num_joints-1
