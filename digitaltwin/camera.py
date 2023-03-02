@@ -80,7 +80,6 @@ class Camera3D(ActiveObject):
         import numpy as np
         num_joints = p.getNumJoints(self.id)
         pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
-        pitch,roll,yaw = p.getEulerFromQuaternion(orn)
 
         near = self.forcal
         far = 1000
@@ -106,8 +105,8 @@ class Camera3D(ActiveObject):
                     p.addUserDebugLine(origin, target,[1,0,0],1,lifeTime=0.1)
                     rayInfo = p.rayTest(origin, target)
                     if not rayInfo: return
-                    
                     id,linkindex,fraction,pos,norm = rayInfo[0]
+                    if id in self.scene.active_objs: return
                     ids.add(id)
 
                 self.actions.append((ray, (origin,target + dr)))
@@ -134,21 +133,16 @@ class Camera3D(ActiveObject):
 
                 pos,orn = p.getBasePositionAndOrientation(id)
                 rot = p.getEulerFromQuaternion(orn)
-                # mesh = p.getMeshData(id,flags=p.MESH_DATA_SIMULATION_MESH)
+                mesh = None#p.getMeshData(id,flags=p.MESH_DATA_SIMULATION_MESH)
                 
                 axis_x = Rotation.from_quat(orn).apply(np.array([length,0,0])) + pos
                 axis_y = Rotation.from_quat(orn).apply(np.array([0,length,0])) + pos
                 axis_z = Rotation.from_quat(orn).apply(np.array([0,0,length])) + pos
-                p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=5)
-                p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=5)
-                p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=5)
-
-                val.append((pos,rot))
-            
-            vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch,180 / np.pi * roll,2)
-            pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
-            _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
-            self.result = (None,(self.pos,self.rot,self.fov,self.forcal,depth_pixels,pixels),val) if val else ('Nothing was recognized',)
+                # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
+                # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
+                # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
+                val.append((pos,rot,None))
+            self.result = (None,val) if val else ('Nothing was recognized',)
             
         self.actions.append((output, ()))
         pass

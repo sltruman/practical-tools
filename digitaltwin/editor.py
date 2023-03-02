@@ -56,11 +56,12 @@ class Editor:
         if id not in self.scene.active_objs: return dict(name='',id=-1,pos=pos)
         return dict(name=self.scene.active_objs[id].name,id=id,pos=pos)
         
-    def move(self,id,pos : tuple[int,int,int]):
+    def move(self,name,pos : tuple[int,int,int]):
+        self.scene.active_objs_by_name[name].properties()
         pass
 
-    def select(self,id)->dict:
-        return self.scene.active_objs[id].properties()
+    def select(self,name)->dict:
+        return self.scene.active_objs_by_name[name].properties()
 
     def add(self):
         pass

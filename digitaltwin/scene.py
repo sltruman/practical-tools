@@ -16,8 +16,8 @@ class Scene:
     
     self.id = p.connect(p.GUI,options=f'--width={width} --height={height} --headless')
     p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
+    p.setPhysicsEngineParameter(erp=1,contactERP=1,frictionERP=1)
     self.reset()
-
 
   def __del__(self):
     self.play(False)
@@ -49,7 +49,6 @@ class Scene:
     from digitaltwin import Robot,Camera3D,Placer,Stacker
         
     for object_info in scene_info['active_objects']:
-      print(object_info)
       kind = object_info['kind']
 
       active_obj = None
@@ -73,7 +72,6 @@ class Scene:
         obj.update(self.timestep)
       
       p.stepSimulation()
-      
       dt -= self.timestep
 
   def update(self):

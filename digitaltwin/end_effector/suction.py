@@ -22,7 +22,7 @@ class Suction:
             radius = 0.01
             axis_z = Rotation.from_quat(ee_orn).apply(np.array([0,0,-radius])) + ee_pos
             rayInfo = p.rayTest(ee_pos, axis_z)
-            p.addUserDebugLine(ee_pos,axis_z,[0,1,0],2,lifeTime=1)
+            p.addUserDebugLine(ee_pos,axis_z,[0,1,0],4,lifeTime=1)
 
             if rayInfo: 
                 o_id,linkindex,fraction,o_pos,norm = rayInfo[0]

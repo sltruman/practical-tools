@@ -10,33 +10,33 @@
 
 # 2 工作计划
 
-| 目标   | 任务     | 问题                | 备注     |
-| ---- | ------ | ----------------- | ------ |
-| 接口定义 | 场景查看   | 载入/重置             |        |
-|      |        | 获取物体标识            |        |
-|      |        | 获取场景画面            |        |
-|      |        | 暂停/继续仿真           |        |
-|      |        | 平移/旋转/缩放/焦点       |        |
-|      |        | 视图切换              |        |
-|      |        | 点云/抓取点/轨迹/碰撞高亮    | 实现时间太长 |
-|      |        |                   |        |
-|      | 场景编辑   | 坐标检测              |        |
-|      |        | 选择/添加/移动/旋转/缩放/删除 |        |
-|      |        | 保存                |        |
-|      |        |                   |        |
-|      | 物体     | 属性                |        |
-|      |        | 模型更换              |        |
-|      | 物体.机械臂 | 抓手更换              |        |
-|      |        | 拾取姿态              |        |
-|      | 物体.相机  | 获取相机画面            |        |
-|      | 物体.码垛器 | 区域参数              |        |
-|      |        | 工件更换              |        |
-|      | 物体.放置器 | 区域参数              |        |
-|      |        | 工件更换              |        |
-|      | 工作流    | 获取可用节点            |        |
-|      |        | 设置/获取             |        |
-|      |        | 启动/停止             |        |
-|      |        |                   |        |
+| 目标   | 任务     | 问题                   | 备注     |
+| ---- | ------ | -------------------- | ------ |
+| 接口定义 | 场景查看   | 载入/重置                |        |
+|      |        | 获取物体标识               |        |
+|      |        | 获取场景画面               |        |
+|      |        | 暂停/继续仿真              |        |
+|      |        | 平移/旋转/缩放/焦点          |        |
+|      |        | 视图切换-上下左右            |        |
+|      |        | 点云/抓取点/轨迹/碰撞高亮       | 实现较为复杂 |
+|      |        |                      |        |
+|      | 场景编辑   | 坐标检测                 |        |
+|      |        | 选择/添加/移动/旋转/缩放/删除/保存 |        |
+|      |        |                      |        |
+|      | 物体     | 位置/姿态                |        |
+|      |        | 标识                   |        |
+|      |        | 模型更换                 |        |
+|      | 物体.机械臂 | 抓手更换                 |        |
+|      |        | 拾取姿态                 |        |
+|      | 物体.相机  | 获取相机画面               |        |
+|      | 物体.码垛器 | 区域参数                 |        |
+|      |        | 工件更换                 |        |
+|      | 物体.放置器 | 区域参数                 |        |
+|      |        | 工件更换                 |        |
+|      | 工作流    | 获取可用节点               |        |
+|      |        | 设置/获取                |        |
+|      |        | 启动/停止                |        |
+|      |        |                      |        |
 
 # 3 业务流程
 
@@ -177,6 +177,10 @@ sequenceDiagram
     end
     ui->ui: 显示物体属性
 ```
+
+## 3.5 场景-保存
+
+        当对场景进行了编辑之后，调用此函数来进行保存。
 
 ## 3.5 物体-更换模型
 
@@ -337,23 +341,24 @@ workflow={
 flowchart TB
     start([开始])
     finish([结束])
-    stacker.generate[堆垛器.生成]
+    stacker.generate[放置器.生成]
     camera.pose_recognize[相机.姿态估计]
-    robot.pick_plan["机器人.路径规划\n(物体,机械臂位置:姿态)"]
-    robot.move1["机器人.移动\n(相对移动,位置偏移)"]
-    robot.move2["机器人.移动\n(绝对移动,位置)"]
-    robot.pick[机器人.拾取]
-    robot.place[机器人.放置]
+    robot.pick_plan["机器人.PlanAlgo路径规划\n(物体,抓取姿态,机械臂位置:姿态)"]
+    robot.move1["机器人.规划移动\n"]
+    robot.move2["机器人.相对移动\n(位置)"]
+    robot.move3["机器人.绝对移动\n(位置)"]
+    robot.pick["机器人.拾取"]
+    robot.place["机器人.放置"]
     robot.home[机器人.休息点]
     start-->stacker.generate
 
     stacker.generate-->camera.pose_recognize
     camera.pose_recognize--"物体[位置,姿态,网格数据]\n"-->robot.pick_plan
-    robot.pick_plan--"路径[末端位置:姿态,...N]"-->robot.pick
-    robot.pick-->robot.move1-->robot.move2-->robot.place
-    robot.place-->camera.pose_recognize
+    robot.pick_plan--"路径[末端位置:姿态,...N]"-->robot.move1-->robot.pick
+    robot.pick-->robot.move2-->robot.move3-->robot.place
+    robot.place-->robot.home-->camera.pose_recognize
 
-    camera.pose_recognize--没有识别到物体-->robot.home-->finish
+    camera.pose_recognize--没有识别到物体-->finish
 ```
 
 ```python
@@ -386,21 +391,22 @@ flowchart TB
     finish([结束])
     stacker.generate[放置器.生成]
     camera.pose_recognize[相机.姿态估计]
-    robot.pick_plan["机器人.PlanAlgo路径规划\n(物体,机械臂位置:姿态)"]
-    robot.move1["机器人.移动\n(相对移动,位置偏移)"]
-    robot.move2["机器人.移动\n(绝对移动,位置)"]
-    robot.pick[机器人.拾取]
-    robot.place[机器人.放置]
+    robot.pick_plan["机器人.PlanAlgo路径规划\n(物体,抓取姿态,机械臂位置:姿态)"]
+    robot.move1["机器人.规划移动\n"]
+    robot.move2["机器人.相对移动\n(位置)"]
+    robot.move3["机器人.绝对移动\n(位置)"]
+    robot.pick["机器人.拾取"]
+    robot.place["机器人.放置"]
     robot.home[机器人.休息点]
     start-->stacker.generate
 
     stacker.generate-->camera.pose_recognize
     camera.pose_recognize--"物体[位置,姿态,网格数据]\n"-->robot.pick_plan
-    robot.pick_plan--"路径[末端位置:姿态,...N]"-->robot.pick
-    robot.pick-->robot.move1-->robot.move2-->robot.place
-    robot.place-->camera.pose_recognize
+    robot.pick_plan--"路径[末端位置:姿态,...N]"-->robot.move1-->robot.pick
+    robot.pick-->robot.move2-->robot.move3-->robot.place
+    robot.place-->robot.home-->camera.pose_recognize
 
-    camera.pose_recognize--没有识别到物体-->robot.home-->finish
+    camera.pose_recognize--没有识别到物体-->finish
 ```
 
 ## 3.11 工作流-获取活动节点
