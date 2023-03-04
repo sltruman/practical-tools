@@ -89,8 +89,8 @@ class Workflow():
             kind = act['kind']
             name = act['name']
             fun = act['fun']
-            args = act['args']
-
+            args = act['args'] if 'args' in act else {}
+            
             print('signal',fun,args)
             obj = self.scene.active_objs_by_name[name]
             eval(f'obj.signal_{fun}(*val,**args)')

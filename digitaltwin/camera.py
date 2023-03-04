@@ -31,8 +31,8 @@ class Camera3D(ActiveObject):
         lower_left_corner = [0, near, 0] - horizontal/2 - vertical/2
 
         depth_far = near
-        sample_rate = 5
-        for j in range(sample_rate-1,0,-1):
+        sample_rate = 2
+        for j in range(sample_rate):
             for i in range(sample_rate):
                 u = float(i) / (sample_rate-1)
                 v = float(j) / (sample_rate-1)
@@ -72,7 +72,9 @@ class Camera3D(ActiveObject):
         self.actions.remove(act)
 
     def signal_capture(self,*args):
-        def output(): self.result = (None,) + self.rtt()
+        def output(): 
+            self.result = (None,) + self.rtt()
+
         self.actions.append((output, ()))
         pass
 

@@ -13,7 +13,7 @@ class Placer(ActiveObject):
         self.center = kwargs['center']
         self.interval = kwargs['interval']
         self.amount = kwargs['amount']
-        self.workpiece_texture = kwargs['workpiece_texture']
+        # self.workpiece_texture = kwargs['workpiece_texture']
         self.elapsed = 0
 
     def properties(self):
