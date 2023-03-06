@@ -64,8 +64,9 @@ class Camera3D(ActiveObject):
                 v = far * near / (far - (far - near) * depth_pixels[h, w]) / depth_far * 255
                 depth_img[h, w] = [v,v,v]
 
-        import cv2
-        cv2.imwrite(self.image_path,depth_img)
+        if self.image_path:
+            import cv2
+            cv2.imwrite(self.image_path,depth_img)
         return pixels.tobytes(),depth_img.tobytes()
 
     def signal_capture(self,*args):
@@ -141,9 +142,7 @@ class Camera3D(ActiveObject):
                 p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0)
                 p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0)
                 val.append((pos,rot,None))
-            
             self.result = (None,val) if val else ('failed',)
-            
         self.actions.append((output, ()))
         pass
     

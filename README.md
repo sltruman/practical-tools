@@ -516,7 +516,73 @@ flowchart TB
 ```
 
 ```python
+{
+    "active_objects": [
+        {
+            "kind":"Robot",
+            "name":"robot",
+            "base":"./data/robots/ur5/ur5.urdf",
+            "pos":[0,0.1,0],
+            "rot":[0,0,3.14],
+            "reset_joint_poses":[-1.57,0.0,-0.3925,-0.785,1.57,0],
+            "joint_damping":[ 0, 1, 0.9, 0.8, 0.7, 0.0],
+            "end_effector":"./data/end_effectors/gripper/gripper.urdf"
+        },
+        {
+            "kind":"Placer",
+            "name":"placer",
+            "base":"./data/objects/tray/traybox.urdf",
+            "pos":[0,-0.5,0.001],
+            "rot":[0,0,0], 
+            "center":[0.0,-0.5,0.25],
+            "interval":0.1,
+            "amount":10,
+            "workpiece":"./data/workpieces/suction/suction.urdf",
+            "workpiece_texture":""
+        }, 
+        {
+            "kind":"Camera3D",
+            "name":"camera",
+            "base":"./data/cameras/camera3d.urdf",
+            "pos":[-0.5,-0.5,0.0],
+            "rot":[0.0,0.0,-1.57],
+            "fov": 20,
+            "forcal": 0.01,
+            "sample_rate": 20, 
+            "image_size": [300,300],
+            "image_path":"./guagua.png"
+        }
+    ],
 
+    "workflow":{
+        "run":"1",
+        "declare":{
+            "1":{"kind":"Placer","fun":"generate","name":"placer", "next":"2"},
+            "2":{
+                "kind":"Camera3D","fun":"pose_recognize","name":"camera", "next":"3",
+                "alt":[{"next":"7","err": "failed"}]
+            },
+            "3":{"kind":"Robot","fun":"pick_plan","name":"robot","args":{
+                "pick_poses":[
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,0]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-0.785]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-1.57]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-2.355]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-3.14]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,2.355]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,1.57]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,0.785]}
+                ]
+            },"next":"4"},
+            "4":{"kind":"Robot","fun":"plan_move","name":"robot","next":"5"},
+            "5":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup":true},"next":"6"},
+            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.35},"next":"7"},
+            "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.3,"y":0.1,"z":0.3},"next":"8"},
+            "8":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": false},"next":"9"},
+            "9":{"kind":"Robot","fun":"home","name":"robot","next":"2"}
+        }
+    }
+}
 ```
 
 ## 3.11 工作流-获取活动节点

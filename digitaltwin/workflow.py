@@ -24,32 +24,32 @@ class Workflow():
                         dict(name="x",kind="Float"),
                         dict(name="y",kind="Float"),
                         dict(name="z",kind="Float"),
-                        dict(name="rx",kind="float"),
+                        dict(name="rx",kind="Float"),
                         dict(name="ry",kind="float"),
-                        dict(name="rz",kind="float"),
+                        dict(name="rz",kind="Float"),
                     ]),
                     dict(f='move',errs=[],args=[
                         dict(name="x",kind="Float"),
                         dict(name="y",kind="Float"),
                         dict(name="z",kind="Float"),
-                        dict(name="rx",kind="float"),
-                        dict(name="ry",kind="float"),
-                        dict(name="rz",kind="float"),
+                        dict(name="rx",kind="Float"),
+                        dict(name="ry",kind="Float"),
+                        dict(name="rz",kind="Float"),
                     ]),
                     dict(f='move_relatively',errs=[],args=[
                         dict(name="x",kind="Float"),
                         dict(name="y",kind="Float"),
                         dict(name="z",kind="Float"),
-                        dict(name="rx",kind="float"),
-                        dict(name="ry",kind="float"),
-                        dict(name="rz",kind="float"),
+                        dict(name="rx",kind="Float"),
+                        dict(name="ry",kind="Float"),
+                        dict(name="rz",kind="Float"),
                         ]),
                     dict(f='do',errs=[],args=[
                         dict(name='pickup',kind='Bool')]),
                 ],names=[]),
             dict(kind='Camera3D',funs=[
-                    dict(f='capture',errs=[],args=[]),
-                    dict(f='pose_recognize',errs=[],args=[])
+                    dict(f='capture',errs=["failed"],args=[]),
+                    dict(f='pose_recognize',errs=["failed"],args=[])
                 ],names=[]),
             dict(kind='Placer',funs=[
                     dict(f='generate',errs=["failed"],args=[])

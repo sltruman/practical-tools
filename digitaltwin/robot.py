@@ -145,13 +145,13 @@ class Robot(ActiveObject):
 
     def signal_pick_plan(self,*args,**kwargs):
         objs, = args
-        def nearest_obj(o):
+        def near_obj(o):
             e_pos,e_orn,_,_,_,_ = p.getLinkState(self.id,p.getNumJoints(self.id)-1)
             o_pos,e_pos = np.array(o[0]),np.array(e_pos)
             distance = abs(np.linalg.norm(o_pos - e_pos))
             return o_pos[2] * 100 - distance
         
-        o_pos,o_rot,o_mesh = max(objs,key=nearest_obj)
+        o_pos,o_rot,o_mesh = max(objs,key=near_obj)
         o_pos = np.array(o_pos)
         o_r = Rotation.from_euler("xyz",o_rot)
 
