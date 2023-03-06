@@ -19,7 +19,7 @@
 |                   |        | 平移/旋转/缩放/焦点            |                             |
 |                   |        | 视图切换-上下左右              |                             |
 |                   |        | 点云/抓取点/轨迹/碰撞高亮         | 实现较为复杂                      |
-|                   |        | 关闭场景                   | 在前端窗口无法正确析构                 |
+|                   |        | 关闭场景                   | 前端窗口无法正确析构                  |
 |                   | 场景编辑   | 坐标检测                   |                             |
 |                   |        | 选择/添加/移动/旋转/缩放/删除/保存   |                             |
 |                   |        |                        |                             |
@@ -67,26 +67,29 @@ scene_profile = {
             "base":"./data/robots/ur5.urdf",
             "pos":[0,0,0],
             "rot":[0,0,1.57],
-            "end_effector":"./data/end_effectors/magnet.urdf"+
+            "end_effector":"./data/end_effectors/magnet.urdf"
         },
         {
-            "kind":"Packer",
-            "name":"packer",
-            "base":"./data/pybullet_objects/tray/traybox.urdf",
+            "kind":"Placer",
+            "name":"placer",
+            "base":"./data/objects/tray/traybox.urdf",
             "pos":[0,-0.5,0.001],
             "rot":[0,0,0],
-            "size":[0.0,-0.5,0.5],
-            "workpiece":"./data/pybullet_objects/lego/lego.urdf"
+            "center":[0.0,-0.5,0.25],
+            "interval":0.1,
+            "amount":30,
+            "workpiece":"./data/workpieces/lego/lego.urdf"
         }, 
         {
             "kind":"Camera3D",
             "name":"camera",
-            "base":"./data/objects/camera3d.urdf",
-            "pos":[-0.492021,-0.593407,0.0],
+            "base":"./data/cameras/camera3d.urdf",
+            "pos":[-0.5,-0.5,0.0],
             "rot":[0.0,0.0,-1.57],
-            "image_size": [300,300],
             "fov": 45,
-            "forcal": 0.01
+            "forcal": 0.01,
+            "image_size": [300,300],
+            "image_path":"./guagua.png"
         }
     ],
 
@@ -304,17 +307,41 @@ flowchart LR
 ```
 
 ```python
-# 格式：json
-workflow={
-    "run":"1",
-    "declare":{
-        "1":{"kind":"Placer","fun":"generate","name":"placer","next":"2"},
-        "2":{"kind":"Camera","fun":"capture","name":"camera"}
+scene_profile = {
+    "active_objects": [{
+            "kind":"Placer",
+            "name":"placer",
+            "base":"./data/objects/tray/traybox.urdf",
+            "pos":[0,-0.5,0.001],
+            "rot":[0,0,0],
+            "center":[0.0,-0.5,0.25],
+            "interval":0.1,
+            "amount":30,
+            "workpiece":"./data/workpieces/lego/lego.urdf"
+        },{
+            "kind":"Camera3D",
+            "name":"camera",
+            "base":"./data/cameras/camera3d.urdf",
+            "pos":[-0.5,-0.5,0.0],
+            "rot":[0.0,0.0,-1.57],
+            "fov": 45,
+            "forcal": 0.01,
+            "image_size": [300,300],
+            "image_path":"./guagua.png"
+        }
+    ],
+
+    "workflow":{
+        "run":"1",
+        "declare":{
+            "1":{"kind":"Packer","fun":"generate","name":"placer","next":"2"},
+            "2":{"kind":"Camera","fun":"capture","name":"camera"}
+        }
     }
 }
 ```
 
-        节点有时因为一些限制参数会返回失败，为应对于不同情况，可以采用分支来进行控制。假设工件生成成功，就拍照，否则对工件进行姿态估计，如下：
+        节点有时因为一些限制参数会返回失败，为应对于不同情况，可以采用分支来进行控制。假设工件生成成功，就进行姿态估计，否则就拍照，如下：
 
 ```mermaid
 flowchart LR
@@ -324,25 +351,50 @@ flowchart LR
     camera.capture[相机.拍照]
     camera.pose_recognize[相机.姿态估计]
     start-->palcer.generate
-    palcer.generate--条件 真-->camera.capture-->finish
-
-    palcer.generate--条件 假-->camera.pose_recognize
-    camera.pose_recognize-->finish
+    palcer.generate-->camera.pose_recognize
+    camera.pose_recognize--成功-->finish
+    camera.pose_recognize--失败-->camera.capture-->finish
 ```
 
 ```python
-# 格式：json
-workflow={
-    "run":"1",
-    "declare":{
-        "1":{
-            "kind":"Placer","fun":"generate","name":"placer","next":"2"
-            "alt":[
-                 {"next":"3","err":"failed"}
-            ]
-        },
-        "2":{"kind":"Camera","fun":"capture","name":"camera"},
-        "3":{"kind":"Camera","fun":"pose_recognize","name":"camera"}
+scene_profile = {
+    "active_objects": [
+        {
+            "kind":"Placer",
+            "name":"placer",
+            "base":"./data/objects/tray/traybox.urdf",
+            "pos":[0,-0.5,0.001],
+            "rot":[0,0,0],
+            "center":[0.0,-0.5,0.25],
+            "interval":0.1,
+            "amount":10,
+            "workpiece":"./data/workpieces/lego/lego.urdf"
+        }, 
+        {
+            "kind":"Camera3D",
+            "name":"camera",
+            "base":"./data/cameras/camera3d.urdf",
+            "pos":[-0.5,-0.5,0.0],
+            "rot":[0.0,0.0,-1.57],
+            "fov": 20,
+            "forcal": 0.01,
+            "sample_rate": 20, 
+            "image_size": [300,300],
+            "image_path":"./guagua.png"
+        }
+    ],
+
+    "workflow":{
+        "run":"1",
+        "declare":{
+            "1":{"kind":"Placer","fun":"generate","name":"placer","next":"2"},
+            "2":{"kind":"Camera","fun":"pose_recognize","name":"camera",
+                "alt":[
+                    {"next":"3","err":"failed"}
+                ]
+            },
+            "3":{"kind":"Camera","fun":"capture","name":"camera"}
+        }
     }
 }
 ```
@@ -376,21 +428,63 @@ flowchart TB
 ```python
 # 格式：json
 workflow={
-    "run":"1",
-    "declare":{
-        "1":{"kind":"Packer","fun":"generate","name":"packer", "next":"2","args":{}},
-        "2":{
-            "kind":"Camera3D","fun":"pose_recognize","name":"camera", "next":"3","args":{},
-            "alt":[
-                {"next":"7","err": "failed"}
-            ]
+    "active_objects": [
+        {
+            "kind":"Robot",
+            "name":"robot",
+            "base":"./data/robots/ur5/ur5.urdf",
+            "pos":[0,0,0],
+            "rot":[0,0,3.14],
+            "reset_joint_poses":[-1.57,0.0,-0.3925,-0.785,1.57,0],
+            "joint_damping":[ 0, 1, 0.9, 0.8, 0.7, 0.0],
+            "end_effector":"./data/end_effectors/suction/suction.urdf"
         },
-        "3":{"kind":"Robot","fun":"pick_plan","name":"robot","next":"4","args":{}},
-        "4":{"kind":"Robot","fun":"move","name":"robot","next":"5","args":{"mode":"plan"}},
-        "5":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": true},"next":"6"},
-        "6":{"kind":"Robot","fun":"move","name":"robot","args":{"mode":"relative","pos":[0.0,0.0,0.1]},"next":"7"},
-        "7":{"kind":"Robot","fun":"move","name":"robot","args":{"mode":"absolute","pos":[0.5,0.0,0.5]},"next":"8"},  
-        "8":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": false},"next":"2"}
+        {
+            "kind":"Stacker",
+            "name":"stacker",
+            "base":"./data/objects/tray/traybox.urdf",
+            "pos":[0,-0.52,0.01],
+            "rot":[0,0,0],
+            "area":[0.3,0.3,0.3],
+            "box_size":[0.1,0.1,0.05],
+            "random_factor":[0.2,0.2,0.0]
+        }, 
+        {
+            "kind":"Camera3D",
+            "name":"camera",
+            "base":"./data/cameras/camera3d.urdf",
+            "pos":[-0.5,-0.52,0.0],
+            "rot":[0.0,0.0,-1.57],
+            "fov": 20,
+            "forcal": 0.01,
+            "sample_rate": 20, 
+            "image_size": [300,300],
+            "image_path":"./guagua.png"
+        }
+    ],
+
+    "workflow": {
+        "run":"1",
+        "declare":{
+            "1":{"kind":"Stacker","fun":"generate","name":"stacker", "next":"2"},
+            "2":{
+                "kind":"Camera3D","fun":"pose_recognize","name":"camera", "next":"3",
+                "alt":[
+                    {"next":"7","err": "failed"}
+                ]
+            },
+            "3":{"kind":"Robot","fun":"pick_plan","name":"robot","next":"4","args":{
+                "pick_poses":[
+                    {"pos":[0.0,0.0,0.024],"rot":[0,0,0]}
+                ]
+            }},
+            "4":{"kind":"Robot","fun":"plan_move","name":"robot","next":"5"},
+            "5":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": true},"next":"6"},
+            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.1},"next":"7"},
+            "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.5,"y":0.0,"z":0.5},"next":"8"},  
+            "8":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": false},"next":"9"},
+            "9":{"kind":"Robot","fun":"home","name":"robot","next":"2"}
+        }
     }
 }
 ```
@@ -419,6 +513,10 @@ flowchart TB
     robot.place-->robot.home-->camera.pose_recognize
 
     camera.pose_recognize--没有识别到物体-->finish
+```
+
+```python
+
 ```
 
 ## 3.11 工作流-获取活动节点

@@ -8,6 +8,8 @@ class Camera3D(ActiveObject):
         self.image_size = kwargs['image_size']
         self.forcal = kwargs['forcal']
         self.fov = kwargs['fov']
+        self.image_path = kwargs['image_path']
+        self.sample_rate = kwargs['sample_rate']
         pass
     
     def properties(self):
@@ -47,9 +49,8 @@ class Camera3D(ActiveObject):
                 if not rayInfo: continue
                 
                 id,linkindex,fraction,pos,norm = rayInfo[0]
-                distance = np.linalg.norm(pos - origin)
+                distance = np.linalg.norm(pos - origin) 
                 if depth_far < distance: depth_far = distance
-        depth_far -= near
 
         vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch,180 / np.pi * roll,2)
         pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
@@ -63,13 +64,9 @@ class Camera3D(ActiveObject):
                 v = far * near / (far - (far - near) * depth_pixels[h, w]) / depth_far * 255
                 depth_img[h, w] = [v,v,v]
 
+        import cv2
+        cv2.imwrite(self.image_path,depth_img)
         return pixels.tobytes(),depth_img.tobytes()
-
-    def update(self,dt):
-        if not self.actions: return
-        fun,args = act = self.actions[0]
-        fun(*args)
-        self.actions.remove(act)
 
     def signal_capture(self,*args):
         def output(): 
@@ -93,22 +90,32 @@ class Camera3D(ActiveObject):
         lower_left_corner = [0, near, 0] - horizontal/2 - vertical/2
         ids = set()
 
-        for j in range(self.image_size[1]-1,0,-1):
-            for i in range(self.image_size[0]):
-                u = float(i) / (self.image_size[0]-1)
-                v = float(j) / (self.image_size[1]-1)
+        sample_rate = 2
+        for j in range(sample_rate):
+            for i in range(sample_rate):
+                u = float(i) / (sample_rate-1)
+                v = float(j) / (sample_rate-1)
+                target = lower_left_corner + u*horizontal + v*vertical
+                target = origin + Rotation.from_quat(orn).apply(target)
+                l = np.linalg.norm(target - origin)
+                dr = (target - origin) / l * far
+                p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=1)
+
+        for j in range(self.sample_rate-1,0,-1):
+            for i in range(self.sample_rate):
+                u = float(i) / (self.sample_rate-1)
+                v = float(j) / (self.sample_rate-1)
                 target = lower_left_corner + u*horizontal + v*vertical
                 target = origin + Rotation.from_quat(orn).apply(target)
                 
                 l = np.linalg.norm(target - origin)
                 dr = (target - origin) / l * far
-
+                
                 def ray(origin,target):
-                    p.addUserDebugLine(origin, target,[1,0,0],1,lifeTime=0.1)
                     rayInfo = p.rayTest(origin, target)
                     if not rayInfo: return
                     id,linkindex,fraction,pos,norm = rayInfo[0]
-                    if id in self.scene.active_objs: return
+                    if id in self.scene.active_objs or id == 0: return
                     ids.add(id)
 
                 self.actions.append((ray, (origin,target + dr)))
@@ -116,22 +123,12 @@ class Camera3D(ActiveObject):
         def output():
             val = list()
             p.removeAllUserDebugItems()
-            
-            avg_length = 0
-            for id in ids:
-                min,max = p.getAABB(id)
-                min,max = np.array(min),np.array(max)
-                center = (max - min)
-                length = np.max(center)
-                avg_length += length
-            avg_length /= len(ids)
 
             for id in ids:
                 min,max = p.getAABB(id)
                 min,max = np.array(min),np.array(max)
                 center = (max - min) / 2 
                 length = np.max(center)
-                if length > avg_length: continue
 
                 pos,orn = p.getBasePositionAndOrientation(id)
                 rot = p.getEulerFromQuaternion(orn)
@@ -140,11 +137,12 @@ class Camera3D(ActiveObject):
                 axis_x = Rotation.from_quat(orn).apply(np.array([length,0,0])) + pos
                 axis_y = Rotation.from_quat(orn).apply(np.array([0,length,0])) + pos
                 axis_z = Rotation.from_quat(orn).apply(np.array([0,0,length])) + pos
-                # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
-                # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
-                # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
+                p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0)
+                p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0)
+                p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0)
                 val.append((pos,rot,None))
-            self.result = (None,val) if val else ('Nothing was recognized',)
+            
+            self.result = (None,val) if val else ('failed',)
             
         self.actions.append((output, ()))
         pass
