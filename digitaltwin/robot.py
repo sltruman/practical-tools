@@ -9,7 +9,7 @@ from .end_effector import Gripper,Suction
 
 class Robot(ActiveObject):
     def __init__(self,scene,**kwargs):
-        self.reset_joint_poses = kwargs['reset_joint_poses']
+        self.current_joint_poses = self.reset_joint_poses = kwargs['reset_joint_poses']
         self.joint_damping = kwargs['joint_damping']
         self.end_effector = kwargs['end_effector']
         super().__init__(scene, **kwargs)
@@ -187,8 +187,15 @@ class Robot(ActiveObject):
         ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
         ee_pos = np.array(ee_pos)
         ee_rot = p.getEulerFromQuaternion(ee_orn)
-        
-        route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
+
+        if 'plugin' in kwargs:
+            # module = kwargs['plugin']
+            # eval(f'import plugins.{module}')
+            import plugins.Planalgo
+            args = (objs,self.pos,self.rot,ee_pos,ee_rot,self.current_joint_poses)
+            route_poses = plugins.Planalgo.plan( (ee_pos,pick_rot), (pick_pos, pick_rot), *args)
+        else:
+            route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
         
         def output(): self.result = None,route_poses
         self.actions.append((output,()))
@@ -199,7 +206,7 @@ class Robot(ActiveObject):
 
         def task(*poses):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
-
+            self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
             axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
@@ -231,6 +238,7 @@ class Robot(ActiveObject):
         
         def task(*poses):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
+            self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
             axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
@@ -260,6 +268,7 @@ class Robot(ActiveObject):
         
         def task(*poses):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
+            self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
             axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos

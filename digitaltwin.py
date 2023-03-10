@@ -17,7 +17,7 @@ else:
     height = sys.argv[3]
     tmp_dir = sys.argv[4]
 
-    if os.path.exists(tmp_dir): shutil.rmtree(tmp_dir)
+    if os.path.exists(tmp_dir): pass#shutil.rmtree(tmp_dir)
     os.makedirs(tmp_dir)
     sock_path = os.path.join(tmp_dir,scene_name + '.sock')
 
@@ -62,15 +62,13 @@ else:
                 buf = b''
             except SyntaxError:
                 traceback.print_exc()
-            except BlockingIOError:
-                pass
+            except BlockingIOError: pass
 
             tick = time() - elapsed
             scene.update_for_tick(tick)
-
+            workflow.update()
             tick = round(tick, 3)
-    except (ConnectionResetError,BrokenPipeError):
-        pass
+    except (ConnectionResetError,BrokenPipeError):pass
     except:
         traceback.print_exc()
         pass
@@ -79,4 +77,4 @@ else:
     del editor
     del scene
     sk.close()
-    if os.path.exists(tmp_dir): shutil.rmtree(tmp_dir)
+    if os.path.exists(tmp_dir): pass#shutil.rmtree(tmp_dir)

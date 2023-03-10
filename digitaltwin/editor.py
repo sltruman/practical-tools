@@ -7,7 +7,7 @@ class Editor:
         self.scene = scene
         pass
         
-    def ray(self,x,y)->tuple[tuple[int,int,int],str]:
+    def ray(self,x,y):
         try:
             width, height, viewMat, projMat, cameraUp, camForward, horizon, vertical, _, _, dist, camTarget = p.getDebugVisualizerCamera()
             mouseX,mouseY = x*width,y*height
@@ -56,7 +56,7 @@ class Editor:
         if id not in self.scene.active_objs: return dict(name='',id=-1,pos=pos)
         return dict(name=self.scene.active_objs[id].name,id=id,pos=pos)
         
-    def move(self,name,pos : tuple[int,int,int]):
+    def move(self,name,pos):
         self.scene.active_objs_by_name[name].properties()
         pass
 

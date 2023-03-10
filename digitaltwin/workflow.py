@@ -8,9 +8,13 @@ class Workflow():
     def __init__(self,scene: Scene):
         self.scene = scene
         self.running = False
-        self.task = None
+        self.actions = list()
         pass
     
+    def update(self):
+
+        pass
+
     def get_active_obj_nodes(self):
         nodes = [
             dict(kind='Robot',funs=[
@@ -25,8 +29,8 @@ class Workflow():
                         dict(name="y",kind="Float"),
                         dict(name="z",kind="Float"),
                         dict(name="rx",kind="Float"),
-                        dict(name="ry",kind="float"),
                         dict(name="rz",kind="Float"),
+                        dict(name="ry",kind="float"),
                     ]),
                     dict(f='move',errs=[],args=[
                         dict(name="x",kind="Float"),
@@ -43,7 +47,7 @@ class Workflow():
                         dict(name="rx",kind="Float"),
                         dict(name="ry",kind="Float"),
                         dict(name="rz",kind="Float"),
-                        ]),
+                    ]),
                     dict(f='do',errs=[],args=[
                         dict(name='pickup',kind='Bool')]),
                 ],names=[]),
@@ -57,7 +61,8 @@ class Workflow():
             dict(kind='Stacker',funs=[
                     dict(f='generate',errs=["failed"],args=[])
                 ],names=[]),
-            dict(kind='ActiveObj',funs=[],names=[])
+            dict(kind='ActiveObj',funs=[],names=[]),
+            dict(king='Plugin',funs=[],names=['Planalgo'],args=[])
         ]
 
         for name,obj in enumerate(self.scene.active_objs_by_name):
@@ -68,46 +73,43 @@ class Workflow():
 
     def start(self):
         self.running = True
-        self.task = Thread(target=self.run)
-        self.task.start()
-        pass
+        wf = self.scene.profile['workflow']
+        self.declare = wf['declare']
+        self.next = wf['run']
+        self.val = ()
+
+        def task():
+            if self.next and self.running:
+                act = self.declare[self.next]
+                kind = act['kind']
+                name = act['name']
+                fun = act['fun']
+                args = act['args'] if 'args' in act else {}
+                
+                print('signal',fun,args)
+                obj = self.scene.active_objs_by_name[name]
+                eval(f'obj.signal_{fun}(*val,**args)')
+                while not obj.idle(): time.sleep(0.5)
+
+                res = obj.result
+                err,self.val = res[0],res[1:]
+                
+                self.next=None
+                if 'next' in act:
+                    self.next = act['next']
+                elif 'alt' in act:
+                    for opt in act['alt']:
+                        if err != opt['err']: continue
+                        next = opt['next']
+                        break
+        
+        self.actions.append(task)
 
     def stop(self):
         self.running = False
-        if self.task: self.task.join()
         self.scene.reset()
         pass
     
-    def run(self):
-        wf = self.scene.profile['workflow']
-        declare = wf['declare']
-        next = wf['run']
-        val = ()
-
-        while next and self.running:
-            act = declare[next]
-            kind = act['kind']
-            name = act['name']
-            fun = act['fun']
-            args = act['args'] if 'args' in act else {}
-            
-            print('signal',fun,args)
-            obj = self.scene.active_objs_by_name[name]
-            eval(f'obj.signal_{fun}(*val,**args)')
-            while not obj.idle(): time.sleep(0.5)
-
-            res = obj.result
-            err,val = res[0],res[1:]
-            
-            next=None
-            if 'next' in act:
-                next = act['next']
-            elif 'alt' in act:
-                for opt in act['alt']:
-                    if err != opt['err']: continue
-                    next = opt['next']
-                    break
-        pass
 
     def set(self,workflow):
         self.scene.profile['workflow'] = json.loads(workflow)
