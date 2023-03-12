@@ -1,0 +1,372 @@
+<?xml version="0.0" ?>
+<robot name="conveyor">
+  <link name="frame">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value="5"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="frame-left.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="frame-left.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+
+  </link>
+    <link name="frame-right">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value="5"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="frame-right.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="frame-right.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="frame"/>
+    <child link="frame-right"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="roller0">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint0" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 -0.430065 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller0"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller1">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint1" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 -0.342194 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller1"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller2">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint2" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 -0.256547 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller2"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller3">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint3" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 -0.174238 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller3"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller4">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint4" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 -0.086366 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller4"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller5">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint5" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 -0.00072 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller5"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller6">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint6" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 0.090488 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller6"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller7">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint7" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 0.178359 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller7"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller8">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint8" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 0.264006 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller8"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller9">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint9" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 0.337417 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller9"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="roller10">
+    <inertial>
+       <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".1"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="roller.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint10" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.002681 0.423063 0.161724"/>
+    <parent link="frame"/>
+    <child link="roller10"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+</robot>

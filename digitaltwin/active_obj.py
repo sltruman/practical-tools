@@ -3,6 +3,7 @@ import pybullet as p
 class ActiveObject:
     def __init__(self,scene,**kwargs):
         self.actions = list()
+        self.result = None,
         self.scene = scene
         self.name = kwargs['name']
         self.pos = kwargs['pos']

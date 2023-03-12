@@ -13,6 +13,7 @@ class Scene:
     self.running = True
     self.scene_path = ''
     self.timestep = 1/180.
+    self.actions = list()
     
     self.id = p.connect(p.GUI,options=f'--width={width} --height={height} --headless')
     p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
@@ -67,15 +68,25 @@ class Scene:
   def update_for_tick(self,dt):
     if not self.running: return
 
+    if self.actions:
+        fun,args = act = self.actions[0]
+        fun(*args)
+        self.actions.pop(0)
+
     while dt >= self.timestep:
       for obj in self.active_objs.values():
         obj.update(self.timestep)
-      
+        
       p.stepSimulation()
       dt -= self.timestep
 
   def update(self):
     if not self.running: return
+
+    if self.actions:
+      fun,args = act = self.actions[0]
+      fun(*args)
+      self.actions.pop(0)
 
     for obj in self.active_objs.values():
       obj.update(self.timestep)

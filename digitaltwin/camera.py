@@ -64,9 +64,6 @@ class Camera3D(ActiveObject):
                 v = far * near / (far - (far - near) * depth_pixels[h, w]) / depth_far * 255
                 depth_img[h, w] = [v,v,v]
 
-        if self.image_path:
-            import cv2
-            cv2.imwrite(self.image_path,depth_img)
         return pixels.tobytes(),depth_img.tobytes()
 
     def signal_capture(self,*args):

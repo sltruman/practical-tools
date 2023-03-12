@@ -5,6 +5,7 @@ import traceback
 import sys
 from time import time
 import shutil
+from digitaltwin import Scene,Editor,Workflow
 # sys.path.insert(0,'/home/truman/Desktop/bullet3/build_cmake/examples/pybullet')
 
 if len(sys.argv) < 2:
@@ -17,8 +18,8 @@ else:
     height = sys.argv[3]
     tmp_dir = sys.argv[4]
 
-    if os.path.exists(tmp_dir): pass#shutil.rmtree(tmp_dir)
-    os.makedirs(tmp_dir)
+    if os.path.exists(tmp_dir): shutil.rmtree(tmp_dir)
+    os.makedirs(tmp_dir,exist_ok=True)
     sock_path = os.path.join(tmp_dir,scene_name + '.sock')
 
     # sk = s.socket(s.AF_INET,s.SOCK_STREAM)
@@ -29,7 +30,6 @@ else:
     print(f'Serving on {sys.argv[1]}')
     sk.listen(1)
 
-    from digitaltwin import Scene,Editor,Workflow
     scene = Scene(width,height)
     editor = Editor(scene)
     workflow = Workflow(scene)
@@ -66,7 +66,6 @@ else:
 
             tick = time() - elapsed
             scene.update_for_tick(tick)
-            workflow.update()
             tick = round(tick, 3)
     except (ConnectionResetError,BrokenPipeError):pass
     except:
@@ -77,4 +76,4 @@ else:
     del editor
     del scene
     sk.close()
-    if os.path.exists(tmp_dir): pass#shutil.rmtree(tmp_dir)
+    if os.path.exists(tmp_dir): shutil.rmtree(tmp_dir)

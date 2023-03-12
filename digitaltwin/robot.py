@@ -216,11 +216,21 @@ class Robot(ActiveObject):
             p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
 
         route_poses, = args
-        for poses in route_poses: 
-            self.actions.append((task,poses))
+        for poses in route_poses: self.actions.append((task,poses))
         
-        def output(): self.result = None,
-        self.actions.append((output,()))
+        def output(*poses):
+            joint_poses = []
+            for joint in self.active_joints:
+                position,velocity,reaction_force,motor_torque = p.getJointState(self.id,joint)
+                joint_poses.append(position)
+            
+            for i in range(len(poses)):
+                if abs(joint_poses[i] - poses[i]) > 0.01:
+                    self.actions.append((output,poses))
+                    return
+
+            self.result = None,
+        self.actions.append((output,route_poses[-1]))
         pass
 
     def signal_move(self,*args,**kwargs):
@@ -247,10 +257,22 @@ class Robot(ActiveObject):
             # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
     
-        for poses in self.plan((ee_pos,ee_rot),(t_pos,t_rot)): self.actions.append((task,(poses)))
+        route_poses = self.plan((ee_pos,ee_rot),(t_pos,t_rot))
+        for poses in route_poses: self.actions.append((task,(poses)))
         
-        def output(): self.result = None,
-        self.actions.append((output,()))
+        def output(*poses):
+            joint_poses = []
+            for joint in self.active_joints:
+                position,velocity,reaction_force,motor_torque = p.getJointState(self.id,joint)
+                joint_poses.append(position)
+            
+            for i in range(len(poses)):
+                if abs(joint_poses[i] - poses[i]) > 0.01:
+                    self.actions.append((output,poses))
+                    return
+
+            self.result = None,
+        self.actions.append((output,route_poses[-1]))
         pass
     
     def signal_move_relatively(self,*args,**kwargs):
@@ -277,14 +299,27 @@ class Robot(ActiveObject):
             # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
 
-        for poses in self.plan((ee_pos,ee_rot),(t_pos,t_rot)): self.actions.append((task,(poses)))
+        route_poses = self.plan((ee_pos,ee_rot),(t_pos,t_rot))
+        for poses in route_poses: self.actions.append((task,(poses)))
         
-        def output(): self.result = None,
-        self.actions.append((output,()))
+        def output(*poses):
+            joint_poses = []
+            for joint in self.active_joints:
+                position,velocity,reaction_force,motor_torque = p.getJointState(self.id,joint)
+                joint_poses.append(position)
+            
+            for i in range(len(poses)):
+                if abs(joint_poses[i] - poses[i]) > 0.01:
+                    self.actions.append((output,poses))
+                    return
+
+            self.result = None,
+        self.actions.append((output,route_poses[-1]))
         pass
     
     def signal_do(self,*args,**kwargs):
-        self.end_effector_obj.do(kwargs['pickup'])
+        def task(): self.end_effector_obj.do(kwargs['pickup'])
+        self.actions.append((task,()))
         def output(): self.result = None,
         self.actions.append((output,()))
         pass

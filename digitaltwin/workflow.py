@@ -8,11 +8,6 @@ class Workflow():
     def __init__(self,scene: Scene):
         self.scene = scene
         self.running = False
-        self.actions = list()
-        pass
-    
-    def update(self):
-
         pass
 
     def get_active_obj_nodes(self):
@@ -74,43 +69,53 @@ class Workflow():
     def start(self):
         self.running = True
         wf = self.scene.profile['workflow']
-        self.declare = wf['declare']
-        self.next = wf['run']
-        self.val = ()
+        declare = wf['declare']
 
-        def task():
-            if self.next and self.running:
-                act = self.declare[self.next]
-                kind = act['kind']
+        def task(last):
+            if not self.running: return
+
+            res = None,
+            next = None
+            if last:
+                act = declare[last]
                 name = act['name']
-                fun = act['fun']
-                args = act['args'] if 'args' in act else {}
+                last_obj = self.scene.active_objs_by_name[name]
                 
-                print('signal',fun,args)
-                obj = self.scene.active_objs_by_name[name]
-                eval(f'obj.signal_{fun}(*val,**args)')
-                while not obj.idle(): time.sleep(0.5)
-
-                res = obj.result
-                err,self.val = res[0],res[1:]
+                if not last_obj.idle():
+                    self.scene.actions.append((task,(last)))
+                    return
                 
-                self.next=None
+                res = last_obj.result
                 if 'next' in act:
-                    self.next = act['next']
+                    next = act['next']
                 elif 'alt' in act:
                     for opt in act['alt']:
                         if err != opt['err']: continue
                         next = opt['next']
                         break
-        
-        self.actions.append(task)
+                else: return
+            else:
+                next = wf["run"]
+
+            err,val = res[0],res[1:]
+            act = declare[next]
+            kind = act['kind']
+            name = act['name']
+            fun = act['fun']
+            args = act['args'] if 'args' in act else {}
+            obj = self.scene.active_objs_by_name[name]
+
+            print('signal',fun,args)
+            eval(f'obj.signal_{fun}(*val,**args)')
+
+            self.scene.actions.append((task,(next)))
+        task(None)
 
     def stop(self):
         self.running = False
         self.scene.reset()
         pass
     
-
     def set(self,workflow):
         self.scene.profile['workflow'] = json.loads(workflow)
 
