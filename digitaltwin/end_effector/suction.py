@@ -5,13 +5,20 @@ import pybullet as p
 class Suction:
     def __init__(self,robot_id):
         self.robot_id = robot_id
-        self.action = None
+        self.action = lambda *args:None,None
+        self.idle = True
+        self.elapsed = 0
         pass
 
     def update(self,dt):
-        if self.action:
-            f,args = self.action
-            f(args)
+        f,args = self.action
+        f(args)
+
+        if self.idle: return
+        self.elapsed += dt
+        if self.elapsed < 0.5: return
+        self.elapsed = 0
+        self.idle = True
         pass
 
     def do(self,pickup=True):
@@ -19,7 +26,7 @@ class Suction:
             num_joints = p.getNumJoints(self.robot_id)
             ee_index = num_joints-1
             ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.robot_id,ee_index)
-            radius = 0.01
+            radius = 0.02
             axis_z = Rotation.from_quat(ee_orn).apply(np.array([0,0,-radius])) + ee_pos
             rayInfo = p.rayTest(ee_pos, axis_z)
             p.addUserDebugLine(ee_pos,axis_z,[0,1,0],4,lifeTime=1)
@@ -38,6 +45,7 @@ class Suction:
 
                 if o_id != -1:
                     self.action = (task,(o_id))
+                    self.idle = False
         else:
-            self.action = None
+            self.action = lambda *args:None,()
         pass

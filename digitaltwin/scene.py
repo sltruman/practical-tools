@@ -47,13 +47,13 @@ class Scene:
     self.scene_path = scene_path
     with open(scene_path,'r') as f: self.profile = scene_info = json.load(f)
 
-    from digitaltwin import Robot,Camera3D,Placer,Stacker
+    import digitaltwin
         
     for object_info in scene_info['active_objects']:
       kind = object_info['kind']
 
       active_obj = None
-      active_obj = eval(f'{kind}(self,**object_info)')
+      active_obj = eval(f'digitaltwin.{kind}(self,**object_info)')
       self.active_objs[active_obj.id] = active_obj
       if 'name' in vars(active_obj): self.active_objs_by_name[active_obj.name] = active_obj
 
@@ -93,20 +93,26 @@ class Scene:
     p.stepSimulation()
 
   def rotate(self,x,y):
-      w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-      yaw -= 360 * x
-      pitch -= 180 * y
-      p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
-      pass
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    yaw -= 360 * x
+    pitch -= 180 * y
+    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
+    pass
   
   def pan(self,x,y):
-      w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-      length = np.array([-x * distance * 3,y * distance * 3,0])
-      pos = target + Rotation.from_euler('xyz',[0,0,yaw],True).apply(length)
-      p.resetDebugVisualizerCamera(distance,yaw,pitch,pos)
-      pass
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    length = np.array([-x * distance * 3,y * distance * 3,0])
+    pos = target + Rotation.from_euler('xyz',[0,0,yaw],True).apply(length)
+    p.resetDebugVisualizerCamera(distance,yaw,pitch,pos)
+    pass
 
   def zoom(self,f):
-      w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-      p.resetDebugVisualizerCamera(distance * f,yaw,pitch,target)
-      pass
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    p.resetDebugVisualizerCamera(distance * f,yaw,pitch,target)
+    pass
+    
+  def get_active_obj_properties(self):
+    objs = dict()
+    for name,obj in self.active_objs_by_name.items():
+      objs[name] = obj.properties()
+    return objs

@@ -4,7 +4,7 @@ from digitaltwin import Scene,Workflow
 scene = Scene(1024,768)
 workflow = Workflow(scene)
 
-scene.load('./data/scenes/深度图.json')
+scene.load('./data/scenes/3D打印机.json')
 workflow.start()
 
 import time

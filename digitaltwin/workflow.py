@@ -99,7 +99,6 @@ class Workflow():
 
             err,val = res[0],res[1:]
             act = declare[next]
-            kind = act['kind']
             name = act['name']
             fun = act['fun']
             args = act['args'] if 'args' in act else {}

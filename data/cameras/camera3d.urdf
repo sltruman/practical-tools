@@ -12,6 +12,11 @@
         <mesh filename="camera3d/camera.obj" scale="1 1 1"/>
       </geometry>
     </visual>
+    <collision>
+      <geometry>
+        <box size="0.1 0.1 2.5"/>
+      </geometry>
+    </collision>
   </link>
   <link name="link_ee">
     <inertial>

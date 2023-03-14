@@ -53,15 +53,13 @@ else:
                         raise BlockingIOError
 
                     res = eval(req.decode())
-                    if res == None: 
-                        pass
-                    elif type(res) == tuple: 
+                    if type(res) == tuple: 
                         for v in res: conn.sendall(v)
-                    else: 
+                    elif type(res) == dict: 
                         conn.sendall(json.dumps(res).encode() + b'\n')
+                    else: pass
                 buf = b''
-            except SyntaxError:
-                traceback.print_exc()
+            except SyntaxError: traceback.print_exc()
             except BlockingIOError: pass
 
             tick = time() - elapsed
