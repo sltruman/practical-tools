@@ -13,7 +13,6 @@ class Printer3D(ActiveObject):
         self.current_joint_poses = self.reset_joint_poses = kwargs['reset_joint_poses']
         self.joint_damping = kwargs['joint_damping']
         self.end_effector = kwargs['end_effector']
-        self.product = kwargs['product']
         kwargs['pos'][1] -= 0.5
         super().__init__(scene, **kwargs)
         pass

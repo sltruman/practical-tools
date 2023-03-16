@@ -2,13 +2,15 @@ import pybullet as p
 from scipy.spatial.transform import Rotation
 from .active_obj import ActiveObject
 
+import pymeshlab as meshlab
+import numpy as np
+
 class Camera3D(ActiveObject):
     def __init__(self,scene,**kwargs):
         super().__init__(scene, **kwargs)
         self.image_size = kwargs['image_size']
         self.forcal = kwargs['forcal']
         self.fov = kwargs['fov']
-        self.image_path = kwargs['image_path']
         self.sample_rate = kwargs['sample_rate']
         pass
     
@@ -67,8 +69,7 @@ class Camera3D(ActiveObject):
         return pixels.tobytes(),depth_img.tobytes()
 
     def signal_capture(self,*args):
-        def output(): 
-            self.result = (None,) + self.rtt()
+        def output(): self.result = (None,) + self.rtt()
 
         self.actions.append((output, ()))
         pass
@@ -143,3 +144,26 @@ class Camera3D(ActiveObject):
         self.actions.append((output, ()))
         pass
     
+    def draw_point_cloud(self,point_clouds):
+        ms = meshlab.MeshSet()
+        ms.load_new_mesh(point_clouds)
+        m = ms.current_mesh()
+        vs = m.vertex_matrix()
+        fs = m.face_matrix()
+        vcs = m.vertex_color_matrix()
+
+        num_joints = p.getNumJoints(self.id)
+        pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        target = Rotation.from_quat(orn).apply([0,2,0]) + pos
+        rayInfo = p.rayTest(pos, target)
+        if not rayInfo: return
+        id,linkindex,fraction,target,norm = rayInfo[0]
+        p.addUserDebugLine(pos, target,[1,0,0],1,lifeTime=0)
+
+        x = [vs[i]+target for i in np.lexsort((vs[:,0],vs[:,1],vs[:,2]))]
+        self.ply_id = p.addUserDebugPoints(x,[[1,1,1]] * len(x),2,lifeTime=0)
+        pass
+
+    def clear_point_clound(self):
+        if 'ply_id' in vars(self): p.removeUserDebugItem(self.ply_id)
+        pass

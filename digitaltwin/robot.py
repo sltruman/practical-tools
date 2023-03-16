@@ -40,7 +40,6 @@ class Robot(ActiveObject):
         gears = []
         with xml.parse(self.base) as doc_robot:
             node_robot = doc_robot.getElementsByTagName('robot')[0]
-            
             for mesh in node_robot.getElementsByTagName('mesh'):
                 filename = mesh.getAttribute('filename')
                 mesh.setAttribute('filename',os.path.join(os.getcwd(),os.path.dirname(base),filename))
@@ -120,7 +119,7 @@ class Robot(ActiveObject):
         ee_pos,ee_rot = origin
         o_pos,o_rot = target
         o_pos = np.array(o_pos)
-        p.addUserDebugLine(ee_pos,o_pos,[1,1,1],2,lifeTime=5)
+        p.addUserDebugLine(ee_pos,o_pos,[1,1,1],2,lifeTime=5) 
 
         route_poses = list()
         while np.linalg.norm(o_pos - ee_pos) != 0:
@@ -160,9 +159,7 @@ class Robot(ActiveObject):
         def perfect_pick_pose(pick_pose):
             pick_p = np.array(pick_pose['pos'])
             pick_r = Rotation.from_euler("xyz",pick_pose['rot'])
-            
             o = o_pos + o_r.apply(pick_p)
-            
             pick_x = o_pos + o_r.apply(pick_p + [0.15,0,0])
             pick_y = o_pos + o_r.apply(pick_p + [0,0.15,0])
             pick_z = o_pos + o_r.apply(pick_p + [0,0,0.15])
@@ -220,16 +217,15 @@ class Robot(ActiveObject):
         route_poses, = args
         for poses in route_poses: self.actions.append((task,poses))
 
-        def output(last_pos,*poses):
+        def output(last_pos):
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             pos = np.linalg.norm(pos)
-            # print(round(last_pos - pos,3))
-            if round(last_pos - pos,3) != 0.000:
-                self.actions.append((output,(pos,poses)))
+            if round(last_pos - pos,6) != 0.000000:
+                self.actions.append((output,(pos,)))
                 return
 
             self.result = None,
-        self.actions.append((output,(0,route_poses[-1])))
+        self.actions.append((output,(0,)))
         pass
 
     def signal_move(self,*args,**kwargs):
@@ -259,16 +255,15 @@ class Robot(ActiveObject):
         route_poses = self.plan((ee_pos,ee_rot),(t_pos,t_rot))
         for poses in route_poses: self.actions.append((task,(poses)))
         
-        def output(last_pos,*poses):
+        def output(last_pos):
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             pos = np.linalg.norm(pos)
-            # print(round(last_pos - pos,3))
-            if round(last_pos - pos,3) != 0.000:
-                self.actions.append((output,(pos,poses)))
+            if round(last_pos - pos,6) != 0.000000:
+                self.actions.append((output,(pos,)))
                 return
 
             self.result = None,
-        self.actions.append((output,(0,route_poses[-1])))
+        self.actions.append((output,(0,)))
         pass
     
     def signal_move_relatively(self,*args,**kwargs):
@@ -298,16 +293,15 @@ class Robot(ActiveObject):
         route_poses = self.plan((ee_pos,ee_rot),(t_pos,t_rot))
         for poses in route_poses: self.actions.append((task,(poses)))
         
-        def output(last_pos,*poses):
+        def output(last_pos):
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             pos = np.linalg.norm(pos)
-            # print(round(last_pos - pos,3))
-            if round(last_pos - pos,3) != 0.000:
-                self.actions.append((output,(pos,poses)))
+            if round(last_pos - pos,6) != 0.000000:
+                self.actions.append((output,(pos,)))
                 return
 
             self.result = None,
-        self.actions.append((output,(0,route_poses[-1])))
+        self.actions.append((output,(0,)))
         pass
     
     def signal_do(self,*args,**kwargs):

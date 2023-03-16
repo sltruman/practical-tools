@@ -1,0 +1,21 @@
+{
+    "active_objects": [{
+            "kind":"Camera3D",
+            "name":"camera",
+            "base":"./data/cameras/camera3d.urdf",
+            "pos":[-0.5,-0.5,0.0],
+            "rot":[0.0,0.0,-1.57],
+            "fov": 20,
+            "forcal": 0.01,
+            "sample_rate": 20, 
+            "image_size": [300,300]
+        }
+    ],
+
+    "workflow": {
+        "run":"1",
+        "declare":{
+            "1":{"name":"printer","fun":"print"}
+        }
+    }
+}
