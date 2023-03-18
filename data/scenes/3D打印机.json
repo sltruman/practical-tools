@@ -1,0 +1,19 @@
+{
+    "active_objects": [{
+        "kind":"Robot",
+        "name":"robot",
+        "base":"./data/robots/ur5/ur5.urdf",
+        "pos":[0,0.1,0],
+        "rot":[0,0,3.14],
+        "reset_joint_poses":[-1.57,0.0,-0.3925,-0.785,1.57,0],
+        "joint_damping":[ 0, 1, 0.9, 0.8, 0.7, 0.0],
+        "end_effector":"./data/end_effectors/nozzle/nozzle.urdf"
+    }],
+
+    "workflow": {
+        "run":"1",
+        "declare":{
+            "1":{"name":"printer","fun":"print"}
+        }
+    }
+}

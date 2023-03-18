@@ -42,7 +42,7 @@ else:
     try:
         while True:
             elapsed = time()
-            
+             
             try:
                 c = conn.recv(1024,s.MSG_DONTWAIT)
                 if not c: raise ConnectionResetError
@@ -51,11 +51,11 @@ else:
                     if req[-1] != 0xa:
                         buf = req
                         raise BlockingIOError
-
+ 
                     res = eval(req.decode())
                     if type(res) == tuple: 
                         for v in res: conn.sendall(v)
-                    elif type(res) == dict: 
+                    elif type(res) == dict or type(res) == list: 
                         conn.sendall(json.dumps(res).encode() + b'\n')
                     else: pass
                 buf = b''

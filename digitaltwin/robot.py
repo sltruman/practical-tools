@@ -79,6 +79,7 @@ class Robot(ActiveObject):
         elif ee_kind == 'Suction': self.end_effector_obj = Suction(self.id)
         else: 
             class PlaceHolder:
+                def __init__(self): self.idle = True
                 def update(self,dt):pass
                 def do(self,pickup):pass
             self.end_effector_obj = PlaceHolder()
@@ -119,7 +120,7 @@ class Robot(ActiveObject):
         ee_pos,ee_rot = origin
         o_pos,o_rot = target
         o_pos = np.array(o_pos)
-        p.addUserDebugLine(ee_pos,o_pos,[1,1,1],2,lifeTime=5) 
+        # p.addUserDebugLine(ee_pos,o_pos,[1,1,1],2,lifeTime=5) 
 
         route_poses = list()
         while np.linalg.norm(o_pos - ee_pos) != 0:
@@ -196,7 +197,7 @@ class Robot(ActiveObject):
         else:
             route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
         
-        def output(): self.result = None,route_poses
+        def output(): self.result = None,route_poses,None
         self.actions.append((output,()))
 
     def signal_plan_move(self,*args,**kwargs):
@@ -214,16 +215,33 @@ class Robot(ActiveObject):
             # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
 
-        route_poses, = args
-        for poses in route_poses: self.actions.append((task,poses))
+        def task2(*point):
+            num_joints = p.getNumJoints(self.id)
+            ee_index = num_joints-1
+            ll = [-7]*len(self.active_joints)
+            ul = [7]*len(self.active_joints)
+            jr = [7]*len(self.active_joints)
+            
+            poses = p.calculateInverseKinematics(self.id, ee_index, point, p.getQuaternionFromEuler([0,0,0]),
+                                                lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,
+                                                jointDamping=self.joint_damping,maxNumIterations=200)
+            p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
 
+            self.current_joint_poses = poses
+            p.addUserDebugPoints([point],[[1,1,1]],2,lifeTime=10)
+
+        route_poses,route_points = args
+        if route_poses:
+            for poses in route_poses: self.actions.append((task,poses))
+        else:
+            for point in route_points: self.actions.append((task2,point))
+        
         def output(last_pos):
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             pos = np.linalg.norm(pos)
             if round(last_pos - pos,6) != 0.000000:
                 self.actions.append((output,(pos,)))
                 return
-
             self.result = None,
         self.actions.append((output,(0,)))
         pass

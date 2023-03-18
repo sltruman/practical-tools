@@ -26,6 +26,8 @@
 
 无序抓取演示：`python3 test2.py`
 
+虚拟相机拍摄点云：`python3 test4.py`
+
 # 2 工作计划
 
 | 目标                | 任务                    | 问题                             | 备注                          |
@@ -68,6 +70,7 @@
 |                   |                       | 获取/设置缩放因子                      |                             |
 |                   |                       | 获取/设置放置模式                      |                             |
 |                   | 工作流                   | 获取可用节点                         |                             |
+|                   |                       |                                |                             |
 |                   |                       | 设置/获取                          |                             |
 |                   |                       | 启动/停止                          |                             |
 |                   | ..................... | .............................. |                             |
@@ -376,7 +379,7 @@ scene_profile = {
 }
 ```
 
-        节点有时因为一些限制参数会返回失败，为应对于不同情况，可以采用分支来进行控制。假设工件生成成功，就进行姿态估计，否则就拍照，如下：
+        节点有时因为一些限制参数会返回失败，为应对于不同情况，可以采用分支来进行控制。假设姿态估计失败就拍照，如下：
 
 ```mermaid
 flowchart LR
@@ -626,34 +629,173 @@ scene_profile={
 
 ```python
 #输入
-workflow.get_active_obj_nodes(
-    #无参
-)\n
+workflow.get_active_obj_nodes()\n
 
 #输出
 [
     {
-        "kind": "Robot", #机器人节点
-        "funs": [   #可用功能
-            {"f":"move","errs":[]},
-            {"f":"pick","errs":[]},
-            {"f":"place","errs":[]}
+        "kind": "Robot",  #机器人
+        "funs": [        #功能
+            {
+                "f": "pick_plan", #拾取路径规划
+                "errs": [],
+                "args": [  # 对抓手姿态的一些控制
+                    {
+                        "name": "pick_poses",  #拾取姿态列表
+                        "kind": "PoseList" #[{pos:[0,0,0],rot:[0,0,0]}]
+                    }
+                ]
+            },
+            {
+                "f": "place_plan",#放置路径规划
+                "errs": [],
+                "args": [  # 对抓手姿态的一些控制
+                    {
+                        "name": "place_poses", #放置姿态
+                        "kind": "Pose"         #{pos:[0,0,0],rot:[0,0,0]}
+                    }
+                ]
+            },
+            {
+                "f": "plan_move",    #抓取移动
+                "errs": [],
+                "args": [            #相对目标点的偏移
+                    
+                ]
+            },
+            {
+                "f": "move", #移动到目标点
+                "errs": [],
+                "args": [   #目标点的位置和抓手姿态
+                    {
+                        "name": "x",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "y",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "z",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "rx",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "ry",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "rz",
+                        "kind": "Float"
+                    }
+                ]
+            },
+            {
+                "f": "move_relatively",  #移动到目标点的相对位置
+                "errs": [],
+                "args": [    #相对位置和抓手姿态
+                    {
+                        "name": "x",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "y",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "z",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "rx",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "ry",
+                        "kind": "Float"
+                    },
+                    {
+                        "name": "rz",
+                        "kind": "Float"
+                    }
+                ]
+            },
+            {
+                "f": "do", #抓取
+                "errs": [],
+                "args": [ #拾取或放置
+                    {
+                        "name": "pickup",
+                        "kind": "Bool"
+                    }
+                ]
+            }
         ],
-        "names": [ #实例名
-            "robot_1",
-            "robot_2"
-        ]
+        "names": []
     },
     {
-        "kind": "Camera3D", #相机节点
+        "kind": "Camera3D", #深度相机
         "funs": [
-            {"f":"capture","errs":[]},
-            {"f":"pose_recognize","errs":["failed"]}
+            {
+                "f": "capture", #获取画面
+                "errs": [
+                    "failed" #画面捕获失败
+                ],
+                "args": [
+                    
+                ]
+            },
+            {
+                "f": "pose_recognize", #姿态估计
+                "errs": [
+                    "failed"  #姿态估计失败
+                ],
+                "args": []
+            }
         ],
-        "names": [ 
-            "camera_1",
-            "camera_2"
-        ]
+        "names": []
+    },
+    {
+        "kind": "Placer", #放置器
+        "funs": [
+            {
+                "f": "generate", #生成工件
+                "errs": [
+                    "failed" #生成失败
+                ],
+                "args": []
+            }
+        ],
+        "names": []
+    },
+    {
+        "kind": "Stacker", #堆垛器
+        "funs": [
+            {
+                "f": "generate", #生成工件
+                "errs": [
+                    "failed" #生成失败
+                ],
+                "args": []
+            }
+        ],
+        "names": []
+    },
+    {
+        "kind": "ActiveObj", #活动物体
+        "funs": [],
+        "names": []
+    },
+    {
+        "kind": "Plugin",  #节点插件
+        "funs": [],
+        "names": [
+            "Planalgo" #路径规划
+        ],
+        "args": []
     }
 ]\n
 ```
@@ -665,3 +807,7 @@ workflow.get_active_obj_nodes(
 ## 3.13 工作流-启动/停止
 
         让整个场景工作起来，调用启动函数。需要突然终止则调用停止函数。
+
+# 4 问题反馈
+
+## 4.1 在PickWiz与仿真平台对接中，工作流的路径规划节点留存问题

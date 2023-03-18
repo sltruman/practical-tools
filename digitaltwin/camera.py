@@ -159,11 +159,10 @@ class Camera3D(ActiveObject):
         if not rayInfo: return
         id,linkindex,fraction,target,norm = rayInfo[0]
         p.addUserDebugLine(pos, target,[1,0,0],1,lifeTime=0)
-
-        x = [vs[i]+target for i in np.lexsort((vs[:,0],vs[:,1],vs[:,2]))]
-        self.ply_id = p.addUserDebugPoints(x,[[1,1,1]] * len(x),2,lifeTime=0)
+        points = [vs[i] + target for i in np.lexsort((vs[:,0],vs[:,1],vs[:,2]))]
+        self.ply_id = p.addUserDebugPoints(points,[[1,0,1]] * len(points),3,lifeTime=0)
         pass
 
-    def clear_point_clound(self):
+    def clear_point_clounds(self):
         if 'ply_id' in vars(self): p.removeUserDebugItem(self.ply_id)
         pass

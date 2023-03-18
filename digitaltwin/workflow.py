@@ -17,7 +17,7 @@ class Workflow():
                         dict(name="pick_poses",kind="PoseList")
                     ]),
                     dict(f='place_plan',errs=[],args=[
-                        dict(name="pick_poses",kind="PoseList")
+                        dict(name="place_poses",kind="Pose")
                     ]),
                     dict(f='plan_move',errs=[],args=[
                         dict(name="x",kind="Float"),
@@ -25,7 +25,7 @@ class Workflow():
                         dict(name="z",kind="Float"),
                         dict(name="rx",kind="Float"),
                         dict(name="rz",kind="Float"),
-                        dict(name="ry",kind="float"),
+                        dict(name="ry",kind="Float"),
                     ]),
                     dict(f='move',errs=[],args=[
                         dict(name="x",kind="Float"),
@@ -47,8 +47,12 @@ class Workflow():
                         dict(name='pickup',kind='Bool')]),
                 ],names=[]),
             dict(kind='Camera3D',funs=[
-                    dict(f='capture',errs=["failed"],args=[]),
-                    dict(f='pose_recognize',errs=["failed"],args=[])
+                    dict(f='capture',errs=["failed"],args=[
+                        dict(name='wait_for_seconds',kind='Float')
+                    ]),
+                    dict(f='pose_recognize',errs=["failed"],args=[
+                        
+                    ])
                 ],names=[]),
             dict(kind='Placer',funs=[
                     dict(f='generate',errs=["failed"],args=[])
@@ -57,13 +61,14 @@ class Workflow():
                     dict(f='generate',errs=["failed"],args=[])
                 ],names=[]),
             dict(kind='ActiveObj',funs=[],names=[]),
-            dict(king='Plugin',funs=[],names=['Planalgo'],args=[])
+            dict(kind='Plugin',funs=[],names=['Planalgo'],args=[])
         ]
 
         for name,obj in enumerate(self.scene.active_objs_by_name):
             kind = type(obj)
-            nodes = [n for n in nodes if n['kind'] == kind]
-            for n in nodes: n.names.append(name)
+            for n in nodes:
+                if n['kind'] == kind: n['names'].append(name)
+
         return nodes
 
     def start(self):
