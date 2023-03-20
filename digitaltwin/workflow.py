@@ -1,6 +1,5 @@
 from .scene import Scene
 import pybullet as p
-from threading import Thread
 import json
 import time
 
@@ -12,56 +11,51 @@ class Workflow():
 
     def get_active_obj_nodes(self):
         nodes = [
-            dict(kind='Robot',funs=[
-                    dict(f='pick_plan',errs=[],args=[
-                        dict(name="pick_poses",kind="PoseList")
-                    ]),
-                    dict(f='place_plan',errs=[],args=[
-                        dict(name="place_poses",kind="Pose")
-                    ]),
-                    dict(f='plan_move',errs=[],args=[
-                        dict(name="x",kind="Float"),
-                        dict(name="y",kind="Float"),
-                        dict(name="z",kind="Float"),
-                        dict(name="rx",kind="Float"),
-                        dict(name="rz",kind="Float"),
-                        dict(name="ry",kind="Float"),
-                    ]),
-                    dict(f='move',errs=[],args=[
-                        dict(name="x",kind="Float"),
-                        dict(name="y",kind="Float"),
-                        dict(name="z",kind="Float"),
-                        dict(name="rx",kind="Float"),
-                        dict(name="ry",kind="Float"),
-                        dict(name="rz",kind="Float"),
-                    ]),
-                    dict(f='move_relatively',errs=[],args=[
-                        dict(name="x",kind="Float"),
-                        dict(name="y",kind="Float"),
-                        dict(name="z",kind="Float"),
-                        dict(name="rx",kind="Float"),
-                        dict(name="ry",kind="Float"),
-                        dict(name="rz",kind="Float"),
-                    ]),
-                    dict(f='do',errs=[],args=[
-                        dict(name='pickup',kind='Bool')]),
-                ],names=[]),
-            dict(kind='Camera3D',funs=[
-                    dict(f='capture',errs=["failed"],args=[
-                        dict(name='wait_for_seconds',kind='Float')
-                    ]),
-                    dict(f='pose_recognize',errs=["failed"],args=[
-                        
-                    ])
-                ],names=[]),
-            dict(kind='Placer',funs=[
-                    dict(f='generate',errs=["failed"],args=[])
-                ],names=[]),
-            dict(kind='Stacker',funs=[
-                    dict(f='generate',errs=["failed"],args=[])
-                ],names=[]),
-            dict(kind='ActiveObj',funs=[],names=[]),
-            dict(kind='Plugin',funs=[],names=['Planalgo'],args=[])
+            {'kind':'Robot','names':[],'funs':[
+                {'f':'pick_plan','errs':[],'args':[  #拾取路径规划
+                    {'name':"pick_poses",'kind':"List"}]},
+                {'f':'place_plan','errs':[],'args':[ #放置路径规划
+                    {'name':"place_poses",'kind':"List"}]},
+                {'f':'plan_move','errs':[],'args':[]}, 
+                {'f':'pick_move','errs':[],'args':[ #拾取移动
+                    {'name':'mode','kind':'String'}, #模式，关节：joint 点：point
+                    {'name':'speed','kind':'Flaot'}, #速度，0.0 ~ 1.0
+                    {'name':'vision_flow','kind':'String'}, #视觉流程
+                    {'name':'pickup','kind':'Bool'} #拾取设置
+                    ]},
+                {'f':'move','errs':[],'args':[ #移动
+                    {'name':'mode','kind':'String'}, #模式，关节：joint 点：point
+                    {'name':'speed','kind':'Flaot'}, #速度，值：0.0 ~ 1.0，默认：0.2
+                    {'name':'pickup','kind':'Bool'}, #拾取设置，？？
+                    {'name':'joints','kind':'List'}, #关节位置，[弧度值1,...弧度值n]
+                    {'name':'point','kind':'List'}, #点位置，[x,y,z,rx,ry,rz]
+                    {'name':'home','kind':'Bool'}, #回到home
+                    ]},
+                {'f':'move_relatively','errs':[],'args':[ #相对移动
+                    {'name':'mode','kind':'String'}, #模式，关节：joint 点：point
+                    {'name':'speed','kind':'Flaot'}, #速度，值：0.0 ~ 1.0，默认：0.2
+                    {'name':'pickup','kind':'Bool'}, #拾取设置，？？
+                    {'name':'joints','kind':'List'}, #关节位置，[弧度值1,...弧度值n]
+                    {'name':'point','kind':'List'}, #点位置，[x,y,z,rx,ry,rz]
+                    {'name':'target','kind':'String'}, #相对目标，当前任务：task_current，下一个任务：next，选择的任务：selected，工具坐标系：frame_end_effector，机械臂坐标系：frame_robot，全局坐标系：frame_global
+                    ]},
+                {'f':'do','errs':[],'args':[  #末端执行器
+                    {'name':'pickup','kind':'Bool'}]} #开/合
+                ]},
+            {'kind':'Camera3D','names':[],'funs':[  #相机
+                {'f':'capture','errs':["failed"],'args':[ #拍照
+                    {'name':'wait_for_seconds','kind':'Float'}]}, #等待时间
+                {'f':'pose_recognize','errs':["failed"],'args':[]}, #姿态估计
+                {'f':'detect','errs':[],'args':[    #视觉检测
+                    {'name':'vision_flow','kind':'String'}]} #视觉流程，？？
+                ]},
+            {'kind':'Placer','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #放置器
+            {'kind':'Stacker','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #堆垛器
+            {'kind':'ActiveObj','names':[],'funs':[],'args':[]},
+            {'kind':'Plugin','names':['PickLight','PlanAlgo'],'funs':[
+                {'f':'detect','errs':[],'args':[ #视觉检测
+                    {'name':'vision_flow','kind':'String'}, #视觉流程，？？
+                ]}]}
         ]
 
         for name,obj in enumerate(self.scene.active_objs_by_name):

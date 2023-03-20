@@ -1,3 +1,4 @@
+sys.path.insert(0,'/home/truman/Desktop/bullet3/build_cmake/examples/pybullet')
 import os
 import socket as s
 import json
@@ -6,7 +7,6 @@ import sys
 from time import time
 import shutil
 from digitaltwin import Scene,Editor,Workflow
-# sys.path.insert(0,'/home/truman/Desktop/bullet3/build_cmake/examples/pybullet')
 
 if len(sys.argv) < 2:
     print("Useage: program <scene_path> <width> <height> <tmp_dir>")

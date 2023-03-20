@@ -15,7 +15,6 @@ class Suction:
         f(args)
 
         if self.idle: return
-        print(self.elapsed)
         self.elapsed += dt
         if self.elapsed < 0.5: return
         self.elapsed = 0

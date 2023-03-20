@@ -6,7 +6,7 @@
 
 # 1 概述
 
-         本文的目标在于梳理并定义前端业务接口规范，用于避免SDK开发者在不完全了解前端业务的情况下开发出不兼容的接口。 
+        本文的目标在于梳理并定义前端业务接口规范，用于避免SDK开发者在不完全了解前端业务的情况下开发出不兼容的接口。 
 
 ## 1.1 安装
 
@@ -14,7 +14,7 @@
 
 下载源代码：`git clone http://120.24.55.96:3000/MixedAI/GraspSim`
 
-安装依赖：`pip install -r requirements.txt`
+安装依赖：`pip3 install -r requirements.txt`
 
 ## 1.2 快速开始
 
@@ -39,7 +39,7 @@
 |                   |                       | 平移/旋转/缩放/焦点                    |                             |
 |                   |                       | 视图切换-前后左右                      |                             |
 |                   |                       | 绘制原点/碰撞点                       | 实现较为复杂                      |
-|                   |                       | 关闭场景                           | 前端窗口无法正确析构                  |
+|                   |                       | 关闭场景                           |                             |
 |                   | 场景编辑                  | 坐标检测                           |                             |
 |                   |                       | 选择/添加/删除/保存                    |                             |
 |                   |                       | 透明化                            |                             |
@@ -70,22 +70,21 @@
 |                   |                       | 获取/设置缩放因子                      |                             |
 |                   |                       | 获取/设置放置模式                      |                             |
 |                   | 工作流                   | 获取可用节点                         |                             |
-|                   |                       |                                |                             |
 |                   |                       | 设置/获取                          |                             |
-|                   |                       | 启动/停止                          |                             |
+|                   |                       | 启动/停止                          | 结束后崩溃                       |
 |                   | ..................... | .............................. |                             |
 | SimEngine<br/>陈君辉 | 验收要求                  | 载入物体的示例                        | 可以调节位置和姿态，并且与地面发生物理交互，如碰撞   |
 |                   |                       | 获取RGBD图的示例                     | 显示RGB图，深度图展现为灰度图的形式         |
 |                   |                       | 获取物体姿态的示例                      | 通过射线检测物体的存在，然后把该物体的姿态轴画出来即可 |
 |                   |                       | 吸盘吸附物体的示例                      | 对力的控制功能                     |
 |                   |                       | 夹爪拾取物体的示例                      | 对摩擦的控制功能                    |
-|                   |                       | 控制一个关节的运动，使另一个关节进行同步运动         | 对关节的同步控制功能                  |
+|                   |                       | 控制一个关节的运动，使另一个关节进行同步运动         | 对关节同步的控制功能                  |
 |                   | ..................... |                                |                             |
 | DexSim<br/>李瑶     | 验收要求                  | 一堆工件生成的示例                      |                             |
 |                   |                       | 一堆工件的深度图示例                     |                             |
 |                   |                       | 一堆工件的姿态示例                      |                             |
 |                   |                       | 控制机械臂+吸盘去拾取工件                  |                             |
-|                   |                       | 控制机械臂+夹爪去拾取工件                  | IK驱动机械臂                     |
+|                   |                       | 控制机械臂+夹爪去拾取工件                  |                             |
 |                   |                       |                                |                             |
 
 # 3 业务流程
@@ -633,171 +632,54 @@ workflow.get_active_obj_nodes()\n
 
 #输出
 [
-    {
-        "kind": "Robot",  #机器人
-        "funs": [        #功能
-            {
-                "f": "pick_plan", #拾取路径规划
-                "errs": [],
-                "args": [  # 对抓手姿态的一些控制
-                    {
-                        "name": "pick_poses",  #拾取姿态列表
-                        "kind": "PoseList" #[{pos:[0,0,0],rot:[0,0,0]}]
-                    }
-                ]
-            },
-            {
-                "f": "place_plan",#放置路径规划
-                "errs": [],
-                "args": [  # 对抓手姿态的一些控制
-                    {
-                        "name": "place_poses", #放置姿态
-                        "kind": "Pose"         #{pos:[0,0,0],rot:[0,0,0]}
-                    }
-                ]
-            },
-            {
-                "f": "plan_move",    #抓取移动
-                "errs": [],
-                "args": [            #相对目标点的偏移
-                    
-                ]
-            },
-            {
-                "f": "move", #移动到目标点
-                "errs": [],
-                "args": [   #目标点的位置和抓手姿态
-                    {
-                        "name": "x",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "y",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "z",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "rx",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "ry",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "rz",
-                        "kind": "Float"
-                    }
-                ]
-            },
-            {
-                "f": "move_relatively",  #移动到目标点的相对位置
-                "errs": [],
-                "args": [    #相对位置和抓手姿态
-                    {
-                        "name": "x",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "y",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "z",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "rx",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "ry",
-                        "kind": "Float"
-                    },
-                    {
-                        "name": "rz",
-                        "kind": "Float"
-                    }
-                ]
-            },
-            {
-                "f": "do", #抓取
-                "errs": [],
-                "args": [ #拾取或放置
-                    {
-                        "name": "pickup",
-                        "kind": "Bool"
-                    }
-                ]
-            }
-        ],
-        "names": []
-    },
-    {
-        "kind": "Camera3D", #深度相机
-        "funs": [
-            {
-                "f": "capture", #获取画面
-                "errs": [
-                    "failed" #画面捕获失败
-                ],
-                "args": [
-                    
-                ]
-            },
-            {
-                "f": "pose_recognize", #姿态估计
-                "errs": [
-                    "failed"  #姿态估计失败
-                ],
-                "args": []
-            }
-        ],
-        "names": []
-    },
-    {
-        "kind": "Placer", #放置器
-        "funs": [
-            {
-                "f": "generate", #生成工件
-                "errs": [
-                    "failed" #生成失败
-                ],
-                "args": []
-            }
-        ],
-        "names": []
-    },
-    {
-        "kind": "Stacker", #堆垛器
-        "funs": [
-            {
-                "f": "generate", #生成工件
-                "errs": [
-                    "failed" #生成失败
-                ],
-                "args": []
-            }
-        ],
-        "names": []
-    },
-    {
-        "kind": "ActiveObj", #活动物体
-        "funs": [],
-        "names": []
-    },
-    {
-        "kind": "Plugin",  #节点插件
-        "funs": [],
-        "names": [
-            "Planalgo" #路径规划
-        ],
-        "args": []
-    }
-]\n
+    {'kind':'Robot','names':[],'funs':[
+        {'f':'pick_plan','errs':[],'args':[  #拾取路径规划
+            {'name':"pick_poses",'kind':"List"}]},
+        {'f':'place_plan','errs':[],'args':[ #放置路径规划
+            {'name':"place_poses",'kind':"List"}]},
+        {'f':'plan_move','errs':[],'args':[]}, 
+        {'f':'pick_move','errs':[],'args':[ #拾取移动
+            {'name':'mode','kind':'String'}, #模式，关节：joint 点：point
+            {'name':'speed','kind':'Flaot'}, #速度，0.0 ~ 1.0
+            {'name':'vision_flow','kind':'String'}, #视觉流程
+            {'name':'pickup','kind':'Bool'} #拾取设置
+            ]},
+        {'f':'move','errs':[],'args':[ #移动
+            {'name':'mode','kind':'String'}, #模式，关节：joint 点：point
+            {'name':'speed','kind':'Flaot'}, #速度，值：0.0 ~ 1.0，默认：0.2
+            {'name':'vision_flow','kind':'String'}, #视觉流程，？？
+            {'name':'pickup','kind':'Bool'}, #拾取设置，？？
+            {'name':'joints','kind':'List'}, #关节位置，[弧度值1,...弧度值n]
+            {'name':'point','kind':'List'}, #点位置，[x,y,z,rx,ry,rz]
+            {'name':'home','kind':'Bool'}, #回到home
+            ]},
+        {'f':'move_relatively','errs':[],'args':[ #相对移动
+            {'name':'mode','kind':'String'}, #模式，关节：joint 点：point
+            {'name':'speed','kind':'Flaot'}, #速度，值：0.0 ~ 1.0，默认：0.2
+            {'name':'vision_flow','kind':'String'}, #视觉流程，？？
+            {'name':'pickup','kind':'Bool'}, #拾取设置，？？
+            {'name':'joints','kind':'List'}, #关节位置，[弧度值1,...弧度值n]
+            {'name':'point','kind':'List'}, #点位置，[x,y,z,rx,ry,rz]
+            {'name':'target','kind':'String'}, #相对目标，当前任务：task_current，下一个任务：next，选择的任务：selected，工具坐标系：frame_end_effector，机械臂坐标系：frame_robot，全局坐标系：frame_global
+            ]},
+        {'f':'do','errs':[],'args':[  #末端执行器
+            {'name':'pickup','kind':'Bool'}]} #开/合
+        ]},
+    {'kind':'Camera3D','names':[],'funs':[  #相机
+        {'f':'capture','errs':["failed"],'args':[ #拍照
+            {'name':'wait_for_seconds','kind':'Float'}]}, #等待时间
+        {'f':'pose_recognize','errs':["failed"],'args':[]}, #姿态估计
+        {'f':'detect','errs':[],'args':[    #视觉检测
+            {'name':'vision_flow','kind':'String'}]} #视觉流程，？？
+        ]},
+    {'kind':'Placer','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #放置器
+    {'kind':'Stacker','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #堆垛器
+    {'kind':'ActiveObj','names':[],'funs':[],'args':[]},
+    {'kind':'Plugin','names':['PickLight','PlanAlgo'],'funs':[
+        {'f':'detect','errs':[],'args':[ #视觉检测
+            {'name':'vision_flow','kind':'String'}, #视觉流程，？？
+        ]}]}
+]
 ```
 
 ## 3.12 工作流-获取/设置
@@ -807,7 +689,3 @@ workflow.get_active_obj_nodes()\n
 ## 3.13 工作流-启动/停止
 
         让整个场景工作起来，调用启动函数。需要突然终止则调用停止函数。
-
-# 4 问题反馈
-
-## 4.1 在PickWiz与仿真平台对接中，工作流的路径规划节点留存问题
