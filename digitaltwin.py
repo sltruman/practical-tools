@@ -1,9 +1,8 @@
-sys.path.insert(0,'/home/truman/Desktop/bullet3/build_cmake/examples/pybullet')
+import sys
 import os
 import socket as s
 import json
 import traceback
-import sys
 from time import time
 import shutil
 from digitaltwin import Scene,Editor,Workflow

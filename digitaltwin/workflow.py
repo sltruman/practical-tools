@@ -73,7 +73,7 @@ class Workflow():
         def task(last):
             if not self.running: return
 
-            res = None,
+            res = err = None,
             next = None
             if last:
                 act = declare[last]
@@ -92,9 +92,9 @@ class Workflow():
                         if err != opt['err']: continue
                         next = opt['next']
                         break
-                else: return
             else:
                 next = wf["run"]
+            if not next: return
 
             err,val = res[0],res[1:]
             act = declare[next]
