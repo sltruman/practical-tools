@@ -12,6 +12,7 @@ class Camera3D(ActiveObject):
         self.forcal = kwargs['forcal']
         self.fov = kwargs['fov']
         self.sample_rate = kwargs['sample_rate']
+        self.point_ids = list()
         pass
     
     def properties(self):
@@ -75,6 +76,7 @@ class Camera3D(ActiveObject):
         pass
 
     def signal_pose_recognize(self,*args):
+        p.removeAllUserDebugItems()
         import numpy as np
         num_joints = p.getNumJoints(self.id)
         pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
@@ -121,7 +123,6 @@ class Camera3D(ActiveObject):
          
         def output():
             val = list()
-            p.removeAllUserDebugItems()
 
             for id in ids:
                 min,max = p.getAABB(id)
@@ -144,6 +145,14 @@ class Camera3D(ActiveObject):
         self.actions.append((output, ()))
         pass
     
+    def set_calibration(self,project,eye_to_hand_transform):
+        self.eye_to_hand_transform = eye_to_hand_transform
+        pass
+
+    def set_rtt_func(self,point_clouds):
+        
+        pass
+
     def draw_point_cloud(self,point_clouds):
         ms = meshlab.MeshSet()
         ms.load_new_mesh(point_clouds)
@@ -152,17 +161,23 @@ class Camera3D(ActiveObject):
         fs = m.face_matrix()
         vcs = m.vertex_color_matrix()
 
-        num_joints = p.getNumJoints(self.id)
-        pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
-        target = Rotation.from_quat(orn).apply([0,2,0]) + pos
-        rayInfo = p.rayTest(pos, target)
-        if not rayInfo: return
-        id,linkindex,fraction,target,norm = rayInfo[0]
-        p.addUserDebugLine(pos, target,[1,0,0],1,lifeTime=0)
-        points = [vs[i] + target for i in np.lexsort((vs[:,0],vs[:,1],vs[:,2]))]
-        self.ply_id = p.addUserDebugPoints(points,[[1,0,1]] * len(points),3,lifeTime=0)
+        point_indexes = [i for i in np.lexsort((vs[:,0],vs[:,1],vs[:,2]))]
+        s=[vcs[i][0:3] for i in point_indexes]
+        R = self.eye_to_hand_transform[:3, :3]
+        T = self.eye_to_hand_transform[:3, 3]
+
+        d=[T + (R @ vs[i]) for i in point_indexes]
+
+        beg = 0; end = len(point_indexes)
+        while beg < end:
+            offset = end - beg
+            if offset > 10000: offset = 10000
+            point_id = p.addUserDebugPoints(d[beg:beg+offset],s[beg:beg+offset],1,lifeTime=0)
+            self.point_ids.append(point_id)
+            beg += offset
+            print(beg)
         pass
 
     def clear_point_clounds(self):
-        if 'ply_id' in vars(self): p.removeUserDebugItem(self.ply_id)
+        for point_id in self.point_ids: p.removeUserDebugItem(point_id)
         pass

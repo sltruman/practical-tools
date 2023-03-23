@@ -1,3 +1,4 @@
+import digitaltwin
 import pybullet as p
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -14,6 +15,7 @@ class Scene:
     self.scene_path = ''
     self.timestep = 1/180.
     self.actions = list()
+    self.ground_z = 0
     
     self.id = p.connect(p.GUI,options=f'--width={width} --height={height} --headless')
     p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
@@ -32,7 +34,7 @@ class Scene:
     p.resetSimulation()
     p.setGravity(0, 0, -9.81)
     p.setTimeStep(self.timestep)
-    self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, 0], useFixedBase=True)
+    self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, self.ground_z], useFixedBase=True)
     self.load(self.scene_path)
     self.play(True)
     pass
@@ -42,13 +44,11 @@ class Scene:
 
     p.resetSimulation()
     p.setGravity(0, 0, -9.81)
-    self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, 0], useFixedBase=True)
-
     self.scene_path = scene_path
     with open(scene_path,'r') as f: self.profile = scene_info = json.load(f)
 
-    import digitaltwin
-        
+    if 'ground_z' not in scene_info: scene_info['ground_z'] = 0
+    self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, scene_info['ground_z']], useFixedBase=True)
     for object_info in scene_info['active_objects']:
       kind = object_info['kind']
 

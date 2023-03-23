@@ -164,13 +164,13 @@ class Robot(ActiveObject):
             pick_x = o_pos + o_r.apply(pick_p + [0.15,0,0])
             pick_y = o_pos + o_r.apply(pick_p + [0,0.15,0])
             pick_z = o_pos + o_r.apply(pick_p + [0,0,0.15])
-            p.addUserDebugLine(o,pick_x,[1,0,0],1,lifeTime=0)
-            p.addUserDebugLine(o,pick_y,[0,1,0],1,lifeTime=0)
-            p.addUserDebugLine(o,pick_z,[0,0,1],1,lifeTime=0)
+            # p.addUserDebugLine(o,pick_x,[1,0,0],1,lifeTime=0)
+            # p.addUserDebugLine(o,pick_y,[0,1,0],1,lifeTime=0)
+            # p.addUserDebugLine(o,pick_z,[0,0,1],1,lifeTime=0)
             pick_x = o_pos + o_r.apply(pick_p + pick_r.apply([0.1,0,0]))
             pick_y = o_pos + o_r.apply(pick_p + pick_r.apply([0,0.1,0]))
             pick_z = o_pos + o_r.apply(pick_p + pick_r.apply([0,0,0.1]))
-            p.addUserDebugLine(o,pick_z,[0,0,1],5,lifeTime=0)
+            # p.addUserDebugLine(o,pick_z,[0,0,1],5,lifeTime=0)
             
             axis_up = [0,0,1]
             pick_axis_up = (o_r * pick_r).apply([0,0,1])
