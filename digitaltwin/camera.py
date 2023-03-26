@@ -58,16 +58,12 @@ class Camera3D(ActiveObject):
         vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch,180 / np.pi * roll,2)
         pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
         _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
-
-        depth_img = np.zeros((self.image_size[1],self.image_size[0],3),np.uint8)
-        depth_pixels.astype(np.uint8)
         
         for h in range(0, self.image_size[1]):
             for w in range(0, self.image_size[0]):
-                v = far * near / (far - (far - near) * depth_pixels[h, w]) / depth_far * 255
-                depth_img[h, w] = [v,v,v]
+                depth_pixels[h, w] = far * near / (far - (far - near) * depth_pixels[h, w])
 
-        return pixels.tobytes(),depth_img.tobytes()
+        return pixels.tobytes(),depth_pixels.tobytes()
 
     def signal_capture(self,*args):
         def output(): self.result = (None,) + self.rtt()
@@ -145,12 +141,21 @@ class Camera3D(ActiveObject):
         self.actions.append((output, ()))
         pass
     
-    def set_calibration(self,project,eye_to_hand_transform):
-        self.eye_to_hand_transform = eye_to_hand_transform
+    def set_calibration(self,project_transform,eye_to_hand_transform):
+        eye_to_hand_transform = np.array(eye_to_hand_transform)
+        R = eye_to_hand_transform[:3, :3]
+        T = eye_to_hand_transform[:3, 3]
+        self.set_pos(T)
+        self.set_rot(Rotation.from_matrix(R).as_euler('xyz'))
+        
+        project_transform = np.array(project_transform)
+        fx = project_transform[0,0]
+        fy = project_transform[1,1]
+        cx = project_transform[0,2]
+        cy = project_transform[1,2]
         pass
 
     def set_rtt_func(self,point_clouds):
-        
         pass
 
     def draw_point_cloud(self,point_clouds):
@@ -163,10 +168,10 @@ class Camera3D(ActiveObject):
 
         point_indexes = [i for i in np.lexsort((vs[:,0],vs[:,1],vs[:,2]))]
         s=[vcs[i][0:3] for i in point_indexes]
-        R = self.eye_to_hand_transform[:3, :3]
-        T = self.eye_to_hand_transform[:3, 3]
+        R = Rotation.from_euler('xyz',self.rot)
+        T = self.pos
 
-        d=[T + (R @ vs[i]) for i in point_indexes]
+        d=[T + R.apply(vs[i]) for i in point_indexes]
 
         beg = 0; end = len(point_indexes)
         while beg < end:

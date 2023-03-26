@@ -7,10 +7,7 @@ class Workflow():
     def __init__(self,scene: Scene):
         self.scene = scene
         self.running = False
-        pass
-
-    def get_active_obj_nodes(self):
-        nodes = [
+        self.nodes = [
             {'kind':'Robot','names':[],'funs':[
                 {'f':'pick_plan','errs':[],'args':[  #拾取路径规划
                     {'name':"pick_poses",'kind':"List"}]},
@@ -46,24 +43,23 @@ class Workflow():
                 {'f':'capture','errs':["failed"],'args':[ #拍照
                     {'name':'wait_for_seconds','kind':'Float'}]}, #等待时间
                 {'f':'pose_recognize','errs':["failed"],'args':[]}, #姿态估计
-                {'f':'detect','errs':[],'args':[    #视觉检测
-                    {'name':'vision_flow','kind':'String'}]} #视觉流程，？？
                 ]},
             {'kind':'Placer','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #放置器
             {'kind':'Stacker','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #堆垛器
             {'kind':'ActiveObj','names':[],'funs':[],'args':[]},
-            {'kind':'Plugin','names':['PickLight','PlanAlgo'],'funs':[
+            {'kind':'Vision','names':['PickLight'],'funs':[
                 {'f':'detect','errs':[],'args':[ #视觉检测
                     {'name':'vision_flow','kind':'String'}, #视觉流程，？？
                 ]}]}
         ]
+        pass
 
+    def get_active_obj_nodes(self):
         for name,obj in enumerate(self.scene.active_objs_by_name):
             kind = type(obj)
-            for n in nodes:
+            for n in self.nodes:
                 if n['kind'] == kind: n['names'].append(name)
-
-        return nodes
+        return self.nodes
 
     def start(self):
         self.running = True
