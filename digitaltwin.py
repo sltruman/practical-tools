@@ -68,7 +68,7 @@ else:
     except:
         traceback.print_exc()
         pass
-    
+     
     del workflow
     del editor
     del scene

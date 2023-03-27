@@ -1,4 +1,5 @@
 {
+    "ground_z": -0.55,
     "active_objects": [
         {
             "kind":"Robot",
@@ -26,30 +27,8 @@
     "workflow":{
         "run":"1",
         "declare":{
-            "1":{"kind":"Placer","fun":"generate","name":"placer", "next":"2"},
-            "2":{
-                "kind":"Camera3D","fun":"pose_recognize","name":"camera", "next":"3",
-                "alt":[{"next":"7","err": "failed"}]
-            },
-            "3":{"kind":"Robot","fun":"pick_plan","name":"robot","args":{
-                "pick_poses":[
-                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,0]},
-                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-0.785]},
-                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-1.57]},
-                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-2.355]},
-                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-3.14]},
-                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,2.355]},
-                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,1.57]},
-                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,0.785]}
-                ],
-                "plugin":"Planalgo"
-            },"next":"4"},
-            "4":{"kind":"Robot","fun":"plan_move","name":"robot","next":"5"},
-            "5":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup":true},"next":"6"},
-            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.35},"next":"7"},
-            "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.3,"y":0.1,"z":0.3},"next":"8"},
-            "8":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": false},"next":"9"},
-            "9":{"kind":"Robot","fun":"home","name":"robot","next":"2"}
+            "1":{"kind":"Camera3D","fun":"capture_reality","name":"camera"},
+            "2":{"kind":"Vision","fun":"detect","name":"PickLight"}
         }
     }
 }
