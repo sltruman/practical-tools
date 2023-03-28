@@ -75,7 +75,8 @@ class Workflow():
         def task(last):
             if not self.running: return
 
-            res = err = None,
+            res = None,
+            err,val = res[0],res[1:]
             next = None
             if last:
                 act = declare[last]
@@ -87,18 +88,21 @@ class Workflow():
                     return
                 
                 res = last_obj.result
-                if 'next' in act:
+                err,val = res[0],res[1:]
+                if 'next' in act and not err:
                     next = act['next']
                 elif 'alt' in act:
                     for opt in act['alt']:
                         if err != opt['err']: continue
                         next = opt['next']
                         break
+
             else:
                 next = wf["run"]
-            if not next: return
+            if not next: 
+                print('workflow stopped')
+                return
 
-            err,val = res[0],res[1:]
             act = declare[next]
             name = act['name']
             fun = act['fun']

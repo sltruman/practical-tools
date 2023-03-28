@@ -41,10 +41,12 @@ class Vision:
                 
                 for pick_point in pick_points:
                     R = pick_point[:3, :3]
-                    pos = T = pick_point[:3, 3]
+                    T = pick_point[:3, 3]
+                    pos = T[0],T[1],T[2]
                     rot = Rotation.from_matrix(R).as_euler('xyz')
                     rot = rot[0],rot[1],rot[2]
-                    self.result[1].append((T,rot))
+                    self.result[1].append((pos,rot))
+                
                 sk.close()
                 print(self.result)
 

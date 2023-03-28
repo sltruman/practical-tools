@@ -254,6 +254,10 @@ class Robot(ActiveObject):
         ee_pos = np.array(ee_pos)
         ee_rot = p.getEulerFromQuaternion(ee_orn)
 
+        if not pick_points: 
+            self.result = 'failed', 
+            return
+
         pick_pos,pick_rot = pick_points[0]
         route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
 
