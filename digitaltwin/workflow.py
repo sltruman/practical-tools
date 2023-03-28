@@ -47,11 +47,17 @@ class Workflow():
             {'kind':'Placer','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #放置器
             {'kind':'Stacker','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #堆垛器
             {'kind':'ActiveObj','names':[],'funs':[],'args':[]},
-            {'kind':'Vision','names':['PickLight'],'funs':[
+            {'kind':'Vision','names':[],'funs':[
                 {'f':'detect','errs':[],'args':[ #视觉检测
                     {'name':'vision_flow','kind':'String'}, #视觉流程，？？
                 ]}]}
         ]
+
+        self.active_plugins_by_name = dict()
+
+        import plugins.vision
+        plugin = plugins.vision.Vision()
+        self.active_plugins_by_name[plugin.name] = plugin
         pass
 
     def get_active_obj_nodes(self):
@@ -74,8 +80,8 @@ class Workflow():
             if last:
                 act = declare[last]
                 name = act['name']
-                last_obj = self.scene.active_objs_by_name[name]
-                
+
+                last_obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
                 if not last_obj.idle():
                     self.scene.actions.append((task,(last)))
                     return
@@ -97,8 +103,8 @@ class Workflow():
             name = act['name']
             fun = act['fun']
             args = act['args'] if 'args' in act else {}
-            obj = self.scene.active_objs_by_name[name]
-
+            obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
+            
             print('signal',fun,args)
             eval(f'obj.signal_{fun}(*val,**args)')
 

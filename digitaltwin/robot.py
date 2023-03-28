@@ -246,6 +246,34 @@ class Robot(ActiveObject):
         self.actions.append((output,(0,)))
         pass
 
+    def signal_pick_move(self,pick_points,**kwargs):
+        num_joints = p.getNumJoints(self.id)
+        ee_index = num_joints-1
+
+        ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        ee_pos = np.array(ee_pos)
+        ee_rot = p.getEulerFromQuaternion(ee_orn)
+
+        pick_pos,pick_rot = pick_points[0]
+        route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
+
+        def task(*poses):
+            p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
+            self.current_joint_poses = poses
+
+        for poses in route_poses: self.actions.append((task,poses))
+        
+        def output(last_pos):
+            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
+            pos = np.linalg.norm(pos)
+            if round(last_pos - pos,6) != 0.000000:
+                self.actions.append((output,(pos,)))
+                return
+            self.result = None,
+        
+        self.actions.append((output,(0,)))
+        pass
+
     def signal_move(self,*args,**kwargs):
         num_joints = p.getNumJoints(self.id)
         ee_index = num_joints-1

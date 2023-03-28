@@ -14,6 +14,8 @@ class Camera3D(ActiveObject):
         self.fov = kwargs['fov']
         self.sample_rate = kwargs['sample_rate']
         self.point_ids = list()
+        pm = np.array(p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],self.forcal,1000)).reshape((4,4))[:3,:3]
+        self.projection_transform = pm
         pass
     
     def properties(self):
@@ -53,7 +55,7 @@ class Camera3D(ActiveObject):
                 if not rayInfo: continue
                 
                 id,linkindex,fraction,pos,norm = rayInfo[0]
-                distance = np.linalg.norm(pos - origin) 
+                distance = np.linalg.norm(pos - origin)
                 if depth_far < distance: depth_far = distance
 
         vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch,180 / np.pi * roll,2)
@@ -141,8 +143,6 @@ class Camera3D(ActiveObject):
         pass
     
     def signal_capture_reality(self,*args):
-        self.clear_point_clounds()
-        
         import sys
         import socket as s
         import os
@@ -159,7 +159,7 @@ class Camera3D(ActiveObject):
         def task():
             width = int.from_bytes(sk.recv(4),'little')
             height = int.from_bytes(sk.recv(4),'little')
-            if not height:
+            if not width:
                 sk.close()
                 self.result = None,
                 return
@@ -173,47 +173,52 @@ class Camera3D(ActiveObject):
             size = width * height * 4
             while len(depth_pixels) < size:
                 depth_pixels += sk.recv(size - len(depth_pixels))
-            sk.close()
-            
-            self.actions.append((self.draw_point_cloud,(rgb_pixels,depth_pixels,width,height)))
-        self.actions.append((task,()))
 
-    def set_calibration(self,project_transform,eye_to_hand_transform):
-        print(project_transform)
-        print(eye_to_hand_transform)
+            sk.close()
+
+            self.clear_point_clounds()
+            self.actions.append((self.draw_point_cloud_from_depth_pixels,(rgb_pixels,depth_pixels,width,height)))
+            
+        self.actions.append((task,()))
+        self.result = None,
+
+    def set_calibration(self,projection_transform,eye_to_hand_transform):
         self.eye_to_hand_transform = np.array(eye_to_hand_transform)
         R = self.eye_to_hand_transform[:3, :3]
         T = self.eye_to_hand_transform[:3, 3]
         self.set_pos(T)
         self.set_rot(Rotation.from_matrix(R).as_euler('xyz'))
-        self.project_transform = np.array(project_transform)
-        self.image_size[0] = self.fx = int(self.project_transform[0,0])
-        self.image_size[1] = self.fy = int(self.project_transform[1,1])
-        self.cx = int(self.project_transform[0,2])
-        self.cy = int(self.project_transform[1,2])
+        self.projection_transform = np.array(projection_transform)
+        self.image_size[0] = self.fx = int(self.projection_transform[0,0])
+        self.image_size[1] = self.fy = int(self.projection_transform[1,1])
+        self.cx = int(self.projection_transform[0,2])
+        self.cy = int(self.projection_transform[1,2])
         pass
 
     def depth_to_point_cloud(self,depth_image, intrinsic_matrix):
         # Convert depth image to point cloud
         rows, cols = depth_image.shape
         c, r = np.meshgrid(np.arange(cols), np.arange(rows), sparse=True)
-        valid = (depth_image > 0) & (depth_image < 1000)
+        valid = (0 < depth_image) & (depth_image < 1000)
         z = np.where(valid, depth_image, np.nan)
         x = np.where(valid, z * (c - intrinsic_matrix[0, 2]) / intrinsic_matrix[0, 0], 0)
         y = np.where(valid, z * (r - intrinsic_matrix[1, 2]) / intrinsic_matrix[1, 1], 0)
+
         point_cloud = np.dstack((x, y, z))
         point_cloud = np.reshape(point_cloud, (rows * cols, 3))
         return point_cloud
 
-    def draw_point_cloud(self,rgb_pixels,depth_pixels,width,height):
+    def draw_point_cloud_from_depth_pixels(self,rgb_pixels,depth_pixels,width,height):
         R = Rotation.from_euler('xyz',self.rot)
         T = self.pos
-
-        point_cloud_color = np.frombuffer(rgb_pixels, dtype=np.byte).reshape((width*height,3))
-        depth_pixels = np.frombuffer(depth_pixels, dtype=np.float32).reshape((width,height))
-        point_cloud = self.depth_to_point_cloud(depth_pixels,self.project_transform)
+        count = width*height
+        sample = int(count / 50000)
+        
+        point_cloud_color = np.frombuffer(rgb_pixels, dtype=np.ubyte).reshape((width*height,3))[::sample] / 255
+        depth_pixels = np.frombuffer(depth_pixels, dtype=np.float32).reshape((height,width))
+        point_cloud = self.depth_to_point_cloud(depth_pixels,self.projection_transform)[::sample]
         point_cloud = R.apply(point_cloud) + T
-
+        
         beg = 0; end = len(point_cloud)
         while beg < end:
             offset = end - beg
@@ -221,8 +226,28 @@ class Camera3D(ActiveObject):
             point_id = p.addUserDebugPoints(point_cloud[beg:beg+offset],point_cloud_color[beg:beg+offset],1,lifeTime=0)
             self.point_ids.append(point_id)
             beg += offset
-            print(beg)
+        pass
 
+    def draw_point_cloud(self,ply_path):
+        ms = meshlab.MeshSet()
+        ms.load_new_mesh(ply_path)
+        m = ms.current_mesh()
+        vs = m.vertex_matrix()
+        fs = m.face_matrix()
+        vcs = m.vertex_color_matrix()[:,:3]
+        R = Rotation.from_euler('xyz',self.rot)
+        T = self.pos
+
+        if len(vs) > len(vcs): vcs.extend([0,0,0]*(len(vs)-len(vcs)))
+        point_cloud = R.apply(vs) + T
+        
+        beg = 0; end = len(vs)
+        while beg < end:
+            offset = end - beg
+            if offset > 10000: offset = 10000
+            point_id = p.addUserDebugPoints(point_cloud[beg:beg+offset],vcs[beg:beg+offset],1,lifeTime=0)
+            self.point_ids.append(point_id)
+            beg += offset
         pass
 
     def clear_point_clounds(self):
