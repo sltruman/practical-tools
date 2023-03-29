@@ -4,7 +4,9 @@ from .active_obj import ActiveObject
 
 import pymeshlab as meshlab
 import numpy as np
-import struct
+import sys
+import socket as s
+import os
 
 class Camera3D(ActiveObject):
     def __init__(self,scene,**kwargs):
@@ -76,16 +78,18 @@ class Camera3D(ActiveObject):
         p.removeAllUserDebugItems()
         import numpy as np
         num_joints = p.getNumJoints(self.id)
-        pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        if num_joints: 
+            pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        else:
+            pos,orn = p.getBasePositionAndOrientation(self.id)
 
-        near = self.forcal
         far = 1000
         origin = np.array(pos)
-        viewport_length = np.tan(np.pi / 180 * self.fov / 2) * near * 2
+        viewport_length = np.tan(np.pi / 180 * self.fov / 2) * self.forcal * 2
 
         horizontal = np.array([viewport_length, 0, 0])
-        vertical = np.array([0, 0, viewport_length])
-        lower_left_corner = [0, near, 0] - horizontal/2 - vertical/2
+        vertical = np.array([0, viewport_length, 0])
+        lower_left_corner = [0, 0, -self.forcal] - horizontal/2 - vertical/2
         ids = set()
 
         sample_rate = 2
@@ -115,7 +119,6 @@ class Camera3D(ActiveObject):
                     id,linkindex,fraction,pos,norm = rayInfo[0]
                     if id in self.scene.active_objs or id == 0: return
                     ids.add(id)
-
                 self.actions.append((ray, (origin,target + dr)))
          
         def output():
@@ -140,12 +143,28 @@ class Camera3D(ActiveObject):
                 val.append((pos,rot,None))
             self.result = (None,val) if val else ('failed',)
         self.actions.append((output, ()))
+
+class Camera3DReal(ActiveObject):
+    def __init__(self,scene,**kwargs):
+        self.point_ids = list()
+        super().__init__(scene, **kwargs)
+        self.image_size = kwargs['image_size']
+        self.projection_transform = kwargs['projection_transform']
+        self.eye_to_hand_transform = kwargs['eye_to_hand_transform']
+        self.rgb_pixels = bytes()
+        self.depth_pixels = bytes()
         pass
     
-    def signal_capture_reality(self,*args):
-        import sys
-        import socket as s
-        import os
+    def properties(self):
+        info = super().properties()
+        info.update(dict(kind='Camera3DReal',image_size=self.image_size,projection_transform=self.projection_transform,eye_to_hand_transform=self.eye_to_hand_transform))
+        return info
+    
+    def rtt(self):
+        return self.rgb_pixels,self.depth_pixels
+
+    def signal_capture(self,*args):
+        self.clear_point_clounds()
         sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
 
         try:
@@ -174,41 +193,38 @@ class Camera3D(ActiveObject):
             while len(depth_pixels) < size:
                 depth_pixels += sk.recv(size - len(depth_pixels))
 
-            sk.close()
+            self.rgb_pixels = rgb_pixels
+            self.depth_pixels = depth_pixels
 
-            self.clear_point_clounds()
+            sk.close()
             self.actions.append((self.draw_point_cloud_from_depth_pixels,(rgb_pixels,depth_pixels,width,height)))
-            
+            self.result = None,self.eye_to_hand_transform
+        
         self.actions.append((task,()))
-        self.result = None,
 
     def set_calibration(self,projection_transform,eye_to_hand_transform):
-        self.eye_to_hand_transform = np.array(eye_to_hand_transform)
-        R = self.eye_to_hand_transform[:3, :3]
-        T = self.eye_to_hand_transform[:3, 3]
+        eye_to_hand_transform = np.array(eye_to_hand_transform)
+        R = eye_to_hand_transform[:3, :3]
+        T = eye_to_hand_transform[:3, 3]
         self.set_pos(T)
         self.set_rot(Rotation.from_matrix(R).as_euler('xyz'))
         self.projection_transform = np.array(projection_transform)
-        self.image_size[0] = self.fx = int(self.projection_transform[0,0])
-        self.image_size[1] = self.fy = int(self.projection_transform[1,1])
-        self.cx = int(self.projection_transform[0,2])
-        self.cy = int(self.projection_transform[1,2])
+        self.eye_to_hand_transform = eye_to_hand_transform
         pass
 
-    def depth_to_point_cloud(self,depth_image, intrinsic_matrix):
-        # Convert depth image to point cloud
-        rows, cols = depth_image.shape
-        c, r = np.meshgrid(np.arange(cols), np.arange(rows), sparse=True)
-        valid = (0 < depth_image) & (depth_image < 1000)
-        z = np.where(valid, depth_image, np.nan)
-        x = np.where(valid, z * (c - intrinsic_matrix[0, 2]) / intrinsic_matrix[0, 0], 0)
-        y = np.where(valid, z * (r - intrinsic_matrix[1, 2]) / intrinsic_matrix[1, 1], 0)
-
-        point_cloud = np.dstack((x, y, z))
-        point_cloud = np.reshape(point_cloud, (rows * cols, 3))
-        return point_cloud
-
     def draw_point_cloud_from_depth_pixels(self,rgb_pixels,depth_pixels,width,height):
+        def depth_to_point_cloud(depth_image, projection_transform):
+            rows, cols = depth_image.shape
+            c, r = np.meshgrid(np.arange(cols), np.arange(rows), sparse=True)
+            valid = (0 < depth_image) & (depth_image < 1000)
+            z = np.where(valid, depth_image, np.nan)
+            x = np.where(valid, z * (c - projection_transform[0, 2]) / projection_transform[0, 0], 0)
+            y = np.where(valid, z * (r - projection_transform[1, 2]) / projection_transform[1, 1], 0)
+
+            point_cloud = np.dstack((x, y, z))
+            point_cloud = np.reshape(point_cloud, (rows * cols, 3))
+            return point_cloud
+
         R = Rotation.from_euler('xyz',self.rot)
         T = self.pos
         count = width*height
@@ -216,7 +232,7 @@ class Camera3D(ActiveObject):
         
         point_cloud_color = np.frombuffer(rgb_pixels, dtype=np.ubyte).reshape((width*height,3))[::sample] / 255
         depth_pixels = np.frombuffer(depth_pixels, dtype=np.float32).reshape((height,width))
-        point_cloud = self.depth_to_point_cloud(depth_pixels,self.projection_transform)[::sample]
+        point_cloud = depth_to_point_cloud(depth_pixels,self.projection_transform)[::sample]
         point_cloud = R.apply(point_cloud) + T
         
         beg = 0; end = len(point_cloud)

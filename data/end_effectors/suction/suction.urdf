@@ -51,5 +51,10 @@
         <mesh filename="link1.obj"/>
       </geometry>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="link1.obj"/>
+      </geometry>
+    </collision>
   </link>
 </robot>

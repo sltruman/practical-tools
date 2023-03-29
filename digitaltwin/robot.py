@@ -120,7 +120,7 @@ class Robot(ActiveObject):
         ee_pos,ee_rot = origin
         o_pos,o_rot = target
         o_pos = np.array(o_pos)
-        # p.addUserDebugLine(ee_pos,o_pos,[1,1,1],2,lifeTime=5) 
+        p.addUserDebugLine(ee_pos,o_pos,[1,1,1],2,lifeTime=5) 
 
         route_poses = list()
         while np.linalg.norm(o_pos - ee_pos) != 0:

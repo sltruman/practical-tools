@@ -13,7 +13,7 @@
         {
             "kind":"Stacker",
             "name":"stacker",
-            "base":"./data/objects/tray/traybox.urdf",
+            "base":"./data/objects/woodboard/woodboard.urdf",
             "pos":[0,-0.52,0.01],
             "rot":[0,0,0],
             "area":[0.3,0.3,0.3],
@@ -23,14 +23,13 @@
         {
             "kind":"Camera3D",
             "name":"camera",
-            "base":"./data/cameras/camera3d.urdf",
-            "pos":[-0.5,-0.52,0.0],
+            "base":"./data/cameras/camera3d/camera3d.urdf",
+            "pos":[-0.032747,-0.564563,1.1767],
             "rot":[0.0,0.0,-1.57],
             "fov": 20,
             "forcal": 0.01,
-            "sample_rate": 20, 
-            "image_size": [300,300],
-            "image_path":"./guagua.png"
+            "sample_rate": 20,
+            "image_size": [300,300]
         }
     ],
 

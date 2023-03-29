@@ -21,12 +21,13 @@ class Vision:
 
         return False
     
-    def signal_detect(self,*args,**kwargs):
+    def signal_detect(self,eye_to_hand_transform,**kwargs):
         sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
         tmp_dir = sys.argv[4]
         sock_path = os.path.join(tmp_dir,self.name + '.sock')
         sk.connect(sock_path)
         buf = b''
+        self.result = None,[]
         
         def task(buf:bytes):
             try:
@@ -36,10 +37,10 @@ class Vision:
                 self.actions.append((task,(buf,)))
             except BlockingIOError: self.actions.append((task,(buf,)))
             except (ConnectionResetError,BrokenPipeError):
-                self.result = None,[]
                 pick_points = np.array(eval(buf.decode()))
                 
                 for pick_point in pick_points:
+                    pick_point = eye_to_hand_transform @ pick_point
                     R = pick_point[:3, :3]
                     T = pick_point[:3, 3]
                     pos = T[0],T[1],T[2]

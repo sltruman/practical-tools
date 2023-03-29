@@ -14,8 +14,8 @@
         {
             "kind":"Camera3D",
             "name":"camera",
-            "base":"./data/cameras/camera3d.urdf",
-            "pos":[-0.5,-0.5,0.0],
+            "base":"./data/cameras/camera3d/camera3d.urdf",
+            "pos":[-0.032747,-0.564563,1.1767],
             "rot":[0.0,0.0,-1.57],
             "fov": 20,
             "forcal": 0.01,
