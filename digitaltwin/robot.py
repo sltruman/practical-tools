@@ -29,12 +29,8 @@ class Robot(ActiveObject):
         pass
 
     def set_base(self,base):
-        self.base = base
+        base_temp = self.base = base
         
-        import tempfile
-        f = tempfile.NamedTemporaryFile("w",delete=False)
-        base_temp = f.name
-
         ee_kind = ""
         mimic_name = ''
         gears = []
@@ -44,7 +40,7 @@ class Robot(ActiveObject):
                 filename = mesh.getAttribute('filename')
                 mesh.setAttribute('filename',os.path.join(os.getcwd(),os.path.dirname(base),filename))
 
-            if 'end_effector' in vars(self):
+            if self.end_effector:
                 link_ee = node_robot.getElementsByTagName('link')[-1]
                 link_ee_name = link_ee.getAttribute('name')
                 with xml.parse(self.end_effector) as doc_ee:
@@ -69,12 +65,17 @@ class Robot(ActiveObject):
                         gears.append((mimic_name,joint_name,multiplier))
 
                 node_robot.removeChild(link_ee).unlink()
+
+            import tempfile
+            f = tempfile.NamedTemporaryFile("w",delete=False)
+            base_temp = f.name
             f.write(node_robot.toxml())
+            f.close()
 
         if 'id' in vars(self): p.removeBody(self.id)
+        print('robot urdf',base_temp)
         self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
-        f.close()
-
+        
         if ee_kind == 'Gripper': self.end_effector_obj = Gripper(self.id,gears)
         elif ee_kind == 'Suction': self.end_effector_obj = Suction(self.id)
         else: 

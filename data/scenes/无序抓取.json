@@ -25,14 +25,24 @@
         {
             "kind":"Camera3D",
             "name":"camera",
-            "base":"./data/cameras/camera3d/camera3d.urdf",
+            "base":"./data/objects/default/empty.urdf",
             "pos":[-0.032747,-0.564563,1.1767],
             "rot":[0.0,0.0,-1.57],
             "fov": 20,
             "forcal": 0.01,
             "sample_rate": 20, 
-            "image_size": [300,300],
-            "image_path":"./guagua.png"
+            "image_size": [1920,1200],
+            "sample_num": 100000
+        },
+        {
+            "kind":"Camera3DReal",
+            "name":"camera2",
+            "base":"./data/cameras/camera3d/camera3d.urdf",
+            "pos":[-0.032747,-0.564563,1.1767],
+            "rot":[0.0,0.0,-1.57],
+            "projection_transform": [[3507.176621132752,0.0,1218.55397352377],[0.0,3506.5191735910958,1038.1997907533078],[0.0,0.0,1.0]],
+            "eye_to_hand_transform": [[-0.03848572352572521,-0.9986251185481502,-0.035591033793917766,0.9516957587752023],[-0.9992461560238449,0.03827916479278677,0.006467241624670584,-0.900332425706558],[-0.005095954886352403,0.03581310018049166,-0.9993455123725961,1.553975140167797],[0.0,0.0,0.0,1.0]],
+            "image_size": [1920,1200]
         }
     ],
 
@@ -61,7 +71,14 @@
             "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.35},"next":"7"},
             "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.3,"y":0.1,"z":0.3},"next":"8"},
             "8":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": false},"next":"9"},
-            "9":{"kind":"Robot","fun":"home","name":"robot","next":"2"}
+            "9":{"kind":"Robot","fun":"home","name":"robot","next":"2"},
+
+            "10":{"kind":"Camera3DReal","fun":"capture","name":"camera2", "next":"11"},
+            "11":{"kind":"Vision","fun":"detect","name":"PickLight","next":"12"},
+            "13":{"kind":"Robot","fun":"pick_move","name":"robot","next":"14"},
+            "14":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.5},"next":"15"},
+            "15":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.3,"y":0.1,"z":0.3},"next":"16"},
+            "17":{"kind":"Robot","fun":"home","name":"robot","next":"10"}
         }
     }
 }

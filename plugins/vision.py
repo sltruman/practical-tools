@@ -32,13 +32,13 @@ class Vision:
         def task(buf:bytes):
             try:
                 c = sk.recv(1024,s.MSG_DONTWAIT)
-                if not c: raise ConnectionResetError
+                if not c: 
+                    pick_points = np.array(eval(buf.decode()))
+                    raise ConnectionResetError
                 buf += c
                 self.actions.append((task,(buf,)))
             except BlockingIOError: self.actions.append((task,(buf,)))
             except (ConnectionResetError,BrokenPipeError):
-                pick_points = np.array(eval(buf.decode()))
-                
                 for pick_point in pick_points:
                     pick_point = eye_to_hand_transform @ pick_point
                     R = pick_point[:3, :3]
@@ -50,5 +50,6 @@ class Vision:
                 
                 sk.close()
                 print(self.result)
+            except SyntaxError:pass
 
         self.actions.append((task,(buf,)))

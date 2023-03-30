@@ -1,5 +1,4 @@
 {
-    "ground_z": 0,
     "active_objects": [
         {
             "kind":"Robot",
@@ -12,6 +11,18 @@
             "end_effector":"./data/end_effectors/motoman/motoman.urdf"
         },
         {
+            "kind":"Placer",
+            "name":"placer",
+            "base":"./data/objects/tray/traybox.urdf",
+            "pos":[0,-0.5,0.001],
+            "rot":[0,0,0], 
+            "center":[0.0,-0.5,0.25],
+            "interval":0.1,
+            "amount":10,
+            "workpiece":"./data/workpieces/suction/suction.urdf",
+            "workpiece_texture":""
+        }, 
+        {
             "kind":"Camera3DReal",
             "name":"camera2",
             "base":"./data/cameras/camera3d/camera3d.urdf",
@@ -19,21 +30,19 @@
             "rot":[0.0,0.0,-1.57],
             "projection_transform": [[3507.176621132752,0.0,1218.55397352377],[0.0,3506.5191735910958,1038.1997907533078],[0.0,0.0,1.0]],
             "eye_to_hand_transform": [[-0.03848572352572521,-0.9986251185481502,-0.035591033793917766,0.9516957587752023],[-0.9992461560238449,0.03827916479278677,0.006467241624670584,-0.900332425706558],[-0.005095954886352403,0.03581310018049166,-0.9993455123725961,1.553975140167797],[0.0,0.0,0.0,1.0]],
-            "image_size": [1920,1200],
-            "sample_num": 100000
+            "image_size": [1920,1200]
         }
     ],
 
     "workflow":{
-        "run":"1",
+        "run":"0",
         "declare":{
-            "1":{"kind":"Camera3DReal","fun":"capture","name":"camera2","next":"2"},
-            "2":{"kind":"Vision","fun":"detect","name":"PickLight","next":"3"},
-            "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"6"},
-            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.5},"next":"7"},
-            "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.5,"y":0.0,"z":0.5},"next":"9"},  
-            "9":{"kind":"Robot","fun":"home","name":"robot","next":"1"}
-            
+            "0":{"kind":"Camera3DReal","fun":"capture","name":"camera2", "next":"1"},
+            "1":{"kind":"Vision","fun":"detect","name":"PickLight","next":"2"},
+            "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"4"},
+            "4":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.5},"next":"5"},
+            "5":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.3,"y":0.1,"z":0.3},"next":"6"},
+            "7":{"kind":"Robot","fun":"home","name":"robot","next":"0"}
         }
     }
 }
