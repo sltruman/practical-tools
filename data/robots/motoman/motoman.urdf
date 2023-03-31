@@ -2,6 +2,11 @@
 <robot name="motoman" xmlns:xacro="http://ros.org/wiki/xacro">
     <!-- link list -->
     <link name="base_link">
+        <!-- <inertial>
+            <mass value="4.0"/>
+            <origin rpy="0 0 0" xyz="0.0 0.0 -0.5"/>
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072"/>
+          </inertial> -->
         <visual>
             <geometry>
                 <mesh filename="visual/base_link.stl"/>
@@ -92,7 +97,7 @@
     <joint name="joint1" type="revolute">
         <parent link="base_link"/>
         <child link="link_1_s"/>
-        <origin xyz="0 0 0.450" rpy="0 0 0" />          <!-- base shift -->
+        <origin xyz="0 0 0.450" rpy="0 0 0" />
         <axis xyz="0 0 1" />
         <limit lower="-2.9670" upper="2.9670" effort="926.10" velocity="4.5355"/>
     </joint>
@@ -139,4 +144,3 @@
     <!-- end of joint list -->
 
 </robot>
-

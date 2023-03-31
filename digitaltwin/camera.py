@@ -161,6 +161,9 @@ class Camera3DReal(ActiveObject):
     
     def rtt(self):
         return self.rgb_pixels,self.depth_pixels
+    
+    def signal_check(self,*args):
+        self.result = None,self.eye_to_hand_transform
 
     def signal_capture(self,*args):
         sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
@@ -195,7 +198,7 @@ class Camera3DReal(ActiveObject):
             self.depth_pixels = depth_pixels
 
             sk.close()
-            self.clear_point_clounds()
+            self.clear_point_cloud()
             self.actions.append((self.draw_point_cloud_from_depth_pixels,(rgb_pixels,depth_pixels,width,height)))
             self.result = None,self.eye_to_hand_transform
 
@@ -268,6 +271,6 @@ class Camera3DReal(ActiveObject):
             beg += offset
         pass
 
-    def clear_point_clounds(self):
+    def clear_point_cloud(self):
         for point_id in self.point_ids: p.removeUserDebugItem(point_id)
         pass

@@ -1,4 +1,5 @@
 import pybullet as p
+import os
 
 class ActiveObject:
     def __init__(self,scene,**kwargs):
@@ -9,6 +10,9 @@ class ActiveObject:
         self.pos = kwargs['pos']
         self.rot = kwargs['rot']
         self.set_base(kwargs['base'])
+        pass
+    def __del__(self):
+        p.removeBody(self.id)
         pass
     
     def properties(self):
@@ -29,7 +33,7 @@ class ActiveObject:
     def set_base(self,base):
         self.base = base
         if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(self.base, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True,flags=p.URDF_ENABLE_SLEEPING)
+        self.id = p.loadURDF(self.base, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
         return self.id
 
     def set_pos(self,pos):

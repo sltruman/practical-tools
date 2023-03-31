@@ -37,7 +37,8 @@ class Workflow():
                     {'name':'target','kind':'String'}, #相对目标，当前任务：task_current，下一个任务：next，选择的任务：selected，工具坐标系：frame_end_effector，机械臂坐标系：frame_robot，全局坐标系：frame_global
                     ]},
                 {'f':'do','errs':[],'args':[  #末端执行器
-                    {'name':'pickup','kind':'Bool'}]} #开/合
+                    {'name':'pickup','kind':'Bool'}]}, #开/合
+                {'f':'home','errs':[],'args':[]} #
                 ]},
             {'kind':'Camera3D','names':[],'funs':[  #相机
                 {'f':'capture','errs':["failed"],'args':[ #拍照
@@ -46,7 +47,6 @@ class Workflow():
                 ]},
             {'kind':'Placer','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #放置器
             {'kind':'Stacker','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #堆垛器
-            {'kind':'ActiveObj','names':[],'funs':[],'args':[]},
             {'kind':'Vision','names':[],'funs':[
                 {'f':'detect','errs':[],'args':[ #视觉检测
                     {'name':'vision_flow','kind':'String'}, #视觉流程，？？

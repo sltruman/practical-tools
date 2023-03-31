@@ -53,3 +53,43 @@ class Vision:
             except SyntaxError:pass
 
         self.actions.append((task,(buf,)))
+
+    def signal_check(self,eye_to_hand_transform,**kwargs):
+        pick_point = np.array([
+            [
+                -0.6109328215852812,
+                -0.770627694607955,
+                -0.18136690351319718,
+                -0.16305102293176799
+            ],
+            [
+                -0.7829483866689572,
+                0.6220597556471429,
+                -0.0057755018884309605,
+                -0.03409599941935853
+            ],
+            [
+                0.11727181739493445,
+                0.13847249629497058,
+                -0.9833984376293907,
+                1.2207300122066735
+            ],
+            [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        ])
+
+        self.result = None,[]
+
+        pick_point = eye_to_hand_transform @ pick_point
+        print(pick_point)
+        R = pick_point[:3, :3]
+        T = pick_point[:3, 3]
+        pos = T[0],T[1],T[2]
+        rot = Rotation.from_matrix(R).as_euler('xyz')
+        rot = rot[0],rot[1],rot[2]
+        self.result[1].append((pos,rot))    
+        print(self.result)

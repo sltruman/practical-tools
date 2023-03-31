@@ -1,6 +1,8 @@
 from .scene import Scene
 import pybullet as p
 import math
+import digitaltwin
+import os
 
 class Editor:
     def __init__(self,scene : Scene):
@@ -49,7 +51,6 @@ class Editor:
             return dict(name='',id=-1,pos=[0.,0.,0.])
             
         rayInfo = p.rayTest(rayFrom, rayTo)
-        p.addUserDebugLine(rayFrom,rayTo,[1,0,0],1,lifeTime=10)
         
         if not rayInfo: return dict(name='',id=-1,pos=[0.,0.,0.])
         id,linkindex,fraction,pos,norm = rayInfo[0]
@@ -63,12 +64,46 @@ class Editor:
     def select(self,name)->dict:
         return self.scene.active_objs_by_name[name].properties()
 
-    def add(self):
-        pass
+    def add(self,kind,base,pos,rot,scale):
+        object_info = {
+            "base":base,
+            "pos":pos,
+            "rot":rot,
+            "scale":scale,
+            "reset_joint_poses":[],
+            "joint_damping":[],
+            "end_effector":"",
+            "name":kind.lower()
+        }
+
+        active_obj = eval(f'digitaltwin.{kind}(self.scene,**object_info)')
+        self.scene.active_objs[active_obj.id] = active_obj
+        
+        name = active_obj.name
+        i = 1
+        while name in self.scene.active_objs_by_name:
+            name = active_obj.name + str(i)
+            i+=1
+        
+        active_obj.name = name
+        self.scene.active_objs_by_name[active_obj.name] = active_obj
+        return active_obj.properties()
     
-    def remove(self):
+    def remove(self,name):
+        active_obj = self.scene.active_objs_by_name[name]
+
+        del self.scene.active_objs[active_obj.id]
+        del self.scene.active_objs_by_name[name]
+        del active_obj
+        
         pass
 
     def save(self):
         pass
+
+    def rename(self,name,new_name):
+        active_obj = self.scene.active_objs_by_name[name]
+        del self.scene.active_objs_by_name[name]
+        active_obj.name = new_name
+        self.scene.active_objs_by_name[new_name] = active_obj
 

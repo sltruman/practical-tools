@@ -12,13 +12,14 @@ class Robot(ActiveObject):
         self.current_joint_poses = self.reset_joint_poses = kwargs['reset_joint_poses']
         self.joint_damping = kwargs['joint_damping']
         self.end_effector = kwargs['end_effector']
+        self.speed = kwargs['speed'] if 'speed' in kwargs else 1.0
         super().__init__(scene, **kwargs)
         self.pickup = False
         pass
 
     def properties(self):
         info = super().properties()
-        info.update(dict(kind='Robot',end_effector=self.end_effector))
+        info.update(dict(kind='Robot',end_effector=self.end_effector,speed=self.speed))
         return info
     
     def update(self,dt):
@@ -111,26 +112,88 @@ class Robot(ActiveObject):
         p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0)
         self.home_pos,self.home_rot = pos,p.getEulerFromQuaternion(orn)
         return self.id
+    
+    def set_speed(self,value):
+        self.speed = value
+    
+    def get_joints(self):
+        return self.current_joint_poses
+    
+    def set_joints(self,joint_poses):
+        p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, joint_poses)
+        self.current_joint_poses = joint_poses
+
+    def set_end_effector_pos(self,pos):
+        self.end_effector_pos = pos
+        num_joints = p.getNumJoints(self.id)
+        ee_index = num_joints-1
+        ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
+        ee_pos = np.array(ee_pos)
+        ll = [-7]*len(self.active_joints)
+        ul = [7]*len(self.active_joints)
+        jr = [7]*len(self.active_joints)
+        
+        joint_poses = p.calculateInverseKinematics(self.id, ee_index, pos, ee_orn,
+                                            lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,
+                                            jointDamping=self.joint_damping,maxNumIterations=200)
+        p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, joint_poses)
+        for i in self.active_joints: self.current_joint_poses[i] = joint_poses[i]
+        pass
+
+    def get_end_effector_pos(self):
+        num_joints = p.getNumJoints(self.id)
+        ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        ee_pos = np.array(ee_pos)
+        ee_rot = p.getEulerFromQuaternion(ee_orn)
+        return ee_pos
+
+    def set_end_effector_rot(self,rot):
+        self.end_effector_rot = rot
+        num_joints = p.getNumJoints(self.id)
+        ee_index = num_joints-1
+        if 'end_effector_pos' in vars(self):
+            ee_pos = self.end_effector_pos
+        else:
+            ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
+
+        ee_pos = np.array(ee_pos)
+        ee_orn = p.getQuaternionFromEuler(rot)
+        ll = [-7]*len(self.active_joints)
+        ul = [7]*len(self.active_joints)
+        jr = [7]*len(self.active_joints)
+        
+        joint_poses = p.calculateInverseKinematics(self.id, ee_index, ee_pos, ee_orn,
+                                            lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,
+                                            jointDamping=self.joint_damping,maxNumIterations=200)
+        p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, joint_poses)
+        for i in self.active_joints: self.current_joint_poses[i] = joint_poses[i]
+
+    def get_end_effector_rot(self):
+        num_joints = p.getNumJoints(self.id)
+        ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        ee_pos = np.array(ee_pos)
+        ee_rot = p.getEulerFromQuaternion(ee_orn)
+        return ee_rot
 
     def set_end_effector(self,base):        
         self.end_effector = base
         if 'id' not in vars(self): return
         self.set_base(self.base)
-
+        
     def plan(self,origin,target,dt=1):
         ee_pos,ee_rot = origin
         o_pos,o_rot = target
         o_pos = np.array(o_pos)
-        p.addUserDebugLine(ee_pos,o_pos,[1,1,1],2,lifeTime=5) 
+        p.addUserDebugLine(ee_pos,o_pos,[0,1,0],2,lifeTime=5) 
 
         route_poses = list()
         while np.linalg.norm(o_pos - ee_pos) != 0:
             direction = o_pos - ee_pos
             length = abs(np.linalg.norm(direction))
-            if length < (self.scene.timestep * dt): 
+            if length < (self.scene.timestep * dt * self.speed): 
                 increment_direction = direction
             else: 
-                increment_direction = direction / length * (self.scene.timestep * dt)
+                increment_direction = direction / length * (self.scene.timestep * dt * self.speed)
             ee_pos += increment_direction
 
             num_joints = p.getNumJoints(self.id)
@@ -189,15 +252,8 @@ class Robot(ActiveObject):
         ee_pos = np.array(ee_pos)
         ee_rot = p.getEulerFromQuaternion(ee_orn)
 
-        if 'plugin' in kwargs:
-            # module = kwargs['plugin']
-            # eval(f'import plugins.{module}')
-            import plugins.Planalgo
-            args = (objs,self.pos,self.rot,ee_pos,ee_rot,self.current_joint_poses)
-            route_poses = plugins.Planalgo.plan( (ee_pos,pick_rot), (pick_pos, pick_rot), *args)
-        else:
-            route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
-        
+        route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
+
         def output(): self.result = None,route_poses,None
         self.actions.append((output,()))
 
@@ -265,6 +321,13 @@ class Robot(ActiveObject):
         def task(*poses):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
+            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
+            axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
+            axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
+            axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
+            p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
+            p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
+            p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
 
         for poses in route_poses: self.actions.append((task,poses))
         

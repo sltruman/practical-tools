@@ -4,6 +4,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 from time import time,sleep
 import json
+import os
 
 class Scene:
   def __init__(self,width=1024,height=768):
@@ -98,6 +99,41 @@ class Scene:
     pitch -= 180 * y
     p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
     pass
+
+  def rotate_front(self):
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    yaw = 0
+    pitch = -1
+    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
+    pass
+
+  def rotate_back(self):
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    yaw = 180
+    pitch = -1
+    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
+    pass
+
+  def rotate_top(self):
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    yaw = 0
+    pitch = -89
+    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
+    pass
+
+  def rotate_left(self):
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    yaw = -89
+    pitch = 0
+    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
+    pass
+
+  def rotate_right(self):
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    yaw = 89
+    pitch = 0
+    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
+    pass
   
   def pan(self,x,y):
     w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
@@ -116,3 +152,4 @@ class Scene:
     for name,obj in self.active_objs_by_name.items():
       objs[name] = obj.properties()
     return objs
+  

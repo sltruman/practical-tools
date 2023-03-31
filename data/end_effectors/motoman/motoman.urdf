@@ -37,7 +37,7 @@
   <joint name="joint_ee" type="fixed">
     <parent link="11"/>
     <child link="ee"/>
-    <origin rpy="0 0.0 0" xyz="0.12 0 0.25"/>
+    <origin rpy="0 3.14 1.57" xyz="0.12 0 0.25"/>
     <limit effort="20" lower="0.00" upper="0.01" velocity="0.2"/>
   </joint>
   <link name="ee"></link>
