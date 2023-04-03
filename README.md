@@ -10,8 +10,6 @@
 
 ## 1.1 安装
 
-建立源代码目录：`mkdir -p ./GraspSim && cd GraspSim`
-
 下载源代码：`git clone http://120.24.55.96:3000/MixedAI/GraspSim`
 
 安装依赖：`pip3 install -r requirements.txt`
@@ -166,11 +164,6 @@ sequenceDiagram
     note left of bullet: 相关函数：stepSimulation
     ui->>scene: 停止()
     scene->scene: 停止场景更新的任务
-    scene->>bullet: 清空场景内所有物体
-    note left of bullet: 相关数：getNumBodies，getBodyUniqueId，removeBody
-    scene->scene: 解析场景文件
-    scene->>bullet: 生成可活动物体
-    note left of bullet: 相关函数：loadURDF,resetBasePositionAndOrientation
 ```
 
 ## 3.3 场景-视口控制
@@ -416,11 +409,9 @@ scene_profile = {
             "fov": 20,
             "forcal": 0.01,
             "sample_rate": 20, 
-            "image_size": [300,300],
-            "image_path":"./guagua.png"
+            "image_size": [300,300]
         }
     ],
-
     "workflow":{
         "run":"1",
         "declare":{

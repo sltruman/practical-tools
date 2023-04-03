@@ -18,7 +18,7 @@ class Placer(ActiveObject):
 
     def properties(self):
         info = super().properties()
-        info.update(dict(kind='Packer',center=self.center,interval=self.interval,amount=self.amount))
+        info.update(dict(kind='Packer',center=self.center,interval=self.interval,amount=self.amount,workpiece=self.workpiece))
         return info
 
     def update(self, dt):

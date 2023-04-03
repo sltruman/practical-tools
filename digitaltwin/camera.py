@@ -2,7 +2,6 @@ import pybullet as p
 from scipy.spatial.transform import Rotation
 from .active_obj import ActiveObject
 
-import pymeshlab as meshlab
 import numpy as np
 import sys
 import socket as s
@@ -249,24 +248,18 @@ class Camera3DReal(ActiveObject):
             beg += offset
         pass
 
-    def draw_point_cloud(self,ply_path):
-        ms = meshlab.MeshSet()
-        ms.load_new_mesh(ply_path)
-        m = ms.current_mesh()
-        vs = m.vertex_matrix()
-        fs = m.face_matrix()
-        vcs = m.vertex_color_matrix()[:,:3]
+    def draw_point_cloud(self,vertexes,colors):
         R = Rotation.from_euler('xyz',self.rot)
         T = self.pos
 
-        if len(vs) > len(vcs): vcs.extend([0,0,0]*(len(vs)-len(vcs)))
-        point_cloud = R.apply(vs) + T
+        if len(vertexes) > len(colors): colors.extend([0,0,0]*(len(vertexes)-len(colors)))
+        vertexes = R.apply(vertexes) + T
         
-        beg = 0; end = len(vs)
+        beg = 0; end = len(vertexes)
         while beg < end:
             offset = end - beg
             if offset > 10000: offset = 10000
-            point_id = p.addUserDebugPoints(point_cloud[beg:beg+offset],vcs[beg:beg+offset],1,lifeTime=0)
+            point_id = p.addUserDebugPoints(vertexes[beg:beg+offset],colors[beg:beg+offset],1,lifeTime=0)
             self.point_ids.append(point_id)
             beg += offset
         pass

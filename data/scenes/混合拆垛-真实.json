@@ -23,7 +23,7 @@
         }, 
         {
             "kind":"Camera3DReal",
-            "name":"camera2",
+            "name":"camera",
             "base":"./data/cameras/camera3d/camera3d.urdf",
             "pos":[-0.032747,-0.564563,1.1767],
             "rot":[0.0,0.0,-1.57],
@@ -35,9 +35,9 @@
     ],
 
     "workflow": {
-        "run":"1",
+        "run":"0",
         "declare":{
-            "0":{"kind":"Camera3DReal","fun":"capture","name":"camera2", "next":"1"},
+            "0":{"kind":"Camera3DReal","fun":"capture","name":"camera", "next":"1"},
             "1":{"kind":"Vision","fun":"detect","name":"PickLight","next":"2"},
             "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"4"},
             "4":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.5},"next":"5"},

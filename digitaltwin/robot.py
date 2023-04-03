@@ -325,9 +325,9 @@ class Robot(ActiveObject):
             axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
             axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
             axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
-            p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
-            p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
-            p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
+            # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
+            # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
+            # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
 
         for poses in route_poses: self.actions.append((task,poses))
         
