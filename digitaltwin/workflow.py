@@ -36,7 +36,9 @@ class Workflow():
                 ]},
             {'kind':'Camera3D','names':[],'funs':[  #相机
                 {'label':'Vision','f':'capture','errs':["failed"],'args':[ #拍照
-                    {'name':'wait_for_seconds','kind':'Float'}]}, #等待时间
+                    {'name':'wait_for_seconds','kind':'Float'}], #等待时间
+                },
+                {'label':'Vision','f':'pose_recognize','errs':["failed"]}, 
                 ]},
             {'kind':'Placer','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #放置器
             {'kind':'Stacker','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #堆垛器

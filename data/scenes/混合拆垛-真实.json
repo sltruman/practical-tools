@@ -39,10 +39,16 @@
         "declare":{
             "0":{"kind":"Camera3DReal","fun":"capture","name":"camera", "next":"1"},
             "1":{"kind":"Vision","fun":"detect","name":"PickLight","next":"2"},
-            "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"4"},
-            "4":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.5},"next":"5"},
-            "5":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.3,"y":0.1,"z":0.3},"next":"6"},
-            "7":{"kind":"Robot","fun":"home","name":"robot","next":"0"}
+            "2":{"kind":"Robot","fun":"pick_move","name":"robot","next":"3"},
+            "3":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.0,0.0,0.5,0,0,0]
+                },"next":"4"},
+            "4":{"kind":"Robot","fun":"move","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.3,0.1,0.3,0,0,0]
+                },"next":"5"},
+            "5":{"kind":"Robot","fun":"move","name":"robot","args":{"home": true},"next":"0"}
         }
     }
 }

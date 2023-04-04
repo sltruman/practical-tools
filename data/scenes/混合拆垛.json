@@ -51,10 +51,16 @@
             }},
             "4":{"kind":"Robot","fun":"plan_move","name":"robot","next":"5"},
             "5":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": true},"next":"6"},
-            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.1},"next":"7"},
-            "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.5,"y":0.0,"z":0.5},"next":"8"},  
+            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.0,0.0,0.1,0,0,0]
+                },"next":"7"},
+            "7":{"kind":"Robot","fun":"move","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.5,0.0,0.5,0,0,0]
+                },"next":"8"},  
             "8":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": false},"next":"9"},
-            "9":{"kind":"Robot","fun":"home","name":"robot","next":"2"}
+            "9":{"kind":"Robot","fun":"move","name":"robot","args":{"home": true},"next":"2"}
         }
     }
 }

@@ -343,18 +343,23 @@ class Robot(ActiveObject):
         pass
 
     def signal_move(self,*args,**kwargs):
+        if 'home' in kwargs:
+            self.signal_home()
+            return 
+        
         num_joints = p.getNumJoints(self.id)
         ee_index = num_joints-1
         ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
         ee_pos = np.array(ee_pos)
         ee_rot = p.getEulerFromQuaternion(ee_orn)
+        t_pos = ee_pos
+        t_rot = ee_rot
 
-        t_pos = kwargs["x"],kwargs["y"],kwargs["z"]
-        if 'rx' in kwargs and 'ry' in kwargs and 'rz' in kwargs:
-            t_rot = kwargs["rx"],kwargs["ry"],kwargs["rz"]
-        else:
-            t_rot = ee_rot
-        
+        if 'mode' in kwargs:
+            if 'point' == kwargs['mode']:
+                t_pos = kwargs['point'][0:3]
+                t_rot = kwargs['point'][3:6]
+                
         def task(*poses):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
@@ -385,14 +390,15 @@ class Robot(ActiveObject):
         ee_index = num_joints-1
         ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
         ee_pos = np.array(ee_pos)
-        ee_rot = p.getEulerFromQuaternion(ee_orn)
+        ee_rot = np.array(p.getEulerFromQuaternion(ee_orn))
+        t_pos = ee_pos
+        t_rot = ee_rot
 
-        t_pos = np.array([kwargs["x"],kwargs["y"],kwargs["z"]]) + ee_pos
-        if 'rx' in kwargs and 'ry' in kwargs and 'rz' in kwargs:
-            t_rot = kwargs["rx"],kwargs["ry"],kwargs["rz"]
-        else:
-            t_rot = ee_rot
-        
+        if 'mode' in kwargs:
+            if 'point' == kwargs['mode']:
+                t_pos = kwargs['point'][0:3] + ee_pos
+                t_rot = kwargs['point'][3:6] + ee_rot
+            
         def task(*poses):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
