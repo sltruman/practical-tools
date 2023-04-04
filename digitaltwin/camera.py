@@ -67,8 +67,7 @@ class Camera3D(ActiveObject):
         return pixels.tobytes(),depth_pixels.tobytes()
 
     def signal_capture(self,*args):
-        def output(): self.result = (None,) + self.rtt()
-        self.actions.append((output, ()))
+        self.result = (None,) + self.rtt()
         pass
 
     def signal_pose_recognize(self,*args):

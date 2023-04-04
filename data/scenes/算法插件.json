@@ -33,8 +33,7 @@
             "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"6"},
             "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.5},"next":"7"},
             "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.5,"y":0.0,"z":0.5},"next":"9"},  
-            "9":{"kind":"Robot","fun":"home","name":"robot","next":"1"}
-            
+            "9":{"kind":"Robot","fun":"home","name":"robot","next":"1"} 
         }
     }
 }
