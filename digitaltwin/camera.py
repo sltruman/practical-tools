@@ -66,6 +66,7 @@ class Camera3D(ActiveObject):
             sock_path = os.path.join(self.scene.tmp_dir,self.name + '.sock')
             sk.connect(sock_path)
             for v in pixels,depth: sk.sendall(v)
+        except: return
         finally:
             sk.close()
 
