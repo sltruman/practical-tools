@@ -37,20 +37,20 @@
     ],
 
     "workflow":{
-        "run":"0",
+        "run":"1",
         "declare":{
-            "0":{"kind":"Camera3DReal","fun":"capture","name":"camera", "next":"1"},
-            "1":{"kind":"Vision","fun":"detect","name":"PickLight","next":"2"},
-            "2":{"kind":"Robot","fun":"pick_move","name":"robot","next":"3"},
-            "3":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
+            "1":{"kind":"Camera3DReal","fun":"capture","name":"camera", "next":"2"},
+            "2":{"kind":"Vision","fun":"detect","name":"PickLight","next":"3"},
+            "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"4"},
+            "4":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
                     "mode":"point",
                     "point":[0.0,0.0,0.5,0,0,0]
-                },"next":"4"},
-            "4":{"kind":"Robot","fun":"move","name":"robot","args":{
+                },"next":"5"},
+            "5":{"kind":"Robot","fun":"move","name":"robot","args":{
                     "mode":"point",
                     "point":[0.5,-0.2,0.5,0,0,0]
-                },"next":"5"},
-            "5":{"kind":"Robot","fun":"move","name":"robot","args":{"home": true},"next":"0"}
+                },"next":"6"},
+            "6":{"kind":"Robot","fun":"move","name":"robot","args":{"home": true},"next":"1"}
         }
     }
 }
