@@ -7,7 +7,8 @@ import json
 import os
 
 class Scene:
-  def __init__(self,width=1024,height=768):
+  def __init__(self,width=1024,height=768,tmp_dir='.'):
+    self.tmp_dir = tmp_dir
     self.tick = time()
     self.active_objs = dict()
     self.active_objs_by_name = dict()

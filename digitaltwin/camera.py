@@ -23,21 +23,27 @@ class Camera3D(ActiveObject):
         return info
     
     def rtt(self):
-        import numpy as np
+        p.removeAllUserDebugItems()
         num_joints = p.getNumJoints(self.id)
-        pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        if num_joints: pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        else: pos,orn = p.getBasePositionAndOrientation(self.id)
         pitch,roll,yaw = p.getEulerFromQuaternion(orn)
 
         near = self.forcal
         far = 1000
         origin = np.array(pos)
-        viewport_length = np.tan(np.pi / 180 * self.fov / 2) * near * 2
 
+        vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch - 90,180 / np.pi * roll,2)
+        pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
+        _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
+
+        depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :])
+
+        viewport_length = np.tan(np.pi / 180 * self.fov / 2) * self.forcal * 2
         horizontal = np.array([viewport_length, 0, 0])
-        vertical = np.array([0, 0, viewport_length])
-        lower_left_corner = [0, near, 0] - horizontal/2 - vertical/2
+        vertical = np.array([0, viewport_length, 0])
+        lower_left_corner = [0, 0, -self.forcal] - horizontal/2 - vertical/2
 
-        depth_far = near
         sample_rate = 2
         for j in range(sample_rate):
             for i in range(sample_rate):
@@ -54,25 +60,35 @@ class Camera3D(ActiveObject):
                 if not rayInfo: continue
                 
                 id,linkindex,fraction,pos,norm = rayInfo[0]
-                distance = np.linalg.norm(pos - origin)
-                if depth_far < distance: depth_far = distance
 
-        vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch,180 / np.pi * roll,2)
-        pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
-        _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
-        
-        for h in range(0, self.image_size[1]):
-            for w in range(0, self.image_size[0]):
-                depth_pixels[h, w] = far * near / (far - (far - near) * depth_pixels[h, w])
         return pixels.tobytes(),depth_pixels.tobytes()
 
     def signal_capture(self,*args):
-        self.result = (None,) + self.rtt()
-        pass
+        pixels,depth = self.rtt()
+        self.result = (None,pixels,depth)
+
+        try:
+            sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
+            sock_path = os.path.join(self.scene.tmp_dir,self.name + '.sock')
+            sk.connect(sock_path)
+            for v in pixels,depth: sk.sendall(v)
+        finally:
+            sk.close()
 
     def signal_pose_recognize(self,*args):
-        p.removeAllUserDebugItems()
-        import numpy as np
+        pixels,depth = self.rtt()
+
+        try:
+            sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
+            sock_path = os.path.join(self.scene.tmp_dir,self.name + '.sock')
+            sk.connect(sock_path)
+            
+            for v in pixels,depth: sk.sendall(v)
+        except: 
+            pass
+        finally:
+            sk.close()
+
         num_joints = p.getNumJoints(self.id)
         if num_joints: 
             pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
@@ -87,17 +103,6 @@ class Camera3D(ActiveObject):
         vertical = np.array([0, viewport_length, 0])
         lower_left_corner = [0, 0, -self.forcal] - horizontal/2 - vertical/2
         ids = set()
-
-        sample_rate = 2
-        for j in range(sample_rate):
-            for i in range(sample_rate):
-                u = float(i) / (sample_rate-1)
-                v = float(j) / (sample_rate-1)
-                target = lower_left_corner + u*horizontal + v*vertical
-                target = origin + Rotation.from_quat(orn).apply(target)
-                l = np.linalg.norm(target - origin)
-                dr = (target - origin) / l * far
-                p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=1)
 
         for j in range(self.sample_rate-1,0,-1):
             for i in range(self.sample_rate):
@@ -116,7 +121,8 @@ class Camera3D(ActiveObject):
                     if id in self.scene.active_objs or id == 0: return
                     ids.add(id)
                 self.actions.append((ray, (origin,target + dr)))
-         
+        
+
         def output():
             val = list()
 
@@ -129,13 +135,13 @@ class Camera3D(ActiveObject):
                 pos,orn = p.getBasePositionAndOrientation(id)
                 rot = p.getEulerFromQuaternion(orn)
                 mesh = None#p.getMeshData(id,flags=p.MESH_DATA_SIMULATION_MESH)
-                
-                axis_x = Rotation.from_quat(orn).apply(np.array([length,0,0])) + pos
-                axis_y = Rotation.from_quat(orn).apply(np.array([0,length,0])) + pos
-                axis_z = Rotation.from_quat(orn).apply(np.array([0,0,length])) + pos
-                p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0)
-                p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0)
-                p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0)
+               
+                # axis_x = Rotation.from_quat(orn).apply(np.array([length,0,0])) + pos
+                # axis_y = Rotation.from_quat(orn).apply(np.array([0,length,0])) + pos
+                # axis_z = Rotation.from_quat(orn).apply(np.array([0,0,length])) + pos
+                # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0)
+                # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0)
+                # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0)
                 val.append((pos,rot,None))
             self.result = (None,val) if val else ('failed',)
         self.actions.append((output, ()))

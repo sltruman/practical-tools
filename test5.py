@@ -8,7 +8,7 @@ scene = Scene(1024, 768)
 scene.load('./data/scenes/算法插件.json')
 workflow = Workflow(scene)
 
-scene.active_objs_by_name['camera2'].set_calibration(projection,eye_to_hand_transform)
+scene.active_objs_by_name['camera'].set_calibration(projection,eye_to_hand_transform)
 
 import pymeshlab as meshlab
 ms = meshlab.MeshSet()
@@ -17,7 +17,7 @@ m = ms.current_mesh()
 vs = m.vertex_matrix()
 fs = m.face_matrix()
 vcs = m.vertex_color_matrix()[:,:3]
-scene.active_objs_by_name['camera2'].draw_point_cloud(vs,vcs)
+scene.active_objs_by_name['camera'].draw_point_cloud(vs,vcs)
 
 # scene.active_objs_by_name['camera'].clear_point_cloud()
 

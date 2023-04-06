@@ -6,25 +6,23 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 class Vision:
-    def __init__(self):
+    def __init__(self,*args,**kwargs):
         self.name = 'PickLight'
         self.actions = list()
         self.result = None,
+        self.tmp_dir = kwargs['tmp_dir']
         pass
     
     def idle(self):
-        if not self.actions: 
-            return True
+        if not self.actions: return True
         fun,args = act = self.actions[0]
         fun(*args)
         self.actions.pop(0)
-
         return False
     
     def signal_detect(self,eye_to_hand_transform,**kwargs):
         sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
-        tmp_dir = sys.argv[4]
-        sock_path = os.path.join(tmp_dir,self.name + '.sock')
+        sock_path = os.path.join(self.tmp_dir,self.name + '.sock')
         sk.connect(sock_path)
         buf = b''
         self.result = None,[]

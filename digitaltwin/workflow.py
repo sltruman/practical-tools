@@ -51,7 +51,7 @@ class Workflow():
         self.active_plugins_by_name = dict()
 
         import plugins.vision
-        plugin = plugins.vision.Vision()
+        plugin = plugins.vision.Vision(tmp_dir = scene.tmp_dir)
         self.active_plugins_by_name[plugin.name] = plugin
         pass
 

@@ -29,7 +29,7 @@ else:
     print(f'Serving on {sys.argv[1]}')
     sk.listen(1)
 
-    scene = Scene(width,height)
+    scene = Scene(width,height,tmp_dir)
     editor = Editor(scene)
     workflow = Workflow(scene)
     scene.load(scene_path)
@@ -41,7 +41,7 @@ else:
     try:
         while True:
             elapsed = time()
-             
+            
             try:
                 c = conn.recv(1024,s.MSG_DONTWAIT)
                 if not c: raise ConnectionResetError

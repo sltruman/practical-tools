@@ -14,8 +14,8 @@
         },
         {
             "kind":"Camera3DReal",
-            "name":"camera2",
-            "base":"./data/cameras/camera3d/camera3d.urdf",
+            "name":"camera",
+            "base":"./data/cameras/camera3d/camera3d_inv.urdf",
             "pos":[-0.032747,-0.564563,1.1767],
             "rot":[0.0,0.0,-1.57],
             "projection_transform": [[3507.176621132752,0.0,1218.55397352377],[0.0,3506.5191735910958,1038.1997907533078],[0.0,0.0,1.0]],
@@ -28,12 +28,12 @@
     "workflow":{
         "run":"1",
         "declare":{
-            "1":{"kind":"Camera3DReal","fun":"check","name":"camera2","next":"2"},
+            "1":{"kind":"Camera3DReal","fun":"check","name":"camera","next":"2"},
             "2":{"kind":"Vision","fun":"check","name":"PickLight","next":"3"},
             "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"6"},
             "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.5},"next":"7"},
-            "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.5,"y":0.0,"z":0.5},"next":"9"},  
-            "9":{"kind":"Robot","fun":"home","name":"robot","next":"1"} 
+            "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.5,"y":0.0,"z":0.5},"next":"9"},
+            "9":{"kind":"Robot","fun":"home","name":"robot","next":"1"}
         }
     }
 }
