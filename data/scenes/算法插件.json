@@ -21,7 +21,7 @@
             "projection_transform": [[3507.176621132752,0.0,1218.55397352377],[0.0,3506.5191735910958,1038.1997907533078],[0.0,0.0,1.0]],
             "eye_to_hand_transform": [[-0.03848572352572521,-0.9986251185481502,-0.035591033793917766,0.9516957587752023],[-0.9992461560238449,0.03827916479278677,0.006467241624670584,-0.900332425706558],[-0.005095954886352403,0.03581310018049166,-0.9993455123725961,1.553975140167797],[0.0,0.0,0.0,1.0]],
             "image_size": [1920,1200],
-            "sample_num": 100000
+            "sample_num": 200000
         }
     ],
 
@@ -31,9 +31,15 @@
             "1":{"kind":"Camera3DReal","fun":"check","name":"camera","next":"2"},
             "2":{"kind":"Vision","fun":"check","name":"PickLight","next":"3"},
             "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"6"},
-            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{"x":0.0,"y":0.0,"z":0.5},"next":"7"},
-            "7":{"kind":"Robot","fun":"move","name":"robot","args":{"x":0.5,"y":0.0,"z":0.5},"next":"9"},
-            "9":{"kind":"Robot","fun":"home","name":"robot","next":"1"}
+            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.0,0.0,0.5,0,0,0]
+                },"next":"7"},
+            "7":{"kind":"Robot","fun":"move","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.5,-0.2,0.5,0,0,0]
+                },"next":"8"},
+            "8":{"kind":"Robot","fun":"home","name":"robot","next":"1"}
         }
     }
 }

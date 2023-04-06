@@ -51,15 +51,9 @@ class Camera3D(ActiveObject):
                 v = float(j) / (sample_rate-1)
                 target = lower_left_corner + u*horizontal + v*vertical
                 target = origin + Rotation.from_quat(orn).apply(target)
-                
                 l = np.linalg.norm(target - origin)
                 dr = (target - origin) / l * far
-
                 p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=1)
-                rayInfo = p.rayTest(origin, target + dr)
-                if not rayInfo: continue
-                
-                id,linkindex,fraction,pos,norm = rayInfo[0]
 
         return pixels.tobytes(),depth_pixels.tobytes()
 
@@ -164,29 +158,19 @@ class Camera3DReal(ActiveObject):
         return info
     
     def rtt(self):
-        return self.rgb_pixels,self.depth_pixels
-    
+        self.signal_capture()
+        
     def signal_check(self,*args):
         self.result = None,self.eye_to_hand_transform
 
     def signal_capture(self,*args):
-        sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
-
         try:
-            tmp_dir = sys.argv[4]
-            sock_path = os.path.join(tmp_dir,self.name + '.sock')
+            sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
+            sock_path = os.path.join(self.scene.tmp_dir,self.name + '.sock')
             sk.connect(sock_path)
-        except:
-            self.result = 'failed',
-            return 
-        
-        def task():
             width = int.from_bytes(sk.recv(4),'little')
             height = int.from_bytes(sk.recv(4),'little')
-            if not width:
-                sk.close()
-                self.result = 'failed',
-                return
+            if not width or not height: raise 'failed'
 
             rgb_pixels = bytes()
             depth_pixels = bytes()
@@ -200,14 +184,16 @@ class Camera3DReal(ActiveObject):
 
             self.rgb_pixels = rgb_pixels
             self.depth_pixels = depth_pixels
-
+        except: 
+            self.result = 'failed',
+            return
+        finally:
             sk.close()
-            self.clear_point_cloud()
-            self.actions.append((self.draw_point_cloud_from_depth_pixels,(rgb_pixels,depth_pixels,width,height)))
-            self.result = None,self.eye_to_hand_transform
 
-        self.actions.append((task,()))
-
+        self.clear_point_cloud()
+        self.actions.append((self.draw_point_cloud_from_depth_pixels,(depth_pixels,rgb_pixels,width,height)))
+        self.result = None,self.eye_to_hand_transform
+        
     def set_calibration(self,projection_transform,eye_to_hand_transform):
         self.projection_transform = projection_transform
         self.eye_to_hand_transform = eye_to_hand_transform
@@ -219,7 +205,7 @@ class Camera3DReal(ActiveObject):
         self.set_rot(Rotation.from_matrix(R).as_euler('xyz').tolist())
         pass
 
-    def draw_point_cloud_from_depth_pixels(self,rgb_pixels,depth_pixels,width,height):
+    def draw_point_cloud_from_depth_pixels(self,depth_pixels,rgb_pixels,width,height):
         def depth_to_point_cloud(depth_image, projection_transform):
             projection_transform = np.array(projection_transform)
             rows, cols = depth_image.shape
@@ -235,8 +221,7 @@ class Camera3DReal(ActiveObject):
 
         R = Rotation.from_euler('xyz',self.rot)
         T = self.pos
-        count = width*height
-        sample = int(count / self.sample_num)
+        sample = int(width*height / self.sample_num)
         sample = 1 if sample < 1 else sample
         
         point_cloud_color = np.frombuffer(rgb_pixels, dtype=np.ubyte).reshape((width*height,3))[::sample] / 255
@@ -256,7 +241,7 @@ class Camera3DReal(ActiveObject):
     def draw_point_cloud(self,vertexes,colors):
         R = Rotation.from_euler('xyz',self.rot)
         T = self.pos
-
+        
         if len(vertexes) > len(colors): colors.extend([0,0,0]*(len(vertexes)-len(colors)))
         vertexes = R.apply(vertexes) + T
         

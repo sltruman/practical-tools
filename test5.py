@@ -17,7 +17,11 @@ m = ms.current_mesh()
 vs = m.vertex_matrix()
 fs = m.face_matrix()
 vcs = m.vertex_color_matrix()[:,:3]
-scene.active_objs_by_name['camera'].draw_point_cloud(vs,vcs)
+
+sample = int(len(vs) / 300000)
+sample = 1 if sample < 1 else sample
+
+scene.active_objs_by_name['camera'].draw_point_cloud(vs[::sample],vcs[::sample])
 
 # scene.active_objs_by_name['camera'].clear_point_cloud()
 
