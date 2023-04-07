@@ -34,6 +34,12 @@ class Scene:
   def reset(self):
     self.play(False)
     p.resetSimulation()
+    del self.active_objs
+    del self.active_objs_by_name
+    
+    self.active_objs = dict()
+    self.active_objs_by_name = dict()
+
     p.setGravity(0, 0, -9.81)
     p.setTimeStep(self.timestep)
     self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, self.ground_z], useFixedBase=True)
@@ -47,17 +53,26 @@ class Scene:
     p.resetSimulation()
     p.setGravity(0, 0, -9.81)
     self.scene_path = scene_path
-    with open(scene_path,'r') as f: self.profile = scene_info = json.load(f)
+    with open(scene_path,'r') as f: self.profile = json.load(f)
 
-    if 'ground_z' not in scene_info: scene_info['ground_z'] = 0
-    self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, scene_info['ground_z']], useFixedBase=True)
-    for object_info in scene_info['active_objects']:
+    if 'ground_z' not in self.profile: self.profile['ground_z'] = 0
+    self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, self.profile['ground_z']], useFixedBase=True)
+    for object_info in self.profile['active_objects']:
       kind = object_info['kind']
 
       active_obj = None
       active_obj = eval(f'digitaltwin.{kind}(self,**object_info)')
       self.active_objs[active_obj.id] = active_obj
       if 'name' in vars(active_obj): self.active_objs_by_name[active_obj.name] = active_obj
+
+  def save(self):
+      self.scene.profile['active_objects']
+      self.scene.profile['ground_z'] = self.ground_z
+      active_objects = list()
+      for obj in self.scene.active_objs_by_name.values():
+        active_objects.append(obj.properties())
+      self.scene.profile['active_objects'] = active_objects
+      with open(self.scene_path,'w') as f: json.dump(f) 
 
   def rtt(self):
     _,_,pixels,_,_ = p.getCameraImage(self.viewport_size[0],self.viewport_size[1],renderer=p.ER_BULLET_HARDWARE_OPENGL)

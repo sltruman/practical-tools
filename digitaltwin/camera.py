@@ -3,7 +3,6 @@ from scipy.spatial.transform import Rotation
 from .active_obj import ActiveObject
 
 import numpy as np
-import sys
 import socket as s
 import os
 
@@ -16,7 +15,7 @@ class Camera3D(ActiveObject):
         self.sample_rate = kwargs['sample_rate']
         self.point_ids = list()
         pass
-    
+
     def properties(self):
         info = super().properties()
         info.update(dict(kind='Camera3D',image_size=self.image_size,fov=self.fov,forcal=self.forcal))
@@ -152,7 +151,12 @@ class Camera3DReal(ActiveObject):
         self.depth_pixels = bytes()
         self.sample_num = kwargs['sample_num']
         pass
-    
+
+    def reset(self):
+        self.clear_point_cloud()
+        super().reset()
+        pass
+
     def properties(self):
         info = super().properties()
         info.update(dict(kind='Camera3DReal',image_size=self.image_size,projection_transform=self.projection_transform,eye_to_hand_transform=self.eye_to_hand_transform))

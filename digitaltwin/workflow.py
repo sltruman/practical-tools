@@ -1,7 +1,6 @@
 from .scene import Scene
 import pybullet as p
 import json
-import time
 
 class Workflow():
     def __init__(self,scene: Scene):
@@ -31,18 +30,22 @@ class Workflow():
                     {'name':'point','kind':'List'}, #点位置，[x,y,z,rx,ry,rz]
                     {'name':'target','kind':'String'}, #相对目标，当前任务：task_current，下一个任务：next，选择的任务：selected，工具坐标系：frame_end_effector，机械臂坐标系：frame_robot，全局坐标系：frame_global
                     ]},
-                {'label':'EndEffector','f':'do','errs':[],'args':[  #末端执行器
-                    {'name':'pickup','kind':'Bool'}]}, #开/合
+                {'label':'EndEffector','f':'pick','errs':[],'args':[]},  #开
+                {'label':'EndEffector','f':'place','errs':[],'args':[]}  #合
+                ]},
+            {'kind':'Camera3DReal','names':[],'funs':[  #相机
+                {'label':'Vision','f':'capture','errs':["failed"],'args':[ #拍照
+                    {'name':'wait_for_seconds','kind':'Float'}] #等待时间
+                }
                 ]},
             {'kind':'Camera3D','names':[],'funs':[  #相机
                 {'label':'Vision','f':'capture','errs':["failed"],'args':[ #拍照
-                    {'name':'wait_for_seconds','kind':'Float'}], #等待时间
-                },
-                {'label':'Vision','f':'pose_recognize','errs':["failed"]}, 
+                    {'name':'wait_for_seconds','kind':'Float'}] #等待时间
+                }
                 ]},
-            {'kind':'Placer','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #放置器
-            {'kind':'Stacker','names':[],'funs':[{'f':'generate','errs':["failed"],'args':[]}]}, #堆垛器
-            {'kind':'Vision','names':[],'funs':[
+            {'kind':'Placer','names':[],'funs':[{'label':'PlacingContainer','f':'generate','errs':["failed"],'args':[]}]}, #放置器
+            {'kind':'Stacker','names':[],'funs':[{'label':'StackingContainer','f':'generate','errs':["failed"],'args':[]}]}, #堆垛器
+            {'kind':'Vision','names':['PickLight'],'funs':[
                 {'label':'Vision','f':'detect','errs':[],'args':[ #视觉检测
                     {'name':'vision_flow','kind':'String'}]} #视觉流程，？？
                 ]}
@@ -56,11 +59,17 @@ class Workflow():
         pass
 
     def get_active_obj_nodes(self):
-        for name,obj in enumerate(self.scene.active_objs_by_name):
-            kind = type(obj)
-            for n in self.nodes:
-                if n['kind'] == kind: n['names'].append(name)
-        return self.nodes
+        from copy import deepcopy
+        
+        nodes = deepcopy(self.nodes)
+        for name in self.scene.active_objs_by_name:
+            obj = self.scene.active_objs_by_name[name]
+            kind = obj.__class__.__name__
+            for i,n in enumerate(nodes):
+                if nodes[i]['kind'] == kind:
+                    nodes[i]['names'].append(name)
+        
+        return [n for n in nodes if n['names']]
 
     def start(self):
         self.running = True

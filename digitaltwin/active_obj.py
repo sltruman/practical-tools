@@ -6,15 +6,17 @@ class ActiveObject:
         self.actions = list()
         self.result = None,
         self.scene = scene
+        self.profile = kwargs
         self.name = kwargs['name']
         self.pos = kwargs['pos']
         self.rot = kwargs['rot']
         self.set_base(kwargs['base'])
         pass
+
     def __del__(self):
         p.removeBody(self.id)
         pass
-    
+
     def properties(self):
         pos,orn = p.getBasePositionAndOrientation(self.id)
         rot = p.getEulerFromQuaternion(orn)
@@ -22,13 +24,18 @@ class ActiveObject:
     
     def update(self,dt):
         if not self.actions: return
-        fun,args = act = self.actions[0]
+        fun,args = self.actions[0]
         fun(*args)
         self.actions.pop(0)
         pass
 
     def idle(self):
-        return 0 == len(self.actions)
+         return 0 == len(self.actions)
+
+    def reset(self):
+        self.actions.clear()
+        p.resetBasePositionAndOrientation(self.id,self.profile['pos'],p.getQuaternionFromEuler(self.profile['rot']))
+        pass
 
     def set_base(self,base):
         self.base = base
@@ -50,6 +57,7 @@ class ActiveObject:
         pass
 
     def get_rot(self):
+
         return self.rot
 
     def set_scale(self,scale):
@@ -62,4 +70,4 @@ class ActiveObject:
         pass
 
     def get_transparence(self):
-        pass
+        pass 

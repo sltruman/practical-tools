@@ -15,7 +15,6 @@ class Placer(ActiveObject):
         self.amount = kwargs['amount']
         # self.workpiece_texture = kwargs['workpiece_texture']
         self.elapsed = 0
-
     def properties(self):
         info = super().properties()
         info.update(dict(kind='Packer',center=self.center,interval=self.interval,amount=self.amount,workpiece=self.workpiece))

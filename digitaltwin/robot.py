@@ -16,10 +16,14 @@ class Robot(ActiveObject):
         super().__init__(scene, **kwargs)
         self.pickup = False
         pass
+    
+    def reset(self):
+        super().reset()
+        pass
 
     def properties(self):
         info = super().properties()
-        info.update(dict(kind='Robot',end_effector=self.end_effector,speed=self.speed))
+        info.update(dict(kind='Robot',end_effector=self.end_effector,speed=self.speed,joint_damping=self.joint_damping,reset_joint_poses=self.reset_joint_poses))
         return info
     
     def update(self,dt):
@@ -426,6 +430,15 @@ class Robot(ActiveObject):
     
     def signal_do(self,*args,**kwargs):
         def task(): self.end_effector_obj.do(kwargs['pickup'])
+        self.actions.append((task,()))
+        pass
+
+    def signal_pick(self,*args,**kwargs):
+        def task(): self.end_effector_obj.do(True)
+        self.actions.append((task,()))
+        pass
+    def signal_place(self,*args,**kwargs):
+        def task(): self.end_effector_obj.do(False)
         self.actions.append((task,()))
         pass
     

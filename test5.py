@@ -27,6 +27,7 @@ scene.active_objs_by_name['camera'].draw_point_cloud(vs[::sample],vcs[::sample])
 
 workflow.start()
 
+
 while True:
     scene.update_for_tick(1/180.)
     time.sleep(1/180.)

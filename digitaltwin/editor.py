@@ -1,8 +1,7 @@
 from .scene import Scene
 import pybullet as p
 import math
-import digitaltwin
-import os
+import numpy as np
 
 class Editor:
     def __init__(self,scene : Scene):
@@ -58,7 +57,7 @@ class Editor:
         return dict(name=self.scene.active_objs[id].name,id=id,pos=pos)
         
     def move(self,name,pos):
-        self.scene.active_objs_by_name[name].properties()
+        self.scene.active_objs_by_name[name].properties() 
         pass
 
     def select(self,name)->dict:
@@ -96,10 +95,6 @@ class Editor:
         del self.scene.active_objs_by_name[name]
         del active_obj
         
-        pass
-
-    def save(self):
-        pass
 
     def rename(self,name,new_name):
         active_obj = self.scene.active_objs_by_name[name]
