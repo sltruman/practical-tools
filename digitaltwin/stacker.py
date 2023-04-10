@@ -34,7 +34,12 @@ class Stacker(ActiveObject):
 
     def update(self, dt):
         super().update(dt)
-    
+
+    def restore(self):
+        super().reset()
+        for obj_id in self.objs: p.removeBody(obj_id)
+        self.objs.clear()
+        
     def signal_generate(self):
         def task(item:bp.Item):
             item_width, item_height, item_depth = item.get_dimension()

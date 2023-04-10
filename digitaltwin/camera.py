@@ -21,6 +21,10 @@ class Camera3D(ActiveObject):
         info.update(dict(kind='Camera3D',image_size=self.image_size,fov=self.fov,forcal=self.forcal))
         return info
     
+    def reset(self):
+        super().reset()
+        pass
+    
     def rtt(self):
         p.removeAllUserDebugItems()
         num_joints = p.getNumJoints(self.id)
@@ -145,16 +149,9 @@ class Camera3DReal(ActiveObject):
         self.point_ids = list()
         super().__init__(scene, **kwargs)
         self.image_size = kwargs['image_size']
-        self.projection_transform = kwargs['projection_transform']
-        self.eye_to_hand_transform = kwargs['eye_to_hand_transform']
         self.rgb_pixels = bytes()
         self.depth_pixels = bytes()
         self.sample_num = kwargs['sample_num']
-        pass
-
-    def reset(self):
-        self.clear_point_cloud()
-        super().reset()
         pass
 
     def properties(self):
@@ -162,6 +159,11 @@ class Camera3DReal(ActiveObject):
         info.update(dict(kind='Camera3DReal',image_size=self.image_size,projection_transform=self.projection_transform,eye_to_hand_transform=self.eye_to_hand_transform))
         return info
     
+    def restore(self):
+        super().reset()
+        self.clear_point_cloud()
+        pass
+
     def rtt(self):
         self.signal_capture()
         

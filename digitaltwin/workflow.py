@@ -121,7 +121,7 @@ class Workflow():
 
     def stop(self):
         self.running = False
-        self.scene.reset()
+        self.scene.restore()
         pass
     
     def set(self,workflow):

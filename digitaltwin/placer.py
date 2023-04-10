@@ -27,6 +27,11 @@ class Placer(ActiveObject):
         self.elapsed = 0
         super().update(dt)
 
+    def restore(self):
+        super().reset()
+        for obj_id in self.objs: p.removeBody(obj_id)
+        self.objs.clear()
+
     def signal_generate(self,*args):
         def task():
             rot = np.array([random.randint(0,314),random.randint(0,314),random.randint(0,314)]) / 100.

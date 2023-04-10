@@ -32,20 +32,19 @@ class Scene:
     pass
 
   def reset(self):
-    self.play(False)
     p.resetSimulation()
     del self.active_objs
     del self.active_objs_by_name
     
     self.active_objs = dict()
-    self.active_objs_by_name = dict()
+    self.active_objs_by_name = dict() 
 
     p.setGravity(0, 0, -9.81)
     p.setTimeStep(self.timestep)
     self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, self.ground_z], useFixedBase=True)
     self.load(self.scene_path)
-    self.play(True)
     pass
+
 
   def load(self,scene_path):
     if not scene_path: return
@@ -73,6 +72,11 @@ class Scene:
         active_objects.append(obj.properties())
       self.scene.profile['active_objects'] = active_objects
       with open(self.scene_path,'w') as f: json.dump(f) 
+
+  def restore(self):
+    for obj in self.scene.active_objs_by_name.values():
+      obj.restore()
+    pass
 
   def rtt(self):
     _,_,pixels,_,_ = p.getCameraImage(self.viewport_size[0],self.viewport_size[1],renderer=p.ER_BULLET_HARDWARE_OPENGL)

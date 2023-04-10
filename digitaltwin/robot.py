@@ -17,10 +17,6 @@ class Robot(ActiveObject):
         self.pickup = False
         pass
     
-    def reset(self):
-        super().reset()
-        pass
-
     def properties(self):
         info = super().properties()
         info.update(dict(kind='Robot',end_effector=self.end_effector,speed=self.speed,joint_damping=self.joint_damping,reset_joint_poses=self.reset_joint_poses))
@@ -32,6 +28,11 @@ class Robot(ActiveObject):
             self.end_effector_obj.update(dt)
             if not self.end_effector_obj.idle: self.actions.append((lambda *args:None,()))
         pass
+
+    def restore(self):
+        super().reset()
+        p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, self.reset_joint_poses)
+        self.end_effector_obj.do(False)
 
     def set_base(self,base):
         base_temp = self.base = base

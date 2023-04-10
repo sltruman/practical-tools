@@ -32,9 +32,8 @@ class ActiveObject:
     def idle(self):
          return 0 == len(self.actions)
 
-    def reset(self):
+    def restore(self):
         self.actions.clear()
-        p.resetBasePositionAndOrientation(self.id,self.profile['pos'],p.getQuaternionFromEuler(self.profile['rot']))
         pass
 
     def set_base(self,base):
