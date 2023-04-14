@@ -12,7 +12,6 @@ class Camera3D(ActiveObject):
         self.image_size = kwargs['image_size']
         self.forcal = kwargs['forcal']
         self.fov = kwargs['fov']
-        self.sample_rate = kwargs['sample_rate']
         self.point_ids = list()
         pass
     
@@ -145,7 +144,6 @@ class Camera3DReal(ActiveObject):
         self.image_size = kwargs['image_size']
         self.rgb_pixels = bytes()
         self.depth_pixels = bytes()
-        self.sample_num = kwargs['sample_num']
         self.profile['projection_transform'] = self.projection_transform = []
         self.profile['eye_to_hand_transform'] = self.eye_to_hand_transform = []
             
@@ -158,7 +156,7 @@ class Camera3DReal(ActiveObject):
         self.signal_capture()
         
     def signal_check(self,*args,**kwargs):
-        self.result = None,self.eye_to_hand_transform
+        self.result = None,self.profile['eye_to_hand_transform']
 
     def signal_capture(self,*args,**kwargs):
         try:
@@ -189,11 +187,11 @@ class Camera3DReal(ActiveObject):
 
         self.clear_point_cloud()
         self.actions.append((self.draw_point_cloud_from_depth_pixels,(depth_pixels,rgb_pixels,width,height)))
-        self.result = None,self.eye_to_hand_transform
+        self.result = None,self.profile['eye_to_hand_transform']
         
     def set_calibration(self,projection_transform,eye_to_hand_transform):
-        self.projection_transform = projection_transform
-        self.eye_to_hand_transform = eye_to_hand_transform
+        self.profile['projection_transform'] = projection_transform
+        self.profile['eye_to_hand_transform'] = eye_to_hand_transform
 
         eye_to_hand_transform = np.array(eye_to_hand_transform)
         R = eye_to_hand_transform[:3, :3]
@@ -216,14 +214,14 @@ class Camera3DReal(ActiveObject):
             point_cloud = np.reshape(point_cloud, (rows * cols, 3))
             return point_cloud
 
-        R = Rotation.from_euler('xyz',self.rot)
-        T = self.pos
-        sample = int(width*height / self.sample_num)
+        R = Rotation.from_euler('xyz',self.profile['rot'])
+        T = self.profile['pos']
+        sample = int(width*height / self.profile['sample_num'])
         sample = 1 if sample < 1 else sample
         
         point_cloud_color = np.frombuffer(rgb_pixels, dtype=np.ubyte).reshape((width*height,3))[::sample] / 255
         depth_pixels = np.frombuffer(depth_pixels, dtype=np.float32).reshape((height,width))
-        point_cloud = depth_to_point_cloud(depth_pixels,self.projection_transform)[::sample]
+        point_cloud = depth_to_point_cloud(depth_pixels,self.profile['projection_transform'])[::sample]
         point_cloud = R.apply(point_cloud) + T
         
         beg = 0; end = len(point_cloud)
@@ -236,8 +234,8 @@ class Camera3DReal(ActiveObject):
         pass
 
     def draw_point_cloud(self,vertexes,colors):
-        R = Rotation.from_euler('xyz',self.rot)
-        T = self.pos
+        R = Rotation.from_euler('xyz',self.profile['rot'])
+        T = self.profile['pos']
         
         if len(vertexes) > len(colors): colors.extend([0,0,0]*(len(vertexes)-len(colors)))
         vertexes = R.apply(vertexes) + T

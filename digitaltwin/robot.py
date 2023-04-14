@@ -12,8 +12,8 @@ class Robot(ActiveObject):
         self.current_joint_poses = self.reset_joint_poses = kwargs['reset_joint_poses']
         self.joint_damping = kwargs['joint_damping']
         self.end_effector = kwargs['end_effector']
-        self.speed = self.profile['speed'] = kwargs['speed'] if 'speed' in kwargs else 1.0
         super().__init__(scene, **kwargs)
+        self.speed = self.profile['speed'] = kwargs['speed'] if 'speed' in kwargs else 1.0
         self.pickup = False
         pass
     

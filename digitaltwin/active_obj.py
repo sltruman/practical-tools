@@ -35,7 +35,6 @@ class ActiveObject:
         self.profile['base'] = base
         if 'id' in vars(self): p.removeBody(self.id)
         self.id = p.loadURDF(base, self.profile['pos'], p.getQuaternionFromEuler(self.profile['rot']),useFixedBase=True)
-        return self.id
 
     def set_pos(self,pos):
         self.profile['pos'] = pos
