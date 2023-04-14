@@ -15,15 +15,9 @@ class Camera3D(ActiveObject):
         self.sample_rate = kwargs['sample_rate']
         self.point_ids = list()
         pass
-
-    def properties(self):
-        info = super().properties()
-        info.update(dict(kind='Camera3D',image_size=self.image_size,fov=self.fov,forcal=self.forcal))
-        return info
     
-    def reset(self):
-        super().reset()
-        pass
+    def restore(self):
+        super().restore()
     
     def rtt(self):
         p.removeAllUserDebugItems()
@@ -60,25 +54,25 @@ class Camera3D(ActiveObject):
 
         return pixels.tobytes(),depth_pixels.tobytes()
 
-    def signal_capture(self,*args):
+    def signal_capture(self,*args,**kwargs):
         pixels,depth = self.rtt()
         self.result = (None,pixels,depth)
 
         try:
             sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
-            sock_path = os.path.join(self.scene.tmp_dir,self.name + '.sock')
+            sock_path = os.path.join(self.scene.tmp_dir,self.profile['name'] + '.sock')
             sk.connect(sock_path)
             for v in pixels,depth: sk.sendall(v)
         except: return
         finally:
             sk.close()
 
-    def signal_pose_recognize(self,*args):
+    def signal_pose_recognize(self,*args,**kwargs):
         pixels,depth = self.rtt()
 
         try:
             sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
-            sock_path = os.path.join(self.scene.tmp_dir,self.name + '.sock')
+            sock_path = os.path.join(self.scene.tmp_dir,self.profile['name'] + '.sock')
             sk.connect(sock_path)
             
             for v in pixels,depth: sk.sendall(v)
@@ -152,28 +146,24 @@ class Camera3DReal(ActiveObject):
         self.rgb_pixels = bytes()
         self.depth_pixels = bytes()
         self.sample_num = kwargs['sample_num']
-        pass
-
-    def properties(self):
-        info = super().properties()
-        info.update(dict(kind='Camera3DReal',image_size=self.image_size,projection_transform=self.projection_transform,eye_to_hand_transform=self.eye_to_hand_transform))
-        return info
-    
+        self.profile['projection_transform'] = self.projection_transform = []
+        self.profile['eye_to_hand_transform'] = self.eye_to_hand_transform = []
+            
     def restore(self):
-        super().reset()
+        super().restore()
         self.clear_point_cloud()
         pass
 
     def rtt(self):
         self.signal_capture()
         
-    def signal_check(self,*args):
+    def signal_check(self,*args,**kwargs):
         self.result = None,self.eye_to_hand_transform
 
-    def signal_capture(self,*args):
+    def signal_capture(self,*args,**kwargs):
         try:
             sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
-            sock_path = os.path.join(self.scene.tmp_dir,self.name + '.sock')
+            sock_path = os.path.join(self.scene.tmp_dir,self.profile['name'] + '.sock')
             sk.connect(sock_path)
             width = int.from_bytes(sk.recv(4),'little')
             height = int.from_bytes(sk.recv(4),'little')

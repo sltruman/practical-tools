@@ -58,23 +58,23 @@ class Scene:
     self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, self.profile['ground_z']], useFixedBase=True)
     for object_info in self.profile['active_objects']:
       kind = object_info['kind']
-
+      
       active_obj = None
       active_obj = eval(f'digitaltwin.{kind}(self,**object_info)')
       self.active_objs[active_obj.id] = active_obj
-      if 'name' in vars(active_obj): self.active_objs_by_name[active_obj.name] = active_obj
+      if 'name' in object_info: self.active_objs_by_name[object_info['name']] = active_obj
 
   def save(self):
-      self.scene.profile['active_objects']
-      self.scene.profile['ground_z'] = self.ground_z
+      self.profile['active_objects']
+      self.profile['ground_z'] = self.ground_z
       active_objects = list()
-      for obj in self.scene.active_objs_by_name.values():
+      for obj in self.active_objs_by_name.values():
         active_objects.append(obj.properties())
-      self.scene.profile['active_objects'] = active_objects
-      with open(self.scene_path,'w') as f: json.dump(f) 
+      self.profile['active_objects'] = active_objects
+      with open(self.scene_path,'w') as f: json.dump(self.profile,f,indent=2) 
 
   def restore(self):
-    for obj in self.scene.active_objs_by_name.values():
+    for obj in self.active_objs_by_name.values():
       obj.restore()
     pass
 
@@ -144,14 +144,14 @@ class Scene:
   def rotate_left(self):
     w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
     yaw = -89
-    pitch = 0
+    pitch = -1
     p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
     pass
 
   def rotate_right(self):
     w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
     yaw = 89
-    pitch = 0
+    pitch = -1
     p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
     pass
   

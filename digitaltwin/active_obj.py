@@ -7,9 +7,6 @@ class ActiveObject:
         self.result = None,
         self.scene = scene
         self.profile = kwargs
-        self.name = kwargs['name']
-        self.pos = kwargs['pos']
-        self.rot = kwargs['rot']
         self.set_base(kwargs['base'])
         pass
 
@@ -18,9 +15,7 @@ class ActiveObject:
         pass
 
     def properties(self):
-        pos,orn = p.getBasePositionAndOrientation(self.id)
-        rot = p.getEulerFromQuaternion(orn)
-        return dict(id=self.id,name=self.name,kind='ActiveObject',base=self.base,pos=pos,rot=rot)
+        return self.profile
     
     def update(self,dt):
         if not self.actions: return
@@ -37,27 +32,26 @@ class ActiveObject:
         pass
 
     def set_base(self,base):
-        self.base = base
+        self.profile['base'] = base
         if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(self.base, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
+        self.id = p.loadURDF(base, self.profile['pos'], p.getQuaternionFromEuler(self.profile['rot']),useFixedBase=True)
         return self.id
 
     def set_pos(self,pos):
-        self.pos = pos
-        p.resetBasePositionAndOrientation(self.id,pos,p.getQuaternionFromEuler(self.rot))
+        self.profile['pos'] = pos
+        p.resetBasePositionAndOrientation(self.id,pos,p.getQuaternionFromEuler(self.profile['rot']))
         pass
 
     def get_pos(self):
-        return self.pos
+        return self.profile['pos']
 
     def set_rot(self,rot):
-        self.rot = rot
-        p.resetBasePositionAndOrientation(self.id,self.pos,p.getQuaternionFromEuler(rot))
+        self.profile['rot'] = rot
+        p.resetBasePositionAndOrientation(self.id,self.profile['pos'],p.getQuaternionFromEuler(rot))
         pass
 
     def get_rot(self):
-
-        return self.rot
+        return self.profile['rot']
 
     def set_scale(self,scale):
         pass
@@ -70,3 +64,6 @@ class ActiveObject:
 
     def get_transparence(self):
         pass 
+
+    def set_user_data(self,value):
+        self.profile['user_data'] = value

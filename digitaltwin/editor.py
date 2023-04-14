@@ -1,10 +1,9 @@
-from .scene import Scene
 import pybullet as p
 import math
 import numpy as np
 
 class Editor:
-    def __init__(self,scene : Scene):
+    def __init__(self,scene):
         self.scene = scene
         pass
         
@@ -54,10 +53,10 @@ class Editor:
         if not rayInfo: return dict(name='',id=-1,pos=[0.,0.,0.])
         id,linkindex,fraction,pos,norm = rayInfo[0]
         if id not in self.scene.active_objs: return dict(name='',id=-1,pos=pos)
-        return dict(name=self.scene.active_objs[id].name,id=id,pos=pos)
+        return dict(name=self.scene.active_objs[id].profile['name'],id=id,pos=pos)
         
     def move(self,name,pos):
-        self.scene.active_objs_by_name[name].properties() 
+        self.scene.active_objs_by_name[name].properties()
         pass
 
     def select(self,name)->dict:
@@ -65,6 +64,7 @@ class Editor:
 
     def add(self,kind,base,pos,rot,scale):
         object_info = {
+            "kind": kind,
             "base":base,
             "pos":pos,
             "rot":rot,
@@ -74,18 +74,19 @@ class Editor:
             "end_effector":"",
             "name":kind.lower()
         }
-
+        
+        import digitaltwin
         active_obj = eval(f'digitaltwin.{kind}(self.scene,**object_info)')
         self.scene.active_objs[active_obj.id] = active_obj
         
-        name = active_obj.name
+        name = active_obj.profile['name']
         i = 1
         while name in self.scene.active_objs_by_name:
-            name = active_obj.name + str(i)
+            name = active_obj.profile['name'] + str(i)
             i+=1
         
-        active_obj.name = name
-        self.scene.active_objs_by_name[active_obj.name] = active_obj
+        active_obj.profile['name'] = name
+        self.scene.active_objs_by_name[active_obj.profile['name']] = active_obj
         return active_obj.properties()
     
     def remove(self,name):
@@ -95,10 +96,9 @@ class Editor:
         del self.scene.active_objs_by_name[name]
         del active_obj
         
-
     def rename(self,name,new_name):
         active_obj = self.scene.active_objs_by_name[name]
         del self.scene.active_objs_by_name[name]
-        active_obj.name = new_name
+        active_obj.profile['name'] = new_name
         self.scene.active_objs_by_name[new_name] = active_obj
 

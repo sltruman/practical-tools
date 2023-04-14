@@ -15,10 +15,6 @@ class Placer(ActiveObject):
         self.amount = kwargs['amount']
         # self.workpiece_texture = kwargs['workpiece_texture']
         self.elapsed = 0
-    def properties(self):
-        info = super().properties()
-        info.update(dict(kind='Packer',center=self.center,interval=self.interval,amount=self.amount,workpiece=self.workpiece))
-        return info
 
     def update(self, dt):
         if not self.actions: return
@@ -28,7 +24,7 @@ class Placer(ActiveObject):
         super().update(dt)
 
     def restore(self):
-        super().reset()
+        super().restore()
         for obj_id in self.objs: p.removeBody(obj_id)
         self.objs.clear()
 

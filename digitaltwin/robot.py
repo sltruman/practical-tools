@@ -12,15 +12,10 @@ class Robot(ActiveObject):
         self.current_joint_poses = self.reset_joint_poses = kwargs['reset_joint_poses']
         self.joint_damping = kwargs['joint_damping']
         self.end_effector = kwargs['end_effector']
-        self.speed = kwargs['speed'] if 'speed' in kwargs else 1.0
+        self.speed = self.profile['speed'] = kwargs['speed'] if 'speed' in kwargs else 1.0
         super().__init__(scene, **kwargs)
         self.pickup = False
         pass
-    
-    def properties(self):
-        info = super().properties()
-        info.update(dict(kind='Robot',end_effector=self.end_effector,speed=self.speed,joint_damping=self.joint_damping,reset_joint_poses=self.reset_joint_poses))
-        return info
     
     def update(self,dt):
         super().update(dt)
@@ -30,12 +25,12 @@ class Robot(ActiveObject):
         pass
 
     def restore(self):
-        super().reset()
+        super().restore()
         p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, self.reset_joint_poses)
         self.end_effector_obj.do(False)
 
     def set_base(self,base):
-        base_temp = self.base = base
+        base_temp = self.base = self.profile['base'] = base
         
         ee_kind = ""
         mimic_name = ''
@@ -69,7 +64,6 @@ class Robot(ActiveObject):
                         multiplier = int(node_mimic.getAttribute('multiplier'))
                         offset = int(node_mimic.getAttribute('offset'))
                         gears.append((mimic_name,joint_name,multiplier))
-
                 node_robot.removeChild(link_ee).unlink()
 
             import tempfile
@@ -80,8 +74,8 @@ class Robot(ActiveObject):
 
         if 'id' in vars(self): p.removeBody(self.id)
         print('robot urdf',base_temp)
-        self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
-        
+        self.id = p.loadURDF(base_temp, self.profile['pos'], p.getQuaternionFromEuler(self.profile['rot']),useFixedBase=True)
+
         if ee_kind == 'Gripper': self.end_effector_obj = Gripper(self.id,gears)
         elif ee_kind == 'Suction': self.end_effector_obj = Suction(self.id)
         else: 
@@ -119,6 +113,7 @@ class Robot(ActiveObject):
         return self.id
     
     def set_speed(self,value):
+        if round(value) == 0.000: return 
         self.speed = value
     
     def get_joints(self):
@@ -127,7 +122,7 @@ class Robot(ActiveObject):
     def set_joints(self,joint_poses):
         p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, joint_poses)
         self.current_joint_poses = joint_poses
-
+        
     def set_end_effector_pos(self,pos):
         self.end_effector_pos = pos
         num_joints = p.getNumJoints(self.id)
@@ -149,8 +144,7 @@ class Robot(ActiveObject):
         num_joints = p.getNumJoints(self.id)
         ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
         ee_pos = np.array(ee_pos)
-        ee_rot = p.getEulerFromQuaternion(ee_orn)
-        return ee_pos
+        return [ee_pos[0],ee_pos[1],ee_pos[2]]
 
     def set_end_effector_rot(self,rot):
         self.end_effector_rot = rot
@@ -175,14 +169,13 @@ class Robot(ActiveObject):
 
     def get_end_effector_rot(self):
         num_joints = p.getNumJoints(self.id)
-        ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
-        ee_pos = np.array(ee_pos)
+        _,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
         ee_rot = p.getEulerFromQuaternion(ee_orn)
-        return ee_rot
+        return [ee_rot[0],ee_rot[1],ee_rot[2]]
 
-    def set_end_effector(self,base):        
-        self.end_effector = base
+    def set_end_effector(self,base):
         if 'id' not in vars(self): return
+        self.end_effector = self.profile['end_effector'] = base
         self.set_base(self.base)
         
     def plan(self,origin,target,dt=1):

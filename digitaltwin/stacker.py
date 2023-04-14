@@ -9,6 +9,7 @@ class Stacker(ActiveObject):
         super().__init__(scene,**kwargs)
         self.objs = list()
         self.area = kwargs['area']
+        self.pos = self.profile['pos']
         self.lower_left = self.pos - np.array([self.area[0],self.area[1],0]) / 2
 
         self.packer = bp.Packer()
@@ -27,19 +28,14 @@ class Stacker(ActiveObject):
         
         self.packer.pack(bigger_first=True)
 
-    def properties(self):
-        info = super().properties()
-        info.update(dict(kind='Stacker',area=self.area))
-        return info
-
     def update(self, dt):
         super().update(dt)
 
     def restore(self):
-        super().reset()
+        super().restore()
         for obj_id in self.objs: p.removeBody(obj_id)
         self.objs.clear()
-        
+
     def signal_generate(self):
         def task(item:bp.Item):
             item_width, item_height, item_depth = item.get_dimension()

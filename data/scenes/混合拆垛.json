@@ -42,7 +42,9 @@
                 "kind":"Camera3D","fun":"pose_recognize","name":"camera", "next":"3",
                 "alt":[
                     {"next":"7","err": "failed"}
-                ]
+                ],"args":{
+                    "showname":"capture"
+                }
             },
             "3":{"kind":"Robot","fun":"pick_plan","name":"robot","next":"4","args":{
                 "pick_poses":[
