@@ -19,7 +19,7 @@ class Robot(ActiveObject):
     
     def update(self,dt):
         super().update(dt)
-        if self.end_effector_obj: 
+        if self.end_effector_obj:
             self.end_effector_obj.update(dt)
             if not self.end_effector_obj.idle: self.actions.append((lambda *args:None,()))
         pass
@@ -61,8 +61,8 @@ class Robot(ActiveObject):
                         node_mimic = node_mimics[0]
                         mimic_name = node_mimic.getAttribute('joint')
                         joint_name = joint.getAttribute('name')
-                        multiplier = int(node_mimic.getAttribute('multiplier'))
-                        offset = int(node_mimic.getAttribute('offset'))
+                        multiplier = 0 #int(node_mimic.getAttribute('multiplier'))
+                        offset = 0#int(node_mimic.getAttribute('offset'))
                         gears.append((mimic_name,joint_name,multiplier))
                 node_robot.removeChild(link_ee).unlink()
 
@@ -176,7 +176,7 @@ class Robot(ActiveObject):
     def set_end_effector(self,base):
         if 'id' not in vars(self): return
         self.end_effector = self.profile['end_effector'] = base
-        self.set_base(self.base)
+        self.set_base(self.profile['base'])
         
     def plan(self,origin,target,dt=1):
         ee_pos,ee_rot = origin
