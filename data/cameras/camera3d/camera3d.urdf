@@ -15,6 +15,12 @@
         <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
+    <collision>
+      <origin rpy="0.0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="camera3d.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
   </link>
 
 </robot>

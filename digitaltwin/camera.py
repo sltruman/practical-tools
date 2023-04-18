@@ -95,10 +95,11 @@ class Camera3D(ActiveObject):
         lower_left_corner = [0, 0, -self.forcal] - horizontal/2 - vertical/2
         ids = set()
 
-        for j in range(self.sample_rate-1,0,-1):
-            for i in range(self.sample_rate):
-                u = float(i) / (self.sample_rate-1)
-                v = float(j) / (self.sample_rate-1)
+        sample_rate = self.profile['sample_rate']
+        for j in range(sample_rate-1,0,-1):
+            for i in range(sample_rate):
+                u = float(i) / (sample_rate-1)
+                v = float(j) / (sample_rate-1)
                 target = lower_left_corner + u*horizontal + v*vertical
                 target = origin + Rotation.from_quat(orn).apply(target)
                 

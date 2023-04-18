@@ -12,8 +12,7 @@ obj = editor.add('Robot','data/robots/franka_panda/franka_panda.urdf',[2,0,0],[0
 print(obj)
 name = obj['name']
 scene.active_objs_by_name[name].set_end_effector('data/end_effectors/gripper2/gripper2.urdf')
-
-print(scene.get_active_obj_properties())
+print(scene.active_objs_by_name[name].get_pos())
 
 while True:
     scene.update_for_tick(1/180.)
