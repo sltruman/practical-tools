@@ -1,15 +1,15 @@
 {
-    "ground_z": -0.7,
+    "ground_z": -0.2,
     "active_objects": [
         {
             "kind":"Robot",
             "name":"robot",
-            "base":"./data/robots/motoman/motoman.urdf",
+            "base":"./data/robots/ur5/ur5.urdf",
             "pos":[0,0,-0.2],
             "rot":[0,0,-1.57],
-            "reset_joint_poses":[0,0.0,0,0,0,3.14],
+            "reset_joint_poses":[0,0.0,0,0,-1.57,3.14],
             "joint_damping":[ 0, 1, 0.9, 0.8, 0.7, 0.0],
-            "end_effector":"./data/end_effectors/motoman/motoman.urdf",
+            "end_effector":"./data/end_effectors/suction/suction_inv.urdf",
             "speed":1.0
         },
         {
@@ -33,13 +33,17 @@
             "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"6"},
             "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
                     "mode":"point",
-                    "point":[0.0,0.0,0.5,0,0,0]
+                    "point":[0.0,0.0,0.25,0,0,0]
                 },"next":"7"},
             "7":{"kind":"Robot","fun":"move","name":"robot","args":{
                     "mode":"point",
-                    "point":[0.5,-0.2,0.5,0,0,0]
+                    "point":[-0.25,-0.40,0.15,0,3.14,0]
                 },"next":"8"},
-            "8":{"kind":"Robot","fun":"home","name":"robot","next":"1"}
+            "8":{"kind":"Robot","fun":"move","name":"robot","args":{
+                    "mode":"point",
+                    "point":[-0.25,-0.40,-0.10,0,3.14,0]
+                },"next":"9"},
+            "9":{"kind":"Robot","fun":"home","name":"robot","next":"1"}
         }
     }
 }

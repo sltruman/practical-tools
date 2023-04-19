@@ -64,11 +64,16 @@ else:
             tick = time() - elapsed
             scene.update_for_tick(tick)
             tick = round(tick, 3)
-    except (ConnectionResetError,BrokenPipeError):pass
+            print(end='',flush=True)
+    except (ConnectionResetError,BrokenPipeError):
+        pass
     except:
         traceback.print_exc()
         pass
-     
+    
+    print('digitaltwin exit.')
+    print(end='',flush=True)
+    
     del workflow
     del editor
     del scene

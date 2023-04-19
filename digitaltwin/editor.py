@@ -68,7 +68,7 @@ class Editor:
             "base":base,
             "pos":pos,
             "rot":rot,
-            "scale":scale,
+            "scale":[1,1,1],
             "reset_joint_poses":[],
             "joint_damping":[],
             "end_effector":"",

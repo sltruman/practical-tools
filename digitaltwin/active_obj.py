@@ -7,6 +7,8 @@ class ActiveObject:
         self.result = None,
         self.scene = scene
         self.profile = kwargs
+        if 'scale' not in kwargs: self.profile['scale'] = [1,1,1] 
+        
         self.set_base(kwargs['base'])
         pass
 
