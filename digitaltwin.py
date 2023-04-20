@@ -71,9 +71,6 @@ else:
         traceback.print_exc()
         pass
     
-    print('digitaltwin exit.')
-    print(end='',flush=True)
-    
     del workflow
     del editor
     del scene

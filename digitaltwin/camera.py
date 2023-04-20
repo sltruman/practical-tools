@@ -253,3 +253,11 @@ class Camera3DReal(ActiveObject):
     def clear_point_cloud(self):
         for point_id in self.point_ids: p.removeUserDebugItem(point_id)
         pass
+
+    def set_roi(self):
+        
+        pass
+
+    def get_roi(self):
+
+        pass

@@ -124,20 +124,6 @@ class Robot(ActiveObject):
         self.current_joint_poses = joint_poses
         
     def set_end_effector_pos(self,pos):
-        self.end_effector_pos = pos
-        num_joints = p.getNumJoints(self.id)
-        ee_index = num_joints-1
-        ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-        ee_pos = np.array(ee_pos)
-        ll = [-7]*len(self.active_joints)
-        ul = [7]*len(self.active_joints)
-        jr = [7]*len(self.active_joints)
-        
-        joint_poses = p.calculateInverseKinematics(self.id, ee_index, pos, ee_orn,
-                                            lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,
-                                            jointDamping=self.joint_damping,maxNumIterations=200)
-        p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, joint_poses)
-        for i in self.active_joints: self.current_joint_poses[i] = joint_poses[i]
         pass
 
     def get_end_effector_pos(self):
@@ -147,25 +133,7 @@ class Robot(ActiveObject):
         return [ee_pos[0],ee_pos[1],ee_pos[2]]
 
     def set_end_effector_rot(self,rot):
-        self.end_effector_rot = rot
-        num_joints = p.getNumJoints(self.id)
-        ee_index = num_joints-1
-        if 'end_effector_pos' in vars(self):
-            ee_pos = self.end_effector_pos
-        else:
-            ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-
-        ee_pos = np.array(ee_pos)
-        ee_orn = p.getQuaternionFromEuler(rot)
-        ll = [-7]*len(self.active_joints)
-        ul = [7]*len(self.active_joints)
-        jr = [7]*len(self.active_joints)
-        
-        joint_poses = p.calculateInverseKinematics(self.id, ee_index, ee_pos, ee_orn,
-                                            lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,
-                                            jointDamping=self.joint_damping,maxNumIterations=200)
-        p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, joint_poses)
-        for i in self.active_joints: self.current_joint_poses[i] = joint_poses[i]
+        pass
 
     def get_end_effector_rot(self):
         num_joints = p.getNumJoints(self.id)

@@ -173,3 +173,13 @@ class Scene:
       objs[name] = obj.properties()
     return objs
   
+  def set_ground_z(self,z):
+    self.profile['ground_z'] = z
+    p.resetBasePositionAndOrientation(self.plane,[0,0,z],p.getQuaternionFromEuler([0,0,0]))
+    pass
+
+  def set_ground_texture(self,texture):
+    self.profile['ground_texture'] = texture
+    p.changeVisualShape(self.plane,-1,textureUniqueId=p.loadTexture(texture))
+    pass
+
