@@ -24,6 +24,13 @@ class Scene:
     p.setPhysicsEngineParameter(erp=1,contactERP=1,frictionERP=1)
     self.reset()
 
+    def draw_origin():
+      p.addUserDebugLine([0,0,0.001],[1,0,0.001],[1,0,0],lineWidth=5,lifeTime=0)
+      p.addUserDebugLine([0,0,0.001],[0,1,0.001],[0,1,0],lineWidth=5,lifeTime=0)
+      p.addUserDebugLine([0,0,0.001],[0,0,1.001],[0,0,1],lineWidth=5,lifeTime=0)
+
+    self.actions.append((draw_origin,()))
+    
   def __del__(self):
     self.play(False)
     p.resetSimulation()
@@ -43,6 +50,7 @@ class Scene:
     p.setTimeStep(self.timestep)
     self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, self.ground_z], useFixedBase=True)
     self.load(self.scene_path)
+
     pass
 
 
@@ -84,6 +92,7 @@ class Scene:
 
   def play(self,run=True):
     self.running = run
+    
     pass
 
   def update_for_tick(self,dt):

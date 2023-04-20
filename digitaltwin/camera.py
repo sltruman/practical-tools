@@ -19,7 +19,6 @@ class Camera3D(ActiveObject):
         super().restore()
     
     def rtt(self):
-        p.removeAllUserDebugItems()
         num_joints = p.getNumJoints(self.id)
         if num_joints: pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
         else: pos,orn = p.getBasePositionAndOrientation(self.id)
