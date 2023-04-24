@@ -52,6 +52,7 @@ else:
                         raise BlockingIOError
  
                     res = eval(req.decode())
+                    # res = exec(req.decode())
                     if type(res) == tuple: 
                         for v in res: conn.sendall(v)
                     elif type(res) == dict or type(res) == list: 

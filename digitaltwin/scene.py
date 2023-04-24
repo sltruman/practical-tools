@@ -30,13 +30,16 @@ class Scene:
       p.addUserDebugLine([0,0,0.001],[0,0,1.001],[0,0,1],lineWidth=5,lifeTime=0)
 
     self.actions.append((draw_origin,()))
-    
+
   def __del__(self):
     self.play(False)
     p.resetSimulation()
     del self.active_objs
     del self.active_objs_by_name
     pass
+
+  def get_profile(self):
+    return self.profile
 
   def reset(self):
     p.resetSimulation()
@@ -50,9 +53,7 @@ class Scene:
     p.setTimeStep(self.timestep)
     self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, self.ground_z], useFixedBase=True)
     self.load(self.scene_path)
-
     pass
-
 
   def load(self,scene_path):
     if not scene_path: return

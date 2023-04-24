@@ -13,7 +13,6 @@ class Camera3D(ActiveObject):
         self.forcal = kwargs['forcal']
         self.fov = kwargs['fov']
         self.point_ids = list()
-        pass
     
     def restore(self):
         super().restore()
@@ -80,10 +79,8 @@ class Camera3D(ActiveObject):
             sk.close()
 
         num_joints = p.getNumJoints(self.id)
-        if num_joints: 
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
-        else:
-            pos,orn = p.getBasePositionAndOrientation(self.id)
+        if num_joints: pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        else: pos,orn = p.getBasePositionAndOrientation(self.id)
 
         far = 1000
         origin = np.array(pos)
@@ -113,7 +110,6 @@ class Camera3D(ActiveObject):
                     ids.add(id)
                 self.actions.append((ray, (origin,target + dr)))
         
-
         def output():
             val = list()
 
@@ -137,6 +133,63 @@ class Camera3D(ActiveObject):
             self.result = (None,val) if val else ('failed',)
         self.actions.append((output, ()))
 
+    def get_roi(self):
+        if 'roi' not in self.profile:
+            return [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        
+        return self.profile['roi']
+
+    def set_roi(self,x,y,z,rx,ry,rz,w,h,d):
+        self.profile['roi'] = [x,y,z,rx,ry,rz,w,h,d]
+        axes = [
+            [-1,0,0],
+            [0,1,0],
+            [0,0,-1]]
+        
+        num_joints = p.getNumJoints(self.id)
+        if num_joints: pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        else: pos,orn = p.getBasePositionAndOrientation(self.id)
+
+        pos = np.array(pos)
+        origin = np.array([x,y,z])
+        size = np.array([w,h,d])
+        radius = size / 2
+
+        R = Rotation.from_euler('xyz',[rx,ry,rz] )
+        p.addUserDebugPoints([pos + Rotation.from_quat(orn).apply(origin @ axes)],[[0,1,0]],10,lifeTime=0)
+
+        p0 = min = 0 - radius
+        p1 = max = 0 + radius
+        p2 = [max[0],min[1],min[2]]
+        p3 = [min[0],max[1],min[2]]
+        p4 = [min[0],min[1],max[2]]
+        p5 = [min[0],max[1],max[2]]
+        p6 = [max[0],min[1],max[2]]
+        p7 = [max[0],max[1],min[2]]
+        pn = pos + Rotation.from_quat(orn).apply(origin @ axes + R.apply([p0,p1,p2,p3,p4,p5,p6,p7]) @ axes)
+        # p.addUserDebugPoints(pn,[[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,0,0]],5,lifeTime=0)
+
+        if 'pids' in vars(self):
+            for id in self.pids:
+                p.removeUserDebugItem(id)
+
+        self.pids = [
+            p.addUserDebugLine(pn[0],pn[2],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[0],pn[3],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[0],pn[4],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[1],pn[5],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[1],pn[6],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[1],pn[7],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[2],pn[6],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[2],pn[7],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[3],pn[7],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[4],pn[6],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[5],pn[3],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[5],pn[4],[1,1,0],1,lifeTime=0)
+        ]
+
+        pass
+        
 class Camera3DReal(ActiveObject):
     def __init__(self,scene,**kwargs):
         self.point_ids = list()
@@ -252,11 +305,5 @@ class Camera3DReal(ActiveObject):
     def clear_point_cloud(self):
         for point_id in self.point_ids: p.removeUserDebugItem(point_id)
         pass
-
-    def set_roi(self):
         
-        pass
-
-    def get_roi(self):
-
-        pass
+        

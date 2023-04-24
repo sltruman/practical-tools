@@ -61,7 +61,7 @@ class Robot(ActiveObject):
                         node_mimic = node_mimics[0]
                         mimic_name = node_mimic.getAttribute('joint')
                         joint_name = joint.getAttribute('name')
-                        multiplier = 0 #int(node_mimic.getAttribute('multiplier'))
+                        multiplier = int(node_mimic.getAttribute('multiplier')) if node_mimic.hasAttribute('multiplier') else 0
                         offset = 0#int(node_mimic.getAttribute('offset'))
                         gears.append((mimic_name,joint_name,multiplier))
                 node_robot.removeChild(link_ee).unlink()
@@ -106,9 +106,9 @@ class Robot(ActiveObject):
         axis_x = Rotation.from_quat(orn).apply(np.array([0.05,0,0])) + pos
         axis_y = Rotation.from_quat(orn).apply(np.array([0,0.05,0])) + pos
         axis_z = Rotation.from_quat(orn).apply(np.array([0,0,0.05])) + pos
-        p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0)
-        p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0)
-        p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0)
+        p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=20)
+        p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=20)
+        p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=20)
         self.home_pos,self.home_rot = pos,p.getEulerFromQuaternion(orn)
         return self.id
     
@@ -191,16 +191,16 @@ class Robot(ActiveObject):
             pick_p = np.array(pick_pose['pos'])
             pick_r = Rotation.from_euler("xyz",pick_pose['rot'])
             o = o_pos + o_r.apply(pick_p)
-            pick_x = o_pos + o_r.apply(pick_p + [0.15,0,0])
-            pick_y = o_pos + o_r.apply(pick_p + [0,0.15,0])
-            pick_z = o_pos + o_r.apply(pick_p + [0,0,0.15])
+            # pick_x = o_pos + o_r.apply(pick_p + [0.15,0,0])
+            # pick_y = o_pos + o_r.apply(pick_p + [0,0.15,0])
+            # pick_z = o_pos + o_r.apply(pick_p + [0,0,0.15])
             # p.addUserDebugLine(o,pick_x,[1,0,0],1,lifeTime=0)
             # p.addUserDebugLine(o,pick_y,[0,1,0],1,lifeTime=0)
             # p.addUserDebugLine(o,pick_z,[0,0,1],1,lifeTime=0)
             pick_x = o_pos + o_r.apply(pick_p + pick_r.apply([0.1,0,0]))
             pick_y = o_pos + o_r.apply(pick_p + pick_r.apply([0,0.1,0]))
             pick_z = o_pos + o_r.apply(pick_p + pick_r.apply([0,0,0.1]))
-            # p.addUserDebugLine(o,pick_z,[0,0,1],5,lifeTime=0)
+            p.addUserDebugLine(o,pick_z,[0,0,1],5,lifeTime=5)
             
             axis_up = [0,0,1]
             pick_axis_up = (o_r * pick_r).apply([0,0,1])
@@ -231,9 +231,9 @@ class Robot(ActiveObject):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
+            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
+            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
+            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
             # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
@@ -246,12 +246,12 @@ class Robot(ActiveObject):
             jr = [7]*len(self.active_joints)
             
             poses = p.calculateInverseKinematics(self.id, ee_index, point, p.getQuaternionFromEuler([0,0,0]),
-                                                lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,
+                                                lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.self.current_joint_poses,
                                                 jointDamping=self.joint_damping,maxNumIterations=200)
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
 
             self.current_joint_poses = poses
-            p.addUserDebugPoints([point],[[1,1,1]],2,lifeTime=10)
+            p.addUserDebugPoints([point],[[1,1,1]],2,lifeTime=5)
 
         route_poses,route_points = args
         if route_poses:
@@ -288,9 +288,9 @@ class Robot(ActiveObject):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
+            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
+            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
+            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
             # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
@@ -330,9 +330,9 @@ class Robot(ActiveObject):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
+            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
+            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
+            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
             # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
@@ -369,9 +369,9 @@ class Robot(ActiveObject):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
+            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
+            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
+            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
             # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
             # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
@@ -422,10 +422,10 @@ class Robot(ActiveObject):
 
         def task(*poses):
             p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
+            # pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
+            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
+            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
+            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
 
         num = int(1 / self.scene.timestep) 
         for t in range(num):

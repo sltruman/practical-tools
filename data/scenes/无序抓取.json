@@ -28,7 +28,7 @@
             "name":"camera",
             "base":"./data/cameras/camera3d/camera3d.urdf",
             "pos":[-0.032747,-0.564563,1.1767],
-            "rot":[0.0,0.0,0.0],
+            "rot":[0.785,0.0,0.0],
             "fov": 20,
             "forcal": 0.01,
             "sample_rate": 20, 
