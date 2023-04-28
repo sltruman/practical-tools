@@ -24,7 +24,9 @@
 
 无序抓取演示：`python3 test2.py`
 
-虚拟相机拍摄点云：`python3 test4.py`
+虚拟相机拍摄点云：`python3 test3.py`
+
+标定： `python3 test5.py`
 
 # 2 工作计划
 

@@ -110,7 +110,6 @@ class Robot(ActiveObject):
         p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=20)
         p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=20)
         self.home_pos,self.home_rot = pos,p.getEulerFromQuaternion(orn)
-        return self.id
     
     def set_speed(self,value):
         if round(value) == 0.000: return 
