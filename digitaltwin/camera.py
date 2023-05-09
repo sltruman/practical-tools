@@ -12,6 +12,7 @@ class Camera3D(ActiveObject):
         self.image_size = kwargs['image_size']
         self.forcal = kwargs['forcal']
         self.fov = kwargs['fov']
+        self.profile['sample_num'] =  kwargs['sample_num'] if 'sample_num' in kwargs else 10000
         self.point_ids = list()
     
     def restore(self):
@@ -29,10 +30,9 @@ class Camera3D(ActiveObject):
 
         vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch - 90,180 / np.pi * roll,2)
         pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
+        
         _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
-
         depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :])
-
         viewport_length = np.tan(np.pi / 180 * self.fov / 2) * self.forcal * 2
         horizontal = np.array([viewport_length, 0, 0])
         vertical = np.array([0, viewport_length, 0])
@@ -51,6 +51,13 @@ class Camera3D(ActiveObject):
 
         return pixels.tobytes(),depth_pixels.tobytes()
 
+    def get_intrinsics(self):
+        return [
+                [self.image_size[0],0.0,self.image_size[0]/2],
+                [0.0,self.image_size[1],self.image_size[1]/2],
+                [0.0,0.0,1.0]
+            ]
+    
     def signal_capture(self,*args,**kwargs):
         pixels,depth = self.rtt()
         self.result = (None,pixels,depth)
@@ -187,7 +194,46 @@ class Camera3D(ActiveObject):
             p.addUserDebugLine(pn[5],pn[3],[1,1,0],1,lifeTime=0),
             p.addUserDebugLine(pn[5],pn[4],[1,1,0],1,lifeTime=0)
         ]
+        pass
+    
+    def draw_point_cloud_from_depth_pixels(self,depth_pixels,rgb_pixels,width,height):
+        def depth_to_point_cloud(depth_image, projection_transform):
+            projection_transform = np.array(projection_transform)
+            rows, cols = depth_image.shape
+            c, r = np.meshgrid(np.arange(cols), np.arange(rows), sparse=True)
+            valid = (0 < depth_image) & (depth_image < 1000)
+            z = np.where(valid, depth_image, np.nan)
+            x = np.where(valid, z * (c - projection_transform[0, 2]) / projection_transform[0, 0], 0)
+            y = np.where(valid, z * (r - projection_transform[1, 2]) / projection_transform[1, 1], 0)
 
+            point_cloud = np.dstack((x, y, z))
+            point_cloud = np.reshape(point_cloud, (rows * cols, 3))
+            return point_cloud
+
+        R = Rotation.from_euler('xyz',self.profile['rot'])
+        T = self.profile['pos']
+        sample = int(width*height / self.profile['sample_num'])
+        sample = 1 if sample < 1 else sample
+
+        pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],self.forcal,1000)
+        self.profile['projection_transform'] = [
+                [width,0,width/2],
+                [0.0,height,height/2],
+                [0.0,0.0,1]
+            ]
+        
+        point_cloud_color = np.frombuffer(rgb_pixels, dtype=np.ubyte).reshape((width*height,4))[::sample] / 255
+        depth_pixels = np.frombuffer(depth_pixels, dtype=np.float32).reshape((height,width))
+        point_cloud = depth_to_point_cloud(depth_pixels,self.profile['projection_transform'])[::sample]
+        point_cloud = R.apply(point_cloud) + T
+        
+        beg = 0; end = len(point_cloud)
+        while beg < end:
+            offset = end - beg
+            if offset > 10000: offset = 10000
+            point_id = p.addUserDebugPoints(point_cloud[beg:beg+offset],point_cloud_color[beg:beg+offset,0:3],1,lifeTime=0)
+            self.point_ids.append(point_id)
+            beg += offset
         pass
         
 class Camera3DReal(ActiveObject):
@@ -199,7 +245,7 @@ class Camera3DReal(ActiveObject):
         self.depth_pixels = bytes()
         self.profile['projection_transform'] = self.projection_transform = []
         self.profile['eye_to_hand_transform'] = self.eye_to_hand_transform = []
-            
+
     def restore(self):
         super().restore()
         self.clear_point_cloud()
@@ -253,7 +299,7 @@ class Camera3DReal(ActiveObject):
         self.set_rot(Rotation.from_matrix(R).as_euler('xyz').tolist())
         pass
 
-    def draw_point_cloud_from_depth_pixels(self,depth_pixels,rgb_pixels,width,height):
+    def draw_point_cloud_from_depth_pixels(self,depth_pixels,rgb_pixels,width,height,alpha=False):
         def depth_to_point_cloud(depth_image, projection_transform):
             projection_transform = np.array(projection_transform)
             rows, cols = depth_image.shape
@@ -299,7 +345,7 @@ class Camera3DReal(ActiveObject):
             if offset > 10000: offset = 10000
             point_id = p.addUserDebugPoints(vertexes[beg:beg+offset],colors[beg:beg+offset],1,lifeTime=0)
             self.point_ids.append(point_id)
-            beg += offset
+        beg += offset   
         pass
 
     def clear_point_cloud(self):

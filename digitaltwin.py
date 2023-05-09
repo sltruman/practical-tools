@@ -15,7 +15,8 @@ else:
 
     width = sys.argv[2]
     height = sys.argv[3]
-    tmp_dir = sys.argv[4]
+    root_dir = sys.argv[4]
+    tmp_dir = sys.argv[5]
 
     if os.path.exists(tmp_dir): shutil.rmtree(tmp_dir)
     os.makedirs(tmp_dir,exist_ok=True)
@@ -29,7 +30,7 @@ else:
     print(f'Serving on {sys.argv[1]}')
     sk.listen(1)
 
-    scene = Scene(width,height,tmp_dir)
+    scene = Scene(width,height,root_dir,tmp_dir)
     editor = Editor(scene)
     workflow = Workflow(scene)
     scene.load(scene_path)

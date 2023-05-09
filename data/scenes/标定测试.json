@@ -12,16 +12,6 @@
             "speed":1.0
         },
         {
-            "kind":"Stacker",
-            "name":"stacker",
-            "base":"./data/objects/woodboard/woodboard.urdf",
-            "pos":[0,-0.52,0.01],
-            "rot":[0,0,0],
-            "area":[0.3,0.3,0.3],
-            "box_size":[0.1,0.1,0.05],
-            "random_factor":[0.2,0.2,0.0]
-        }, 
-        {
             "kind":"Camera3D",
             "name":"camera",
             "base":"./data/cameras/camera3d/camera3d.urdf",
@@ -30,7 +20,14 @@
             "fov": 20,
             "forcal": 0.01,
             "sample_rate": 20, 
-            "image_size": [1920,1200]
+            "image_size": [1024,768]
+        },
+        {
+            "kind":"ActiveObject",
+            "name":"plane",
+            "base":"./data/objects/calibration_plane/calibration_plane.urdf",
+            "pos":[0,-0.52,0.01],
+            "rot":[0,0,0]
         }
     ],
 

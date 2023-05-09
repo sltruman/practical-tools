@@ -35,21 +35,21 @@ class Robot(ActiveObject):
         ee_kind = ""
         mimic_name = ''
         gears = []
-        with xml.parse(self.base) as doc_robot:
+        with xml.parse(os.path.join(self.scene.root_dir,base)) as doc_robot:
             node_robot = doc_robot.getElementsByTagName('robot')[0]
             for mesh in node_robot.getElementsByTagName('mesh'):
                 filename = mesh.getAttribute('filename')
-                mesh.setAttribute('filename',os.path.join(os.getcwd(),os.path.dirname(base),filename))
+                mesh.setAttribute('filename',os.path.join(self.scene.root_dir,os.path.dirname(base),filename))
 
             if self.end_effector:
                 link_ee = node_robot.getElementsByTagName('link')[-1]
                 link_ee_name = link_ee.getAttribute('name')
-                with xml.parse(self.end_effector) as doc_ee:
+                with xml.parse(os.path.join(self.scene.root_dir,self.end_effector)) as doc_ee:
                     node_ee = doc_ee.getElementsByTagName('robot')[0]
                     ee_kind = node_ee.getAttribute("kind")
                     for mesh in node_ee.getElementsByTagName('mesh'):
                         filename = mesh.getAttribute('filename')
-                        mesh.setAttribute('filename',os.path.join(os.getcwd(),os.path.dirname(self.end_effector),filename))
+                        mesh.setAttribute('filename',os.path.join(self.scene.root_dir,os.path.dirname(self.end_effector),filename))
                     for i,link in enumerate(node_ee.getElementsByTagName('link')):
                         if i == 0: link.setAttribute('name',link_ee.getAttribute('name'))
                         node_robot.appendChild(link)

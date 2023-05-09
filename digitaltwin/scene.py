@@ -7,8 +7,10 @@ import json
 import os
 
 class Scene:
-  def __init__(self,width=1024,height=768,tmp_dir='.'):
+  def __init__(self,width=1024,height=768,root_dir='.',tmp_dir='.'):
     self.tmp_dir = tmp_dir
+    self.root_dir = root_dir
+
     self.tick = time()
     self.active_objs = dict()
     self.active_objs_by_name = dict()
@@ -28,7 +30,6 @@ class Scene:
       p.addUserDebugLine([0,0,0.001],[1,0,0.001],[1,0,0],lineWidth=5,lifeTime=0)
       p.addUserDebugLine([0,0,0.001],[0,1,0.001],[0,1,0],lineWidth=5,lifeTime=0)
       p.addUserDebugLine([0,0,0.001],[0,0,1.001],[0,0,1],lineWidth=5,lifeTime=0)
-
     self.actions.append((draw_origin,()))
 
   def __del__(self):
@@ -47,11 +48,11 @@ class Scene:
     del self.active_objs_by_name
     
     self.active_objs = dict()
-    self.active_objs_by_name = dict() 
+    self.active_objs_by_name = dict()
 
     p.setGravity(0, 0, -9.81)
     p.setTimeStep(self.timestep)
-    self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, self.ground_z], useFixedBase=True)
+    self.plane = p.loadURDF(os.path.join(self.root_dir,"data/pybullet_objects/plane.urdf"), [0, 0, self.ground_z], useFixedBase=True)
     self.load(self.scene_path)
     pass
 
@@ -64,7 +65,8 @@ class Scene:
     with open(scene_path,'r') as f: self.profile = json.load(f)
 
     if 'ground_z' not in self.profile: self.profile['ground_z'] = 0
-    self.plane = p.loadURDF("./data/pybullet_objects/plane.urdf", [0, 0, self.profile['ground_z']], useFixedBase=True)
+    
+    self.plane = p.loadURDF(os.path.join(self.root_dir,"data/pybullet_objects/plane.urdf"), [0, 0, self.profile['ground_z']], useFixedBase=True)
     for object_info in self.profile['active_objects']:
       kind = object_info['kind']
       

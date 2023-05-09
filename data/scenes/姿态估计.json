@@ -20,7 +20,7 @@
             "fov": 20,
             "forcal": 0.01,
             "sample_rate": 20, 
-            "image_size": [300,300],
+            "image_size": [1024,768],
             "image_path":"./guagua.png"
         }
     ],
