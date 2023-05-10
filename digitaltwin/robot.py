@@ -9,11 +9,16 @@ from .end_effector import Gripper,Suction
 
 class Robot(ActiveObject):
     def __init__(self,scene,**kwargs):
+        if 'reset_joint_poses' not in kwargs: kwargs['reset_joint_poses'] = []
+        if 'joint_damping' not in kwargs: kwargs['joint_damping'] = []
+        if 'end_effector' not in kwargs: kwargs['end_effector'] = ''
+        if 'speed' not in kwargs:  kwargs['speed'] = 1.0
+        self.speed = kwargs['speed']
         self.current_joint_poses = self.reset_joint_poses = kwargs['reset_joint_poses']
         self.joint_damping = kwargs['joint_damping']
         self.end_effector = kwargs['end_effector']
+        
         super().__init__(scene, **kwargs)
-        self.speed = self.profile['speed'] = kwargs['speed'] if 'speed' in kwargs else 1.0
         self.pickup = False
         pass
     

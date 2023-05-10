@@ -8,12 +8,41 @@ import os
 
 class Camera3D(ActiveObject):
     def __init__(self,scene,**kwargs):
+        if 'fov' not in kwargs: kwargs['fov'] = 35
+        if 'image_size' not in kwargs: kwargs['image_size'] = 35
+        if 'sample_num' not in kwargs: kwargs['sample_num'] = 10000
+        if 'forcal' not in kwargs: kwargs['forcal'] = 0.010
+
         super().__init__(scene, **kwargs)
         self.image_size = kwargs['image_size']
         self.forcal = kwargs['forcal']
         self.fov = kwargs['fov']
-        self.profile['sample_num'] =  kwargs['sample_num'] if 'sample_num' in kwargs else 10000
+        self.sample_num = kwargs['sample_num']
         self.point_ids = list()
+
+        num_joints = p.getNumJoints(self.id)
+        if num_joints: pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        else: pos,orn = p.getBasePositionAndOrientation(self.id)
+        pitch,roll,yaw = p.getEulerFromQuaternion(orn)
+        near = self.forcal
+        far = 1000
+        origin = np.array(pos)
+
+        viewport_length = np.tan(np.pi / 180 * self.fov / 2) * self.forcal * 2
+        horizontal = np.array([viewport_length, 0, 0])
+        vertical = np.array([0, viewport_length, 0])
+        lower_left_corner = [0, 0, -self.forcal] - horizontal/2 - vertical/2
+
+        sample_rate = 2
+        for j in range(sample_rate):
+            for i in range(sample_rate):
+                u = float(i) / (sample_rate-1)
+                v = float(j) / (sample_rate-1)
+                target = lower_left_corner + u*horizontal + v*vertical
+                target = origin + Rotation.from_quat(orn).apply(target)
+                l = np.linalg.norm(target - origin)
+                dr = (target - origin) / l * far
+                p.addUserDebugLine(origin, target + dr,[1,0,0],1)
     
     def restore(self):
         super().restore()
@@ -28,11 +57,6 @@ class Camera3D(ActiveObject):
         far = 1000
         origin = np.array(pos)
 
-        vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch - 90,180 / np.pi * roll,2)
-        pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
-        
-        _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
-        depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :])
         viewport_length = np.tan(np.pi / 180 * self.fov / 2) * self.forcal * 2
         horizontal = np.array([viewport_length, 0, 0])
         vertical = np.array([0, viewport_length, 0])
@@ -48,13 +72,33 @@ class Camera3D(ActiveObject):
                 l = np.linalg.norm(target - origin)
                 dr = (target - origin) / l * far
                 p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=1)
-
+        
+        vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch - 90,180 / np.pi * roll,2)
+        pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
+        
+        _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
+        depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :])
+        
         return pixels.tobytes(),depth_pixels.tobytes()
 
     def get_intrinsics(self):
+        import math
+
+        def fov_to_f(w, h, fov):
+            fov_rad = math.radians(fov)
+            
+            d = w / 2
+            fx = d / math.tan(fov_rad / 2)
+
+            d = h / 2
+            fy = d / math.tan(fov_rad / 2)
+            return fx,fy
+        
+        fx,fy = fov_to_f(self.image_size[0],self.image_size[1],self.fov)
+
         return [
-                [self.image_size[0],0.0,self.image_size[0]/2],
-                [0.0,self.image_size[1],self.image_size[1]/2],
+                [fx,0.0,self.image_size[0]/2],
+                [0.0,fy,self.image_size[1]/2],
                 [0.0,0.0,1.0]
             ]
     
@@ -199,7 +243,7 @@ class Camera3D(ActiveObject):
     def draw_point_cloud_from_depth_pixels(self,depth_pixels,rgb_pixels,width,height):
         def depth_to_point_cloud(depth_image, projection_transform):
             projection_transform = np.array(projection_transform)
-            rows, cols = depth_image.shape
+            rows,cols = depth_image.shape
             c, r = np.meshgrid(np.arange(cols), np.arange(rows), sparse=True)
             valid = (0 < depth_image) & (depth_image < 1000)
             z = np.where(valid, depth_image, np.nan)
@@ -210,21 +254,16 @@ class Camera3D(ActiveObject):
             point_cloud = np.reshape(point_cloud, (rows * cols, 3))
             return point_cloud
 
-        R = Rotation.from_euler('xyz',self.profile['rot'])
+        R = Rotation.from_euler('xyz',[3.14,0,0])
         T = self.profile['pos']
         sample = int(width*height / self.profile['sample_num'])
         sample = 1 if sample < 1 else sample
 
-        pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],self.forcal,1000)
-        self.profile['projection_transform'] = [
-                [width,0,width/2],
-                [0.0,height,height/2],
-                [0.0,0.0,1]
-            ]
+        self.profile['projection_transform'] = self.get_intrinsics()
         
-        point_cloud_color = np.frombuffer(rgb_pixels, dtype=np.ubyte).reshape((width*height,4))[::sample] / 255
+        point_cloud_color = np.frombuffer(rgb_pixels, dtype=np.ubyte).reshape((width*height,4)) / 255
         depth_pixels = np.frombuffer(depth_pixels, dtype=np.float32).reshape((height,width))
-        point_cloud = depth_to_point_cloud(depth_pixels,self.profile['projection_transform'])[::sample]
+        point_cloud = depth_to_point_cloud(depth_pixels,self.profile['projection_transform'])
         point_cloud = R.apply(point_cloud) + T
         
         beg = 0; end = len(point_cloud)

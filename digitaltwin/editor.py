@@ -47,7 +47,6 @@ class Editor:
                 rayFrom[2] + rayForward[2] - 0.5 * horizon[2] + 0.5 * vertical[2] + float(mouseX) * dHor[2] - float(mouseY) * dVer[2]]
         except:
             return dict(name='',id=-1,pos=[0.,0.,0.])
-            
         rayInfo = p.rayTest(rayFrom, rayTo)
         
         if not rayInfo: return dict(name='',id=-1,pos=[0.,0.,0.])
@@ -62,18 +61,17 @@ class Editor:
     def select(self,name)->dict:
         return self.scene.active_objs_by_name[name].properties()
 
-    def add(self,kind,base,pos,rot,scale):
+    def add(self,kind,base,pos,rot,scale,extra_params={}):
         object_info = {
             "kind": kind,
             "base":base,
             "pos":pos,
             "rot":rot,
             "scale":[1,1,1],
-            "reset_joint_poses":[],
-            "joint_damping":[],
-            "end_effector":"",
             "name":kind.lower()
         }
+
+        object_info.update(extra_params)
         
         import digitaltwin
         active_obj = eval(f'digitaltwin.{kind}(self.scene,**object_info)')
