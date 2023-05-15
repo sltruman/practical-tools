@@ -3,24 +3,24 @@
         {
             "kind":"Placer",
             "name":"placer",
-            "base":"./data/objects/tray/traybox.urdf",
+            "base":"./objects/tray/traybox.urdf",
             "pos":[0,-0.5,0.001],
             "rot":[0,0,0],
             "center":[0.0,-0.5,0.25],
             "interval":0.1,
             "amount":10,
-            "workpiece":"./data/workpieces/lego/lego.urdf"
+            "workpiece":"./workpieces/lego/lego.urdf"
         }, 
         {
             "kind":"Camera3D",
             "name":"camera",
-            "base":"./data/cameras/camera3d/camera3d.urdf",
+            "base":"./cameras/camera3d/camera3d.urdf",
             "pos":[-0.032747,-0.564563,1.1767],
             "rot":[0.0,0.0,-1.57],
             "fov": 20,
             "forcal": 0.01,
             "sample_rate": 20, 
-            "image_size": [1024,768],
+            "image_size": 1920,
             "image_path":"./guagua.png"
         }
     ],

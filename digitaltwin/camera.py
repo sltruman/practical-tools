@@ -74,9 +74,9 @@ class Camera3D(ActiveObject):
                 p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=1)
         
         vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch - 90,180 / np.pi * roll,2)
-        pm = p.computeProjectionMatrixFOV(self.fov,self.image_size[0]/self.image_size[1],near,far)
+        pm = p.computeProjectionMatrixFOV(self.fov,1,near,far)
         
-        _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size[0],self.image_size[1],viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
+        _,_,pixels,depth_pixels,_ = p.getCameraImage(self.image_size,self.image_size,viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
         depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :])
         
         return pixels.tobytes(),depth_pixels.tobytes()
@@ -94,11 +94,11 @@ class Camera3D(ActiveObject):
             fy = d / math.tan(fov_rad / 2)
             return fx,fy
         
-        fx,fy = fov_to_f(self.image_size[0],self.image_size[1],self.fov)
+        fx,fy = fov_to_f(self.image_size,self.image_size,self.fov)
 
         return [
-                [fx,0.0,self.image_size[0]/2],
-                [0.0,fy,self.image_size[1]/2],
+                [fx,0.0,self.image_size/2],
+                [0.0,fy,self.image_size/2],
                 [0.0,0.0,1.0]
             ]
     
@@ -338,7 +338,7 @@ class Camera3DReal(ActiveObject):
         self.set_rot(Rotation.from_matrix(R).as_euler('xyz').tolist())
         pass
 
-    def draw_point_cloud_from_depth_pixels(self,depth_pixels,rgb_pixels,width,height,alpha=False):
+    def draw_point_cloud_from_depth_pixels(self,depth_pixels,rgb_pixels,width,height):
         def depth_to_point_cloud(depth_image, projection_transform):
             projection_transform = np.array(projection_transform)
             rows, cols = depth_image.shape

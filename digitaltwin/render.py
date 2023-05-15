@@ -1,62 +1,118 @@
-import pybullet as p
-import numpy as np
-from scipy.spatial.transform import Rotation
-import multiprocessing as mp
+# import pybullet as p
+# import numpy as np
+# import os
+# from scipy.spatial.transform import Rotation
+# import multiprocessing as mp
+# import socket as s
+# from time import time,sleep
+# import traceback
+# import json
 
-class Render:
-    def __init__(self,scene):
-        self.p = mp.Process(target=self.run,args=())
-        self.p.start()
-        pass
+# from ctypes import *
 
-    def __del__(self):
-        pass
+# try:
+#     rt = CDLL('librt.so')
+# except:
+#     rt = CDLL('librt.so.1')
 
-    def run(self):
-        from math import pi, sin, cos
-        from direct.task import Task
-        from direct.showbase.ShowBase import ShowBase
-        from direct.filter.CommonFilters import CommonFilters
-        from direct.filter.FilterManager import FilterManager
-        from panda3d.core import NodePath
+# ftok = rt.ftok
+# ftok.argtypes = [c_char_p,c_int]
+# ftok.restype = c_int
 
-        class App(ShowBase):
-            def __init__(self):
-                ShowBase.__init__(self)
-                self.scene = self.loader.loadModel("models/environment")
-                self.scene.reparentTo(self.render)
-                self.scene.setScale(0.25, 0.25, 0.25)
-                self.scene.setPos(-8, 42, 0)
-                self.taskMgr.add(self.spinCameraTask, "SpinCameraTask")
+# shmget = rt.shmget
+# shmget.argtypes = [c_int, c_size_t, c_int]  
+# shmget.restype = c_int  
 
-                self.buffer = self.win.makeTextureBuffer("hello", 256, 256)
-                self.altCam = self.makeCamera(self.buffer)
-                self.altCam.reparentTo(self.render)
-                self.altCam.setPos(0, -10, 0)
-                
-            def spinCameraTask(self, task):
-                angleDegrees = task.time * 6.0
-                angleRadians = angleDegrees * (pi / 180.0)
-                self.camera.setPos(20 * sin(angleRadians), -20 * cos(angleRadians), 3)
-                self.camera.setHpr(angleDegrees, 0, 0)
-                texture = self.buffer.getTexture()
-                print(texture.getRamImageAs('RGBA'))
+# shmat = rt.shmat  
+# shmat.argtypes = [c_int, POINTER(c_void_p), c_int]
+# shmat.restype = c_void_p
 
-                return Task.cont
+# shmdt = rt.shmdt
+# shmdt.argtypes = [POINTER(c_void_p)]
+# shmdt.restype = c_int
 
-        app = App()
-        app.run()
-        pass
+# shmctl = rt.shmctl
+# shmctl.argtypes = [c_int, c_int, POINTER(c_void_p)]
+# shmctl.restype = c_int
 
-    def rtt(self):
-        pass
 
-    def sync_bodies(self):
-        pass
+# class Render:
+#     def __init__(self,scene):
+#         self.scene = scene
+#         self.p = mp.Process(target=run,args=(scene,))
+#         self.p.start()
+#         pass
+
+#     def __del__(self):
+#         self.p.kill()
+#         pass
+
+#     def sync_bodies(self):
+#         pass
     
-    def draw_points(self):
-        pass
+#     def draw_points(self):
+#         pass
 
-    def draw_lines(self):
-        pass
-    
+#     def draw_lines(self):
+#         pass
+
+# def run(scene):
+#     shmkey = ftok(scene.scene_path.encode(), 1)
+#     texture_size = scene.width*scene.height*4
+#     shmid = shmget(shmkey, texture_size, 512 | 438)
+#     if shmid == -1:
+#         print ("Failed to create shared memory!",flush=True)
+#         exit(-1)
+
+#     shmaddr = shmat(shmid, None, 0)
+#     id = p.connect(p.SHARED_MEMORY,options=f'--width={scene.width} --height={scene.height} --shared_memory_key=12345')
+
+#     def rtt():
+#         _,_,pixels,depth_pixels,_ = p.getCameraImage(scene.width,scene.height,renderer=p.ER_BULLET_HARDWARE_OPENGL,physicsClientId=id)
+#         return pixels.tobytes(),depth_pixels.tobytes()
+
+#     while True:
+#         try:
+#             rgba,_ = rtt()
+#             texture = create_string_buffer(rgba,texture_size)
+#             memmove(shmaddr,texture,texture_size)
+#             sleep(0.050)
+#             pass
+#         except SyntaxError: traceback.print_exc()
+#         except BlockingIOError: pass
+
+# # def run():
+# #     from math import pi, sin, cos
+# #     from direct.task import Task
+# #     from direct.showbase.ShowBase import ShowBase
+# #     from direct.filter.CommonFilters import CommonFilters
+# #     from direct.filter.FilterManager import FilterManager
+# #     from panda3d.core import NodePath
+
+# #     class App(ShowBase):
+# #         def __init__(self):
+# #             ShowBase.__init__(self)
+# #             self.scene = self.loader.loadModel("models/environment")
+# #             self.scene.reparentTo(self.render)
+# #             self.scene.setScale(0.25, 0.25, 0.25)
+# #             self.scene.setPos(-8, 42, 0)
+# #             self.taskMgr.add(self.spinCameraTask, "SpinCameraTask")
+
+# #             self.buffer = self.win.makeTextureBuffer("hello", 256, 256)
+# #             self.altCam = self.makeCamera(self.buffer)
+# #             self.altCam.reparentTo(self.render)
+# #             self.altCam.setPos(0, -10, 0)
+            
+# #         def spinCameraTask(self, task):
+# #             angleDegrees = task.time * 6.0
+# #             angleRadians = angleDegrees * (pi / 180.0)
+# #             self.camera.setPos(20 * sin(angleRadians), -20 * cos(angleRadians), 3)
+# #             self.camera.setHpr(angleDegrees, 0, 0)
+# #             texture = self.buffer.getTexture()
+# #             print(texture.getRamImageAs('RGBA'))
+
+# #             return Task.cont
+
+# #     app = App()
+# #     app.run()
+# #     pass

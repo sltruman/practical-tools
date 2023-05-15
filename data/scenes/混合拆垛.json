@@ -3,18 +3,18 @@
         {
             "kind":"Robot",
             "name":"robot",
-            "base":"./data/robots/ur5/ur5.urdf",
+            "base":"robots/ur5/ur5.urdf",
             "pos":[0,0,0],
             "rot":[0,0,3.14],
             "reset_joint_poses":[-1.57,0.0,-0.3925,-0.785,1.57,0],
             "joint_damping":[ 0, 1, 0.9, 0.8, 0.7, 0.0],
-            "end_effector":"./data/end_effectors/suction/suction.urdf",
+            "end_effector":"./end_effectors/suction/suction.urdf",
             "speed":1.0
         },
         {
             "kind":"Stacker",
             "name":"stacker",
-            "base":"./data/objects/woodboard/woodboard.urdf",
+            "base":"./objects/woodboard/woodboard.urdf",
             "pos":[0,-0.52,0.01],
             "rot":[0,0,0],
             "area":[0.3,0.3,0.3],
@@ -24,13 +24,13 @@
         {
             "kind":"Camera3D",
             "name":"camera",
-            "base":"./data/cameras/camera3d/camera3d.urdf",
+            "base":"./cameras/camera3d/camera3d.urdf",
             "pos":[-0.032747,-0.564563,1.1767],
             "rot":[0.0,0.0,0.0],
             "fov": 20,
             "forcal": 0.01,
             "sample_rate": 20, 
-            "image_size": [1920,1200]
+            "image_size": 1920
         }
     ],
 

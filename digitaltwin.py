@@ -8,38 +8,34 @@ import shutil
 from digitaltwin import Scene,Editor,Workflow
 
 if len(sys.argv) < 2:
-    print("Useage: program <scene_path> <width> <height> <tmp_dir>")
+    print("Useage: program <scene_path> <width> <height> <data_dir> <tmp_dir>")
 else:
     scene_path = sys.argv[1]
     scene_name = os.path.basename(scene_path)
 
-    width = sys.argv[2]
-    height = sys.argv[3]
-    root_dir = sys.argv[4]
+    width = int(sys.argv[2])
+    height = int(sys.argv[3])
+    data_dir = sys.argv[4]
     tmp_dir = sys.argv[5]
 
     if os.path.exists(tmp_dir): shutil.rmtree(tmp_dir)
     os.makedirs(tmp_dir,exist_ok=True)
     sock_path = os.path.join(tmp_dir,scene_name + '.sock')
-
-    # sk = s.socket(s.AF_INET,s.SOCK_STREAM)
     sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
     sk.setsockopt(s.SOL_SOCKET,s.SO_REUSEADDR,1)
     sk.bind(sock_path)
-    # sk.bind(('localhost',6000))
-    print(f'Serving on {sys.argv[1]}')
+    print(f'Serving on {sock_path}',flush=True)
     sk.listen(1)
+    conn,addr = sk.accept()
 
-    scene = Scene(width,height,root_dir,tmp_dir)
+    scene = Scene(width,height,data_dir,tmp_dir)    
     editor = Editor(scene)
     workflow = Workflow(scene)
     scene.load(scene_path)
-
-    conn,addr = sk.accept()
-    print(f'Client addr {addr}')
     
     buf = b''
     try:
+        frame_tick_elapsed = 0
         while True:
             elapsed = time()
             
@@ -51,28 +47,30 @@ else:
                     if req[-1] != 0xa:
                         buf = req
                         raise BlockingIOError
- 
+
                     res = eval(req.decode())
-                    # res = exec(req.decode())
                     if type(res) == tuple: 
                         for v in res: conn.sendall(v)
                     elif type(res) == dict or type(res) == list: 
                         conn.sendall(json.dumps(res).encode() + b'\n')
-                    else: pass
                 buf = b''
             except SyntaxError: traceback.print_exc()
             except BlockingIOError: pass
 
             tick = time() - elapsed
             scene.update_for_tick(tick)
-            tick = round(tick, 3)
+            # tick = round(tick, 3)
+            
+            # frame_tick_elapsed += tick
+            # if frame_tick_elapsed > 0.020:
+                # frame_tick_elapsed = 0
             print(end='',flush=True)
     except (ConnectionResetError,BrokenPipeError):
         pass
     except:
         traceback.print_exc()
         pass
-    
+
     del workflow
     del editor
     del scene

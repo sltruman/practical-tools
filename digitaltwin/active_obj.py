@@ -36,8 +36,8 @@ class ActiveObject:
     def set_base(self,base):
         self.profile['base'] = base
         if 'id' in vars(self): p.removeBody(self.id)
-        print(os.path.join(self.scene.root_dir,base))
-        self.id = p.loadURDF(os.path.join(self.scene.root_dir,base), self.profile['pos'], p.getQuaternionFromEuler(self.profile['rot']),useFixedBase=True)
+        print(os.path.join(self.scene.data_dir,base))
+        self.id = p.loadURDF(os.path.join(self.scene.data_dir,base), self.profile['pos'], p.getQuaternionFromEuler(self.profile['rot']),useFixedBase=True)
 
     def set_pos(self,pos):
         self.profile['pos'] = pos

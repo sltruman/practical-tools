@@ -1,11 +1,11 @@
 from time import time
-from digitaltwin import Scene,Workflow,Render
+from digitaltwin import Scene,Workflow
 from threading import Thread
 
 scene = Scene(1024,768)
 workflow = Workflow(scene)
 
-scene.load('./data/scenes/标定测试.json')
+scene.load('./scenes/标定测试.json')
 
 def updating():
     import time
@@ -15,6 +15,3 @@ def updating():
 
 t = Thread(target=updating)
 t.start()
-
-rgba,depth = scene.active_objs_by_name['camera'].rtt()
-scene.active_objs_by_name['camera'].draw_point_cloud_from_depth_pixels(depth,rgba,1024,768)
