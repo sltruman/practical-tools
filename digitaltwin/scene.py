@@ -8,7 +8,7 @@ import os
 import socket as s
 
 class Scene:
-  def __init__(self,width=1024,height=768,data_dir='.',tmp_dir='.'):
+  def __init__(self,width=1024,height=768,data_dir='./data',tmp_dir='.'):
     self.tmp_dir = tmp_dir
     self.data_dir = data_dir
 

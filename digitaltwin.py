@@ -76,3 +76,4 @@ else:
     del scene
     sk.close()
     if os.path.exists(tmp_dir): shutil.rmtree(tmp_dir)
+    print('digitaltwin exit!',flush=True)

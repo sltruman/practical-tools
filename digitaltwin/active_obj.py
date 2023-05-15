@@ -3,12 +3,12 @@ import os
 
 class ActiveObject:
     def __init__(self,scene,**kwargs):
+        if 'scale' not in kwargs: kwargs['scale'] = [1,1,1] 
+
         self.actions = list()
         self.result = None,
         self.scene = scene
         self.profile = kwargs
-        if 'scale' not in kwargs: self.profile['scale'] = [1,1,1] 
-        
         self.set_base(kwargs['base'])
         pass
 

@@ -1,5 +1,5 @@
 {
-    "ground_z":-0.05,
+    "ground_z":0,
     "active_objects": [
         {
             "kind":"Robot",
@@ -17,11 +17,7 @@
             "name":"camera",
             "base":"./cameras/camera3d/camera3d.urdf",
             "pos":[-0.032747,-0.564563,1.1767],
-            "rot":[0.0,0.0,0.0],
-            "fov": 20,
-            "forcal": 0.01,
-            "sample_rate": 20,
-            "image_size": 1024
+            "rot":[0.0,0.0,0.0]
         },
         {
             "kind":"ActiveObject",
