@@ -26,16 +26,16 @@ else:
     sk.bind(sock_path)
     print(f'Serving on {sock_path}',flush=True)
     sk.listen(1)
-    conn,addr = sk.accept()
-
+    
     scene = Scene(width,height,data_dir,tmp_dir)    
+    scene.load(scene_path)
     editor = Editor(scene)
     workflow = Workflow(scene)
-    scene.load(scene_path)
     
+    conn,addr = sk.accept()
+
     buf = b''
     try:
-        frame_tick_elapsed = 0
         while True:
             elapsed = time()
             
@@ -60,10 +60,6 @@ else:
             tick = time() - elapsed
             scene.update_for_tick(tick)
             # tick = round(tick, 3)
-            
-            # frame_tick_elapsed += tick
-            # if frame_tick_elapsed > 0.020:
-                # frame_tick_elapsed = 0
             print(end='',flush=True)
     except (ConnectionResetError,BrokenPipeError):
         pass

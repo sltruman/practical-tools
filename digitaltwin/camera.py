@@ -331,8 +331,8 @@ class Camera3DReal(ActiveObject):
 
         axes = [
             [1,0,0],
-            [0,-1,0],
-            [0,0,-1]]
+            [0,1,0],
+            [0,0,1]]
         
         point_cloud = R.apply(point_cloud @ axes) + T 
         

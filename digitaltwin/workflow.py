@@ -125,7 +125,6 @@ class Workflow():
         pass
     
     def set(self,workflow):
-        print(workflow)
         self.scene.profile['workflow'] = json.loads(workflow)
 
     def get(self):
