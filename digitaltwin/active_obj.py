@@ -9,6 +9,11 @@ class ActiveObject:
         self.result = None,
         self.scene = scene
         self.profile = kwargs
+
+        self.base = kwargs['base']
+        self.pos = kwargs['pos']
+        self.rot = kwargs['rot']
+        self.scale = kwargs['scale']
         self.set_base(kwargs['base'])
         pass
 
@@ -34,26 +39,25 @@ class ActiveObject:
         pass
 
     def set_base(self,base):
-        self.profile['base'] = base
+        self.base = base
         if 'id' in vars(self): p.removeBody(self.id)
-        print(os.path.join(self.scene.data_dir,base))
-        self.id = p.loadURDF(os.path.join(self.scene.data_dir,base), self.profile['pos'], p.getQuaternionFromEuler(self.profile['rot']),useFixedBase=True)
+        self.id = p.loadURDF(os.path.join(self.scene.data_dir,base), self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
 
     def set_pos(self,pos):
-        self.profile['pos'] = pos
-        p.resetBasePositionAndOrientation(self.id,pos,p.getQuaternionFromEuler(self.profile['rot']))
+        self.pos = pos
+        p.resetBasePositionAndOrientation(self.id,pos,p.getQuaternionFromEuler(self.rot))
         pass
 
     def get_pos(self):
-        return self.profile['pos']
+        return self.pos
 
     def set_rot(self,rot):
-        self.profile['rot'] = rot
-        p.resetBasePositionAndOrientation(self.id,self.profile['pos'],p.getQuaternionFromEuler(rot))
+        self.rot = rot
+        p.resetBasePositionAndOrientation(self.id,self.pos,p.getQuaternionFromEuler(rot))
         pass
 
     def get_rot(self):
-        return self.profile['rot']
+        return self.rot
 
     def set_scale(self,scale):
         pass
@@ -68,4 +72,4 @@ class ActiveObject:
         pass 
 
     def set_user_data(self,value):
-        self.profile['user_data'] = value
+        self.user_data = value

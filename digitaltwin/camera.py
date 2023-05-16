@@ -9,20 +9,17 @@ import os
 
 class Camera3D(ActiveObject):
     def __init__(self,scene,**kwargs):
-        if 'forcal' not in kwargs: kwargs['forcal'] = 0.010
-        if 'sensor_w_mm' not in kwargs: kwargs['sensor_w_mm'] = 3.6
-        if 'sensor_h_mm' not in kwargs: kwargs['sensor_h_mm'] = 2.7
+        if 'focal' not in kwargs: kwargs['focal'] = 0.010
+        if 'fov' not in kwargs: kwargs['fov'] = math.radians(20.4)
         if 'pixels_w' not in kwargs: kwargs['pixels_w'] = 1024
         if 'pixels_h' not in kwargs: kwargs['pixels_h'] = 768
         if 'sample_rate' not in kwargs: kwargs['sample_rate'] = 20
 
         super().__init__(scene, **kwargs)
-        self.forcal = self.profile['forcal']
+        self.focal = self.profile['focal']
+        self.fov = self.profile['fov']
         self.pixels_w = self.profile['pixels_w']
         self.pixels_h = self.profile['pixels_h']
-        self.pixels_per_mm = self.profile['pixels_w'] / self.profile['sensor_w_mm']
-        self.fov = math.degrees(math.atan(self.pixels_w / self.pixels_per_mm / 2 / 1000 / self.forcal) * 2)
-        
         self.point_ids = list()
 
     def restore(self):
@@ -34,14 +31,14 @@ class Camera3D(ActiveObject):
         else: pos,orn = p.getBasePositionAndOrientation(self.id)
         pitch,roll,yaw = p.getEulerFromQuaternion(orn)
 
-        near = self.forcal
+        near = self.focal
         far = 1000
         origin = np.array(pos)
 
-        viewport_length = np.tan(np.pi / 180 * self.fov / 2) * self.forcal * 2
+        viewport_length = np.tan(self.fov / 2) * self.focal * 2
         horizontal = np.array([viewport_length, 0, 0])
         vertical = np.array([0, viewport_length, 0])
-        lower_left_corner = [0, 0, -self.forcal] - horizontal/2 - vertical/2
+        lower_left_corner = [0, 0, -self.focal] - horizontal/2 - vertical/2
 
         sample_rate = 2
         for j in range(sample_rate):
@@ -54,22 +51,34 @@ class Camera3D(ActiveObject):
                 dr = (target - origin) / l * far
                 p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=0)
         
-        vm = p.computeViewMatrixFromYawPitchRoll(origin,near,180 / np.pi * yaw,180 / np.pi * pitch - 90,180 / np.pi * roll,2)
-        pm = p.computeProjectionMatrixFOV(self.fov,1,near,far)
+        vm = p.computeViewMatrixFromYawPitchRoll(origin,near,math.degrees(yaw),math.degrees(pitch) - 90,math.degrees(roll),2)
+        pm = p.computeProjectionMatrixFOV(math.degrees(self.fov),self.pixels_w/self.pixels_h,near,far)
         
         _,_,pixels,depth_pixels,_ = p.getCameraImage(self.pixels_w,self.pixels_h,viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
-        depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :])
+        depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :]) - near
         
         return pixels.tobytes(),depth_pixels.tobytes()
 
     def get_intrinsics(self):
-        s = [
-            [self.pixels_w ,0.0,self.pixels_w/2],
-            [0.0,self.pixels_h,self.pixels_h/2],
+        fx = self.pixels_w / 2 / math.tan(self.fov / 2)
+        fy = self.pixels_h / 2 / math.tan(self.fov / 2)
+        cx = self.pixels_w/2
+        cy = self.pixels_h/2
+
+        intrinsics = [
+            [fy,0.0,cx],
+            [0.0,fy,cy],
             [0.0,0.0,1.0],
         ]
-        print(s)
-        return s
+
+        return intrinsics
+    
+    def get_extrinsics(self):
+        extrinsics = np.identity(4)
+        x = Rotation.from_euler('xyz',self.rot).as_matrix()
+        extrinsics[:3,:3] = x
+        extrinsics[:3,3] = self.pos
+        return extrinsics
     
     def signal_capture(self,*args,**kwargs):
         pixels,depth = self.rtt()
@@ -104,7 +113,7 @@ class Camera3D(ActiveObject):
 
         far = 1000
         origin = np.array(pos)
-        viewport_length = np.tan(np.pi / 180 * self.fov / 2) * self.forcal * 2
+        viewport_length = np.tan(self.fov / 2) * self.forcal * 2
 
         horizontal = np.array([viewport_length, 0, 0])
         vertical = np.array([0, viewport_length, 0])
@@ -212,22 +221,18 @@ class Camera3D(ActiveObject):
         
 class Camera3DReal(ActiveObject):
     def __init__(self,scene,**kwargs):
-        if 'projection_transform' not in kwargs:
-            self.projection_transform = kwargs['projection_transform'] = [
-                [0,0,0],
-                [0,0,0],
-                [0,0,0]]
-        
-        if 'eye_to_hand_transform' not in kwargs:
-            self.eye_to_hand_transform = kwargs['eye_to_hand_transform'] = [
-                [1,0,0,0],
-                [0,1,0,0],
-                [0,0,1,0],
-                [0,0,0,1]]
+        if 'focal' not in kwargs: kwargs['focal'] = 0.010
+        if 'fov' not in kwargs: kwargs['fov'] = math.degrees(20)
+        if 'pixels_w' not in kwargs: kwargs['pixels_w'] = 1024
+        if 'pixels_h' not in kwargs: kwargs['pixels_h'] = 768
         if 'sample_num' not in kwargs: kwargs['sample_num'] = 100000
-        super().__init__(scene, **kwargs)
 
-        
+        super().__init__(scene, **kwargs)
+        self.focal = self.profile['focal']
+        self.pixels_w = self.profile['pixels_w']
+        self.pixels_h = self.profile['pixels_h']
+        self.sample_num = self.profile['sample_num']
+
         self.point_ids = list()
         self.rgb_pixels = bytes()
         self.depth_pixels = bytes()
@@ -274,44 +279,55 @@ class Camera3DReal(ActiveObject):
         self.actions.append((self.draw_point_cloud_from_depth_pixels,(depth_pixels,rgb_pixels,width,height)))
         self.result = None,self.profile['eye_to_hand_transform']
         
-    def set_calibration(self,projection_transform,eye_to_hand_transform):
-        self.profile['projection_transform'] = projection_transform
-        self.profile['eye_to_hand_transform'] = eye_to_hand_transform
-
-        eye_to_hand_transform = np.array(eye_to_hand_transform)
-        R = eye_to_hand_transform[:3, :3]
-        T = eye_to_hand_transform[:3, 3]
-        self.set_pos(T.tolist())
-        self.set_rot(Rotation.from_matrix(R).as_euler('xyz').tolist())
+    def set_calibration(self,intrinsics,extrinsics):
+        self.set_intrinsics(intrinsics)
+        self.set_extrinsics(extrinsics)
         pass
 
-    def set_intrinsics(self,projection_transform):
-        self.profile['projection_transform'] = projection_transform
-        return 
+    def set_intrinsics(self,intrinsics):
+        self.intrinsics = intrinsics
+        m = np.array(intrinsics)
+
+        fx = m[0,0]
+        fy = m[1,1]
+        cx = m[0,2]
+        cy = m[1,2]
+
+        self.pixels_w = cx * 2
+        self.pixels_y = cy * 2
+        self.fov = math.atan(self.pixels_w / 2 / fx) * 2
+        
+    def set_extrinsics(self,extrinsics):
+        self.extrinsics = extrinsics
+        m = np.array(extrinsics)
+        R = m[:3, :3]
+        T = m[:3, 3]
+        self.set_pos(T.tolist())
+        self.set_rot(Rotation.from_matrix(R).as_euler('xyz').tolist())
+        print(self.pos,self.rot)
 
     def draw_point_cloud_from_depth_pixels(self,depth_pixels,rgb_pixels,width,height):
-        def depth_to_point_cloud(depth_image, projection_transform):
-            projection_transform = np.array(projection_transform)
+        def depth_to_point_cloud(depth_image, intrinsics):
             rows, cols = depth_image.shape
             c, r = np.meshgrid(np.arange(cols), np.arange(rows), sparse=True)
             valid = (0 < depth_image) & (depth_image < 1000)
             z = np.where(valid, depth_image, np.nan)
-            x = np.where(valid, z * (c - projection_transform[0, 2]) / projection_transform[0, 0], 0)
-            y = np.where(valid, z * (r - projection_transform[1, 2]) / projection_transform[1, 1], 0)
+            x = np.where(valid, z * (c - intrinsics[0, 2]) / intrinsics[0, 0], 0)
+            y = np.where(valid, z * (r - intrinsics[1, 2]) / intrinsics[1, 1], 0)
 
             point_cloud = np.dstack((x, y, z))
             point_cloud = np.reshape(point_cloud, (rows * cols, 3))
             return point_cloud
 
-        R = Rotation.from_euler('xyz',self.profile['rot'])
-        T = self.profile['pos']
-        sample = int(width*height / self.profile['sample_num'])
+        R = Rotation.from_euler('xyz',self.rot)
+        T = self.pos
+        sample = int(width*height / self.sample_num)
         sample = 1 if sample < 1 else sample
         
         pixels_size = 4 if len(rgb_pixels) == width * height * 4 else 3
         point_cloud_color = np.frombuffer(rgb_pixels, dtype=np.ubyte).reshape((width*height,pixels_size))[::sample] / 255
         depth_pixels = np.frombuffer(depth_pixels, dtype=np.float32).reshape((height,width))
-        point_cloud = depth_to_point_cloud(depth_pixels,self.profile['projection_transform'])[::sample]
+        point_cloud = depth_to_point_cloud(depth_pixels, np.array(self.intrinsics) )[::sample]
 
         axes = [
             [1,0,0],
@@ -319,7 +335,6 @@ class Camera3DReal(ActiveObject):
             [0,0,-1]]
         
         point_cloud = R.apply(point_cloud @ axes) + T 
-        
         
         beg = 0; end = len(point_cloud)
         while beg < end:
@@ -331,8 +346,8 @@ class Camera3DReal(ActiveObject):
         pass
 
     def draw_point_cloud(self,vertexes,colors):
-        R = Rotation.from_euler('xyz',self.profile['rot'])
-        T = self.profile['pos']
+        R = Rotation.from_euler('xyz',self.rot)
+        T = self.pos
         
         if len(vertexes) > len(colors): colors.extend([0,0,0]*(len(vertexes)-len(colors)))
         vertexes = R.apply(vertexes) + T
@@ -343,7 +358,7 @@ class Camera3DReal(ActiveObject):
             if offset > 10000: offset = 10000
             point_id = p.addUserDebugPoints(vertexes[beg:beg+offset],colors[beg:beg+offset],1,lifeTime=0)
             self.point_ids.append(point_id)
-        beg += offset   
+        beg += offset
         pass
 
     def clear_point_cloud(self):
