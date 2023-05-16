@@ -28,7 +28,8 @@ extrinsics = scene.active_objs_by_name['camera'].get_extrinsics()
 properties = editor.add('Camera3DReal',"./cameras/camera3d/camera3d.urdf",[-0.032747,0.564563,1.1767],[0,0,0],[0,0,0])
 
 scene.active_objs_by_name['camera3dreal'].set_intrinsics(intrinsics)
-# scene.active_objs_by_name['camera3dreal'].set_extrinsics(extrinsics)
+scene.active_objs_by_name['camera3dreal'].set_extrinsics(extrinsics)
+
 scene.active_objs_by_name['camera3dreal'].draw_point_cloud_from_depth_pixels(depth,rgba,1024,768)
 
 img = np.frombuffer(rgba, dtype=np.uint8).reshape((768, 1024, 4))

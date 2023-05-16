@@ -113,11 +113,11 @@ class Camera3D(ActiveObject):
 
         far = 1000
         origin = np.array(pos)
-        viewport_length = np.tan(self.fov / 2) * self.forcal * 2
+        viewport_length = np.tan(self.fov / 2) * self.focal * 2
 
         horizontal = np.array([viewport_length, 0, 0])
         vertical = np.array([0, viewport_length, 0])
-        lower_left_corner = [0, 0, -self.forcal] - horizontal/2 - vertical/2
+        lower_left_corner = [0, 0, -self.focal] - horizontal/2 - vertical/2
         ids = set()
 
         sample_rate = self.profile['sample_rate']
