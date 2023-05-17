@@ -1,6 +1,7 @@
 from .scene import Scene
 import pybullet as p
 import json
+import traceback
 
 class Workflow():
     def __init__(self,scene: Scene):
@@ -104,7 +105,7 @@ class Workflow():
             else:
                 next = wf["run"]
             if not next: 
-                print('workflow stopped')
+                print('workflow stopped',flush=True)
                 return
 
             act = declare[next]
@@ -113,8 +114,13 @@ class Workflow():
             args = act['args'] if 'args' in act else {}
             obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
             
-            print('signal',fun,args)
-            eval(f'obj.signal_{fun}(*val,**args)')
+            try:
+                print('signal',fun,args,flush=True)
+                eval(f'obj.signal_{fun}(*val,**args)')
+            except:
+                traceback.print_exc()
+                print('workflow stopped',flush=True)
+                return 
 
             self.scene.actions.append((task,(next)))
         task(None)

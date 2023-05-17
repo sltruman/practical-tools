@@ -277,7 +277,7 @@ class Camera3DReal(ActiveObject):
 
         self.clear_point_cloud()
         self.actions.append((self.draw_point_cloud_from_depth_pixels,(depth_pixels,rgb_pixels,width,height)))
-        self.result = None,self.profile['eye_to_hand_transform']
+        self.result = None,self.intrinsics
         
     def set_calibration(self,intrinsics,extrinsics):
         self.set_intrinsics(intrinsics)
