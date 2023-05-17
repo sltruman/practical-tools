@@ -3,18 +3,17 @@ import os
 import socket as s
 import json
 import traceback
-from time import time
+from time import time,sleep
 import shutil
 from digitaltwin import Scene,Editor,Workflow
 
 if len(sys.argv) < 2:
-    print("Useage: program <scene_path> <width> <height> <data_dir> <tmp_dir>")
+    print("Useage: program <width> <height> <scene_path> <data_dir> <tmp_dir>")
 else:
-    scene_path = sys.argv[1]
+    width = int(sys.argv[1])
+    height = int(sys.argv[2])
+    scene_path = sys.argv[3]
     scene_name = os.path.basename(scene_path)
-
-    width = int(sys.argv[2])
-    height = int(sys.argv[3])
     data_dir = sys.argv[4]
     tmp_dir = sys.argv[5]
 

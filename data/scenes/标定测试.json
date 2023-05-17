@@ -29,34 +29,9 @@
     ],
 
     "workflow": {
-        "run":"1",
+        "run":null,
         "declare":{
-            "1":{"kind":"Stacker","fun":"generate","name":"stacker", "next":"2"},
-            "2":{
-                "kind":"Camera3D","fun":"pose_recognize","name":"camera", "next":"3",
-                "alt":[
-                    {"next":"7","err": "failed"}
-                ],"args":{
-                    "showname":"capture"
-                }
-            },
-            "3":{"kind":"Robot","fun":"pick_plan","name":"robot","next":"4","args":{
-                "pick_poses":[
-                    {"pos":[0.0,0.0,0.025],"rot":[0,0,0]}
-                ]
-            }},
-            "4":{"kind":"Robot","fun":"plan_move","name":"robot","next":"5"},
-            "5":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": true},"next":"6"},
-            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
-                    "mode":"point",
-                    "point":[0.0,0.0,0.1,0,0,0]
-                },"next":"7"},
-            "7":{"kind":"Robot","fun":"move","name":"robot","args":{
-                    "mode":"point",
-                    "point":[0.5,0.0,0.5,0,0,0]
-                },"next":"8"},  
-            "8":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": false},"next":"9"},
-            "9":{"kind":"Robot","fun":"move","name":"robot","args":{"home": true},"next":"2"}
+
         }
     }
 }

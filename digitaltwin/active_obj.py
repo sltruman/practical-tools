@@ -3,7 +3,7 @@ import os
 
 class ActiveObject:
     def __init__(self,scene,**kwargs):
-        if 'scale' not in kwargs: kwargs['scale'] = [1,1,1] 
+        if 'scale' not in kwargs: kwargs['scale'] = [1,1,1]
 
         self.actions = list()
         self.result = None,
@@ -41,7 +41,8 @@ class ActiveObject:
     def set_base(self,base):
         self.base = base
         if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(os.path.join(self.scene.data_dir,base), self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
+        self.id = p.loadURDF(os.path.join(self.scene.data_dir,base), self.pos, p.getQuaternionFromEuler(self.rot))
+        p.resetBasePositionAndOrientation(self.id,self.pos,p.getQuaternionFromEuler(self.rot))
 
     def set_pos(self,pos):
         self.pos = pos
