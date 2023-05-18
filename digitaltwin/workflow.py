@@ -73,6 +73,10 @@ class Workflow():
         return [n for n in nodes if n['names']]
 
     def start(self):
+        if self.running: 
+            print('Workflow has started',flush=True)
+            return
+
         self.running = True
         wf = self.scene.profile['workflow']
         declare = wf['declare']
@@ -89,7 +93,7 @@ class Workflow():
 
                 last_obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
                 if not last_obj.idle():
-                    self.scene.actions.append((task,(last)))
+                    self.scene.actions.append((task,(last,)))
                     return
                 
                 res = last_obj.result
@@ -101,11 +105,11 @@ class Workflow():
                         if err != opt['err']: continue
                         next = opt['next']
                         break
-
             else:
                 next = wf["run"]
+
             if not next: 
-                print('workflow stopped',flush=True)
+                print('Workflow stopped',flush=True)
                 return
 
             act = declare[next]
@@ -115,14 +119,18 @@ class Workflow():
             obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
             
             try:
-                print('signal',fun,args,flush=True)
+                print('error', err,flush=True)
+                print('signal',fun,flush=True)
+                print('val',val,flush=True)
+                print('args',args,flush=True)
                 eval(f'obj.signal_{fun}(*val,**args)')
             except:
                 traceback.print_exc()
-                print('workflow stopped',flush=True)
+                print('Workflow stopped',flush=True)
                 return 
 
-            self.scene.actions.append((task,(next)))
+            self.scene.actions.append((task,(next,)))
+
         task(None)
 
     def stop(self):

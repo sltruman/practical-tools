@@ -41,7 +41,7 @@ class ActiveObject:
     def set_base(self,base):
         self.base = base
         if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(os.path.join(self.scene.data_dir,base), self.pos, p.getQuaternionFromEuler(self.rot))
+        self.id = p.loadURDF(os.path.join(self.scene.data_dir,base), self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=False)
         p.resetBasePositionAndOrientation(self.id,self.pos,p.getQuaternionFromEuler(self.rot))
 
     def set_pos(self,pos):

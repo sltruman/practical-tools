@@ -89,7 +89,7 @@ class Scene:
     pass
 
   def rtt(self):
-    _,_,pixels,_,_ = p.getCameraImage(self.width,self.height,renderer=p.ER_BULLET_HARDWARE_OPENGL)
+    _,_,pixels,_,_ = p.getCameraImage(self.width,self.height,flags=p.ER_NO_SEGMENTATION_MASK,renderer=p.ER_BULLET_HARDWARE_OPENGL)
     return pixels.tobytes(),
 
   def play(self,run=True):

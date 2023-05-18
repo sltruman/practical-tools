@@ -277,7 +277,7 @@ class Camera3DReal(ActiveObject):
 
         self.clear_point_cloud()
         self.actions.append((self.draw_point_cloud_from_depth_pixels,(depth_pixels,rgb_pixels,width,height)))
-        self.result = None,self.intrinsics
+        self.result = None,self.extrinsics
         
     def set_calibration(self,intrinsics,extrinsics):
         self.set_intrinsics(intrinsics)
