@@ -9,14 +9,14 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/BaseLink.stl" />
+        <mesh filename="Visual/BaseLink.stl" />
       </geometry>
       <material name="MotomanBlue" />
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/BaseLink.stl" />
+        <mesh filename="Collision/BaseLink.stl" />
       </geometry>
     </collision>
   </link>
@@ -24,14 +24,14 @@
     <visual>
       <origin xyz="0 0 -0.65" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link1.stl" />
+        <mesh filename="Visual/Link1.stl" />
       </geometry>
       <material name="MotomanBlue" />
     </visual>
     <collision>
       <origin xyz="0 0 -0.65" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link1.stl" />
+        <mesh filename="Collision/Link1.stl" />
       </geometry>
     </collision>
   </link>
@@ -39,14 +39,14 @@
     <visual>
       <origin xyz="-0.325 0 -0.65" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link2.stl" />
+        <mesh filename="Visual/Link2.stl" />
       </geometry>
       <material name="MotomanBlue" />
     </visual>
     <collision>
       <origin xyz="-0.325 0 -0.65" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link2.stl" />
+        <mesh filename="Collision/Link2.stl" />
       </geometry>
     </collision>
   </link>
@@ -54,14 +54,14 @@
     <visual>
       <origin xyz="-0.325 0 -1.8" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link3.stl" />
+        <mesh filename="Visual/Link3.stl" />
       </geometry>
       <material name="MotomanBlue" />
     </visual>
     <collision>
       <origin xyz="-0.325 0 -1.8" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link3.stl" />
+        <mesh filename="Collision/Link3.stl" />
       </geometry>
     </collision>
   </link>
@@ -69,14 +69,14 @@
     <visual>
       <origin xyz="-0.325 0 -2.1" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link4.stl" />
+        <mesh filename="Visual/Link4.stl" />
       </geometry>
       <material name="MotomanBlue" />
     </visual>
     <collision>
       <origin xyz="-0.325 0 -2.1" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link4.stl" />
+        <mesh filename="Collision/Link4.stl" />
       </geometry>
     </collision>
   </link>
@@ -84,14 +84,14 @@
     <visual>
       <origin xyz="-1.55 0 -2.1" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link5.stl" />
+        <mesh filename="Visual/Link5.stl" />
       </geometry>
       <material name="MotomanBlue" />
     </visual>
     <collision>
       <origin xyz="-1.55 0 -2.1" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link5.stl" />
+        <mesh filename="Collision/Link5.stl" />
       </geometry>
     </collision>
   </link>
@@ -99,14 +99,14 @@
     <visual>
       <origin xyz="-1.775 0 -2.1" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link6.stl" />
+        <mesh filename="Visual/Link6.stl" />
       </geometry>
       <material name="MotomanBlue" />
     </visual>
     <collision>
       <origin xyz="-1.775 0 -2.1" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link6.stl" />
+        <mesh filename="Collision/Link6.stl" />
       </geometry>
     </collision>
   </link>

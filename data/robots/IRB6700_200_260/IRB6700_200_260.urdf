@@ -9,14 +9,14 @@
       <visual>
           <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-               <mesh filename="../Visual/BaseLink.stl" />
+               <mesh filename="Visual/BaseLink.stl" />
             </geometry>
           <material name="ABBWhite" />
       </visual>
       <collision>
           <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="../Collision/BaseLink.stl" />
+                <mesh filename="Collision/BaseLink.stl" />
             </geometry>
           <material name="ABBWhite" />
       </collision>
@@ -25,14 +25,14 @@
       <visual>
           <origin xyz="0 0 -0.78" rpy="0 0 0" />
             <geometry>
-                <mesh filename="../Visual/Link1.stl" />
+                <mesh filename="Visual/Link1.stl" />
             </geometry>
           <material name="ABBWhite" />
       </visual>
       <collision>
           <origin xyz="0 0 -0.78" rpy="0 0 0" />
             <geometry>
-                <mesh filename="../Collision/Link1.stl" />
+                <mesh filename="Collision/Link1.stl" />
             </geometry>
           <material name="ABBWhite" />
       </collision>
@@ -41,14 +41,14 @@
       <visual>
           <origin xyz="0.349 0.194 -0.638" rpy="0 0 0" />
             <geometry>
-               <mesh filename="../Visual/LinkCylinder.stl" />
+               <mesh filename="Visual/LinkCylinder.stl" />
             </geometry>
           <material name="ABBWhite" />
       </visual>
       <collision>
           <origin xyz="0.349 0.194 -0.638" rpy="0 0 0" />
             <geometry>
-               <mesh filename="../Collision/LinkCylinder.stl" />
+               <mesh filename="Collision/LinkCylinder.stl" />
             </geometry>
           <material name="ABBWhite" />
       </collision>
@@ -57,14 +57,14 @@
       <visual>
           <origin xyz="0.349 0.194 -0.638" rpy="0 0 0" />
             <geometry>
-               <mesh filename="../Visual/LinkPiston.stl" />
+               <mesh filename="Visual/LinkPiston.stl" />
             </geometry>
           <material name="ABBWhite" />
       </visual>
       <collision>
           <origin xyz="0.349 0.194 -0.638" rpy="0 0 0" />
             <geometry>
-               <mesh filename="../Collision/LinkPiston.stl" />
+               <mesh filename="Collision/LinkPiston.stl" />
             </geometry>
           <material name="ABBWhite" />
       </collision>
@@ -73,14 +73,14 @@
     <visual>
       <origin xyz="-0.322 0 -0.78" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link2.stl" />
+        <mesh filename="Visual/Link2.stl" />
       </geometry>
       <material name="ABBWhite" />
     </visual>
     <collision>
       <origin xyz="-0.322 0 -0.78" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link2.stl" />
+        <mesh filename="Collision/Link2.stl" />
       </geometry>
       <material name="ABBWhite" />
     </collision>
@@ -89,14 +89,14 @@
     <visual>
       <origin xyz="-0.322 0 -1.905" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link3.stl" />
+        <mesh filename="Visual/Link3.stl" />
       </geometry>
       <material name="ABBWhite" />
     </visual>
     <collision>
       <origin xyz="-0.322 0 -1.905" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link3.stl" />
+        <mesh filename="Collision/Link3.stl" />
       </geometry>
       <material name="ABBWhite" />
     </collision>
@@ -105,14 +105,14 @@
     <visual>
       <origin xyz="-0.322 0 -2.105" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link4.stl" />
+        <mesh filename="Visual/Link4.stl" />
       </geometry>
       <material name="ABBWhite" />
     </visual>
     <collision>
       <origin xyz="-0.322 0 -2.105" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link4.stl" />
+        <mesh filename="Collision/Link4.stl" />
       </geometry>
       <material name="ABBWhite" />
     </collision>
@@ -121,14 +121,14 @@
     <visual>
       <origin xyz="-1.4645 0 -2.105" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link5.stl" />
+        <mesh filename="Visual/Link5.stl" />
       </geometry>
       <material name="ABBWhite" />
     </visual>
     <collision>
       <origin xyz="-1.4645 0 -2.105" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link5.stl" />
+        <mesh filename="Collision/Link5.stl" />
       </geometry>
       <material name="ABBWhite" />
     </collision>
@@ -137,14 +137,14 @@
     <visual>
       <origin xyz="-1.6645 0 -2.105" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Visual/Link6.stl" />
+        <mesh filename="Visual/Link6.stl" />
       </geometry>
       <material name="ABBWhite" />
     </visual>
     <collision>
       <origin xyz="1.6645 0 -2.105" rpy="0 0 0" />
       <geometry>
-        <mesh filename="../Collision/Link6.stl" />
+        <mesh filename="Collision/Link6.stl" />
       </geometry>
       <material name="ABBWhite" />
     </collision>

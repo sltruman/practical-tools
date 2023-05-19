@@ -8,84 +8,84 @@
     <link name="base_link">
         <visual>
             <geometry>
-                <mesh filename="../visual/gp12_base_link.stl"/>
+                <mesh filename="visual/gp12_base_link.stl"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <mesh filename="../collision/gp12_base_link.stl"/>
+                <mesh filename="collision/gp12_base_link.stl"/>
             </geometry>
         </collision>
     </link>
     <link name="link_1_s">
         <visual>
             <geometry>
-                <mesh filename="../visual/gp12_link_1_s.stl"/>
+                <mesh filename="visual/gp12_link_1_s.stl"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <mesh filename="../collision/gp12_link_1_s.stl"/>
+                <mesh filename="collision/gp12_link_1_s.stl"/>
             </geometry>
         </collision>
     </link>
     <link name="link_2_l">
         <visual>
             <geometry>
-                <mesh filename="../visual/gp12_link_2_l.stl"/>
+                <mesh filename="visual/gp12_link_2_l.stl"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <mesh filename="../collision/gp12_link_2_l.stl"/>
+                <mesh filename="collision/gp12_link_2_l.stl"/>
             </geometry>
         </collision>
     </link>
     <link name="link_3_u">
         <visual>
             <geometry>
-                <mesh filename="../visual/gp12_link_3_u.stl"/>
+                <mesh filename="visual/gp12_link_3_u.stl"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <mesh filename="../collision/gp12_link_3_u.stl"/>
+                <mesh filename="collision/gp12_link_3_u.stl"/>
             </geometry>
         </collision>
     </link>
     <link name="link_4_r">
         <visual>
             <geometry>
-                <mesh filename="../visual/gp12_link_4_r.stl"/>
+                <mesh filename="visual/gp12_link_4_r.stl"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <mesh filename="../collision/gp12_link_4_r.stl"/>
+                <mesh filename="collision/gp12_link_4_r.stl"/>
             </geometry>
         </collision>
     </link>
     <link name="link_5_b">
         <visual>
             <geometry>
-                <mesh filename="../visual/gp12_link_5_b.stl"/>
+                <mesh filename="visual/gp12_link_5_b.stl"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <mesh filename="../collision/gp12_link_5_b.stl"/>
+                <mesh filename="collision/gp12_link_5_b.stl"/>
             </geometry>
         </collision>
     </link>
     <link name="link_6_t">
         <visual>
             <geometry>
-                <mesh filename="../visual/gp12_link_6_t.stl"/>
+                <mesh filename="visual/gp12_link_6_t.stl"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <mesh filename="../collision/gp12_link_6_t.stl"/>
+                <mesh filename="collision/gp12_link_6_t.stl"/>
             </geometry>
         </collision>
     </link>
@@ -143,4 +143,3 @@
     <!-- end of joint list -->
 
 </robot>
-

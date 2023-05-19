@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <robot name="ABB_IRB2600_12_185" version="0.1.0" >
-    <image filename="../IRB2600_12_185.jpg" />
+    <image filename="IRB2600_12_185.jpg" />
 
     <vendor name="ABB" />
     <payload value="12" />
@@ -21,14 +21,14 @@
 		<visual>
 			<origin xyz="0 0 0" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Visual/BaseLink.stl" />
+				<mesh filename="Visual/BaseLink.stl" />
 			</geometry>
 			<material name="ABBGray" />
 		</visual>
 		<collision>
 			<origin xyz="0 0 0" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Collision/BaseLink.stl" />
+				<mesh filename="Collision/BaseLink.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -36,14 +36,14 @@
 		<visual>
 			<origin xyz="0 0 -0.445" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Visual/Link1.stl" />
+				<mesh filename="Visual/Link1.stl" />
 			</geometry>
 			<material name="ABBGray" />
 		</visual>
 		<collision>
 			<origin xyz="0 0 -0.445" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Collision/Link1.stl" />
+				<mesh filename="Collision/Link1.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -51,14 +51,14 @@
 		<visual>
 			<origin xyz="-0.15 0 -0.445" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Visual/Link2.stl" />
+				<mesh filename="Visual/Link2.stl" />
 			</geometry>
 			<material name="ABBGray" />
 		</visual>
 		<collision>
 			<origin xyz="-0.15 0 -0.445" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Collision/Link2.stl" />
+				<mesh filename="Collision/Link2.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -66,14 +66,14 @@
 		<visual>
 			<origin xyz="-0.15 0 -1.345" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Visual/Link3.stl" />
+				<mesh filename="Visual/Link3.stl" />
 			</geometry>
 			<material name="ABBGray" />
 		</visual>
 		<collision>
 			<origin xyz="-0.15 0 -1.345" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Collision/Link3.stl" />
+				<mesh filename="Collision/Link3.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -81,14 +81,14 @@
 		<visual>
 			<origin xyz="-0.15 0 -1.46" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Visual/Link4.stl" />
+				<mesh filename="Visual/Link4.stl" />
 			</geometry>
 			<material name="ABBGray" />
 		</visual>
 		<collision>
 			<origin xyz="-0.15 0 -1.46" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Collision/Link4.stl" />
+				<mesh filename="Collision/Link4.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -96,14 +96,14 @@
 		<visual>
 			<origin xyz="-0.945 0 -1.46" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Visual/Link5.stl" />
+				<mesh filename="Visual/Link5.stl" />
 			</geometry>
 			<material name="ABBGray" />
 		</visual>
 		<collision>
 			<origin xyz="-0.945 0 -1.46" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Collision/Link5.stl" />
+				<mesh filename="Collision/Link5.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -111,14 +111,14 @@
 		<visual>
 			<origin xyz="-1.03 0 -1.46" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Visual/Link6.stl" />
+				<mesh filename="Visual/Link6.stl" />
 			</geometry>
 			<material name="ABBGray" />
 		</visual>
 		<collision>
 			<origin xyz="-1.03 0 -1.46" quat="0 0 0 1" />
 			<geometry>
-				<mesh filename="../Collision/Link6.stl" />
+				<mesh filename="Collision/Link6.stl" />
 			</geometry>
 		</collision>
 	</link>

@@ -5,7 +5,7 @@
   <link name="base_link">
     <visual>
       <geometry>
-        <mesh filename="../Visual/BaseLink.dae" />
+        <mesh filename="Visual/BaseLink.dae" />
       </geometry>
       <material name="LightGrey">
         <color rgba="0.7 0.7 0.7 1.0" />
@@ -13,7 +13,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="../Collision/BaseLink.stl" />
+        <mesh filename="Collision/BaseLink.stl" />
       </geometry>
     </collision>
     <inertial>
@@ -26,7 +26,7 @@
   <link name="Link1">
     <visual>
       <geometry>
-        <mesh filename="../Visual/Link1.dae" />
+        <mesh filename="Visual/Link1.dae" />
       </geometry>
       <material name="LightGrey">
         <color rgba="0.7 0.7 0.7 1.0" />
@@ -34,7 +34,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="../Collision/Link1.stl" />
+        <mesh filename="Collision/Link1.stl" />
       </geometry>
     </collision>
     <inertial>
@@ -46,7 +46,7 @@
   <link name="Link2">
     <visual>
       <geometry>
-        <mesh filename="../Visual/Link2.dae" />
+        <mesh filename="Visual/Link2.dae" />
       </geometry>
       <material name="LightGrey">
         <color rgba="0.7 0.7 0.7 1.0" />
@@ -54,7 +54,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="../Collision/Link2.stl" />
+        <mesh filename="Collision/Link2.stl" />
       </geometry>
     </collision>
     <inertial>
@@ -66,7 +66,7 @@
   <link name="Link3">
     <visual>
       <geometry>
-        <mesh filename="../Visual/Link3.dae" />
+        <mesh filename="Visual/Link3.dae" />
       </geometry>
       <material name="LightGrey">
         <color rgba="0.7 0.7 0.7 1.0" />
@@ -74,7 +74,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="../Collision/Link3.stl" />
+        <mesh filename="Collision/Link3.stl" />
       </geometry>
     </collision>
     <inertial>
@@ -86,7 +86,7 @@
   <link name="Link4">
     <visual>
       <geometry>
-        <mesh filename="../Visual/Link4.dae" />
+        <mesh filename="Visual/Link4.dae" />
       </geometry>
       <material name="LightGrey">
         <color rgba="0.7 0.7 0.7 1.0" />
@@ -94,7 +94,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="../Collision/Link4.stl" />
+        <mesh filename="Collision/Link4.stl" />
       </geometry>
     </collision>
     <inertial>
@@ -106,7 +106,7 @@
   <link name="Link5">
     <visual>
       <geometry>
-        <mesh filename="../Visual/Link5.dae" />
+        <mesh filename="Visual/Link5.dae" />
       </geometry>
       <material name="LightGrey">
         <color rgba="0.7 0.7 0.7 1.0" />
@@ -114,7 +114,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="../Collision/Link5.stl" />
+        <mesh filename="Collision/Link5.stl" />
       </geometry>
     </collision>
     <inertial>
@@ -126,7 +126,7 @@
   <link name="Link6">
     <visual>
       <geometry>
-        <mesh filename="../Visual/Link6.dae" />
+        <mesh filename="Visual/Link6.dae" />
       </geometry>
       <material name="LightGrey">
         <color rgba="0.7 0.7 0.7 1.0" />
@@ -134,7 +134,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="../Collision/Link6.stl" />
+        <mesh filename="Collision/Link6.stl" />
       </geometry>
     </collision>
     <inertial>

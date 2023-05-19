@@ -12,14 +12,14 @@
 		<visual>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Visual/BaseLink.stl" />
+				<mesh filename="Visual/BaseLink.stl" />
 			</geometry>
 			<material name="ABBOrange" />
 		</visual>
 		<collision>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Collision/BaseLink.stl" />
+				<mesh filename="Collision/BaseLink.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -27,14 +27,14 @@
 		<visual>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Visual/Link1.stl" />
+				<mesh filename="Visual/Link1.stl" />
 			</geometry>
 			<material name="ABBOrange" />
 		</visual>
 		<collision>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Collision/Link1.stl" />
+				<mesh filename="Collision/Link1.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -42,14 +42,14 @@
 		<visual>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Visual/Link2.stl" />
+				<mesh filename="Visual/Link2.stl" />
 			</geometry>
 			<material name="ABBOrange" />
 		</visual>
 		<collision>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Collision/Link2.stl" />
+				<mesh filename="Collision/Link2.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -57,14 +57,14 @@
 		<visual>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Visual/Link3.stl" />
+				<mesh filename="Visual/Link3.stl" />
 			</geometry>
 			<material name="ABBOrange" />
 		</visual>
 		<collision>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Collision/Link3.stl" />
+				<mesh filename="Collision/Link3.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -72,14 +72,14 @@
 		<visual>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Visual/Link4.stl" />
+				<mesh filename="Visual/Link4.stl" />
 			</geometry>
 			<material name="ABBOrange" />
 		</visual>
 		<collision>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Collision/Link4.stl" />
+				<mesh filename="Collision/Link4.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -87,14 +87,14 @@
 		<visual>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Visual/Link5.stl" />
+				<mesh filename="Visual/Link5.stl" />
 			</geometry>
 			<material name="ABBOrange" />
 		</visual>
 		<collision>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Collision/Link5.stl" />
+				<mesh filename="Collision/Link5.stl" />
 			</geometry>
 		</collision>
 	</link>
@@ -102,14 +102,14 @@
 		<visual>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Visual/Link6.stl" />
+				<mesh filename="Visual/Link6.stl" />
 			</geometry>
 			<material name="ABBGray" />
 		</visual>
 		<collision>
 			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
 			<geometry>
-				<mesh filename="../Collision/Link6.stl" />
+				<mesh filename="Collision/Link6.stl" />
 			</geometry>
 		</collision>
 	</link>
