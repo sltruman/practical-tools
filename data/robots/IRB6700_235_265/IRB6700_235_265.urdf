@@ -1,0 +1,222 @@
+<?xml version="1.0" ?>
+<robot name="ABB_IRB6700_235_265">
+  <material name="ABBWhite">
+    <color rgba="0.9254902 0.9254902 0.9058824 1" />
+  </material>
+
+  <!-- link list -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Visual/BaseLink.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Collision/BaseLink.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </collision>
+  </link>
+  <link name="Link1">
+    <visual>
+      <origin xyz="0 0 -0.78" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Visual/Link1.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.78" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Collision/Link1.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </collision>
+  </link>
+  <link name="LinkCylinder">
+    <visual>
+      <origin xyz="0.349 0.194 -0.638" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Visual/LinkCylinder.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </visual>
+    <collision>
+      <origin xyz="0.349 0.194 -0.638" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Collision/LinkCylinder.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </collision>
+  </link>
+  <link name="LinkPiston">
+    <visual>
+      <origin xyz="0.349 0.194 -0.638" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Visual/LinkPiston.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </visual>
+    <collision>
+      <origin xyz="0.349 0.194 -0.638" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Collision/LinkPiston.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </collision>
+  </link>
+  <link name="Link2">
+    <visual>
+      <origin xyz="-0.322 0 -0.78" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Visual/Link2.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </visual>
+    <collision>
+      <origin xyz="-0.322 0 -0.78" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Collision/Link2.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </collision>
+  </link>
+  <link name="Link3">
+    <visual>
+      <origin xyz="-0.322 0 -1.915" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Visual/Link3.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </visual>
+    <collision>
+      <origin xyz="-0.322 0 -1.915" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Collision/Link3.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </collision>
+  </link>
+  <link name="Link4">
+    <visual>
+      <origin xyz="-0.322 0 -2.115" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Visual/Link4.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </visual>
+    <collision>
+      <origin xyz="-0.322 0 -2.115" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Collision/Link4.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </collision>
+  </link>
+  <link name="Link5">
+    <visual>
+      <origin xyz="-1.5045 0 -2.115" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Visual/Link5.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </visual>
+    <collision>
+      <origin xyz="-1.5045 0 -2.115" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Collision/Link5.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </collision>
+  </link>
+  <link name="Link6">
+    <visual>
+      <origin xyz="-1.7045 0 -2.115" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Visual/Link6.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </visual>
+    <collision>
+      <origin xyz="-1.7045 0 -2.115" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="../Collision/Link6.stl" />
+      </geometry>
+      <material name="ABBWhite" />
+    </collision>
+  </link>
+  <link name="ee_link" />
+  <!-- end of link list -->
+
+  <!-- joint list -->
+  <joint name="Joint1" type="revolute">
+    <origin xyz="0 0 0.78" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="Link1" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.967" upper="2.967" effort="0" velocity="1.745"/>
+  </joint>
+  <joint name="Joint2" type="revolute">
+    <origin xyz="0.322 0 0" rpy="0 0 0" />
+    <parent link="Link1" />
+    <child link="Link2" />
+    <axis xyz="0 1 0" />
+    <limit lower="-1.134" upper="1.484" effort="0" velocity="1.571"/>
+  </joint>
+  <joint name="Joint3" type="revolute">
+    <origin xyz="0 0 1.135" rpy="0 0 0" />
+    <parent link="Link2" />
+    <child link="Link3" />
+    <axis xyz="0 1 0" />
+    <limit lower="-3.141" upper="1.221" effort="0" velocity="1.571"/>
+  </joint>
+  <joint name="Joint4" type="revolute">
+    <origin xyz="0 0 0.2" rpy="0 0 0" />
+    <parent link="Link3" />
+    <child link="Link4" />
+    <axis xyz="1 0 0" />
+    <limit lower="-5.235" upper="5.235" effort="0" velocity="2.967" />
+  </joint>
+  <joint name="Joint5" type="revolute">
+    <origin xyz="1.1825 0 0" rpy="0 0 0" />
+    <parent link="Link4" />
+    <child link="Link5" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.268" upper="2.268" effort="0" velocity="2.094"/>
+  </joint>
+  <joint name="Joint6" type="revolute">
+    <origin xyz="0.2 0 0" rpy="0 0 0" />
+    <parent link="Link5" />
+    <child link="Link6" />
+    <axis xyz="1 0 0" />
+    <limit lower="-6.283" upper="6.283" effort="0" velocity="3.316"/>
+  </joint>
+  <joint name="jointEE" type="fixed">
+    <origin xyz="0 0 0" rpy="0 1.571 0" />
+    <parent link="Link6" />
+    <child link="ee_link" />
+    <axis xyz="0 0 0" />
+  </joint>
+  <joint name="JointCylinder" type="revolute">
+    <origin xyz="-0.349 -0.194 -0.142" rpy="0 0 0" />
+    <parent link="Link1" />
+    <child link="LinkCylinder" />
+    <axis xyz="0 1 0" />
+    <mimic joint="Joint2" multiplier="-0.25" />
+    <limit lower="-0.284" upper="0.370" effort="0"  velocity="1.571"/>
+  </joint>
+  <joint name="JointPiston" type="prismatic">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="LinkCylinder" />
+    <child link="LinkPiston" />
+    <axis xyz="0 1 0" />
+    <mimic joint="Joint2" multiplier="0.15" />
+    <limit lower="-0.25" upper="0.25" effort="0"  velocity="1.571"/>
+  </joint>
+  <!-- end of joint list -->
+
+</robot>

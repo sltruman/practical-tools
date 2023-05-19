@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<robot name="Motoman_GP8">
+  <material name="MotomanBlue">
+    <color rgba="0.12941 0.14902 1 1" />
+  </material>
+
+  <!-- link list -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <mesh filename="../Visual/BaseLink.stl" />
+      </geometry>
+      <material name="MotomanBlue" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../Collision/BaseLink.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="Link1">
+    <visual>
+      <geometry>
+        <mesh filename="../Visual/Link1.stl" />
+      </geometry>
+      <material name="MotomanBlue" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../Collision/Link1.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="Link2">
+    <visual>
+      <geometry>
+        <mesh filename="../Visual/Link2.stl" />
+      </geometry>
+      <material name="MotomanBlue" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../Collision/Link2.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="Link3">
+    <visual>
+      <geometry>
+        <mesh filename="../Visual/Link3.stl" />
+      </geometry>
+      <material name="MotomanBlue" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../Collision/Link3.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="Link4">
+    <visual>
+      <geometry>
+        <mesh filename="../Visual/Link4.stl" />
+      </geometry>
+      <material name="MotomanBlue" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../Collision/Link4.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="Link5">
+    <visual>
+      <geometry>
+        <mesh filename="../Visual/Link5.stl" />
+      </geometry>
+      <material name="MotomanBlue" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../Collision/Link5.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="Link6">
+    <visual>
+      <geometry>
+        <mesh filename="../Visual/Link6.stl" />
+      </geometry>
+      <material name="MotomanBlue" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../Collision/Link6.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="ee_link" />
+  <!-- end of link list -->
+
+  <!-- joint list -->
+  <joint name="Joint1" type="revolute">
+    <parent link="base_link" />
+    <child link="Link1" />
+    <origin xyz="0 0 0.330" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.9670" upper="2.9670" effort="150.92" velocity="7.9412" />
+  </joint>
+  <joint name="Joint2" type="revolute">
+    <parent link="Link1" />
+    <child link="Link2" />
+    <origin xyz="0.040 0 0" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-1.1344" upper="2.5307" effort="176.4" velocity="6.7495" />
+  </joint>
+  <joint name="Joint3" type="revolute">
+    <parent link="Link2" />
+    <child link="Link3" />
+    <origin xyz="0 0 0.345" rpy="0 0 0" />
+    <axis xyz="0 -1 0" />
+    <limit lower="-1.2217" upper="3.3161" effort="107.56" velocity="9.0757" />
+  </joint>
+  <joint name="Joint4" type="revolute">
+    <parent link="Link3" />
+    <child link="Link4" />
+    <origin xyz="0.340 0 0.040" rpy="0 0 0" />
+    <axis xyz="-1 0 0" />
+    <limit lower="-3.3161" upper="3.3161" effort="55.86" velocity="9.5993" />
+  </joint>
+  <joint name="Joint5" type="revolute">
+    <parent link="Link4" />
+    <child link="Link5" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="0 -1 0" />
+    <limit lower="-2.3561" upper="2.3561" effort="32.68" velocity="9.5993" />
+  </joint>
+  <joint name="Join6" type="revolute">
+    <parent link="Link5" />
+    <child link="Link6" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="-1 0 0" />
+    <limit lower="-6.2944" upper="6.2944" effort="22.54" velocity="17.4845" />
+  </joint>
+  <joint name="jointEE" type="fixed">
+    <origin xyz="0.080 0 0" rpy="3.1415926 -1.570796 0" />
+    <parent link="Link6" />
+    <child link="ee_link" />
+  </joint>
+  <!-- end of joint list -->
+
+</robot>

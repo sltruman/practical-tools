@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="ABB_IRB1200_7_70" version="1.2.0">
+
+	<!-- link list -->
+	<link name="base_link">
+		<visual  name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/BaseLink.dae" />
+			</geometry>
+		</visual>
+		<collision  name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/BaseLink.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link1">
+		<visual  name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link1.dae" />
+			</geometry>
+		</visual>
+		<collision  name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link1.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link2">
+		<visual  name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link2.dae" />
+			</geometry>
+		</visual>
+		<collision  name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link2.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link3">
+		<visual  name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link3.dae" />
+			</geometry>
+		</visual>
+		<collision  name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link3.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link4">
+		<visual  name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="-0.100 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link4.dae" />
+			</geometry>
+		</visual>
+		<collision  name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="-0.100 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link4.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link5">
+		<visual  name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link5.dae" />
+			</geometry>
+		</visual>
+		<collision  name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link5.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link6">
+		<visual  name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link6.dae" />
+			</geometry>
+		</visual>
+		<collision  name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link6.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="ee_link" />
+	<!-- end of link list -->
+
+	<!-- joint list -->
+	<joint name="Joint1" type="revolute">
+		<axis xyz="0.000 0.000 1.000" />
+		<parent link="base_link" />
+		<child link="Link1" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.399" />
+		<limit acceleration="25.135" effort="0.0" lower="-2.947" upper="2.947" velocity="5.027" />
+	</joint>
+	<joint name="Joint2" type="revolute">
+		<axis xyz="0.000 1.000 0.000" />
+		<parent link="Link1" />
+		<child link="Link2" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+		<limit acceleration="20.945" effort="0.0" lower="-1.725" upper="2.336" velocity="4.189" />
+	</joint>
+	<joint name="Joint3" type="revolute">
+		<axis xyz="0.000 1.000 0.000" />
+		<parent link="Link2" />
+		<child link="Link3" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.350" />
+		<limit acceleration="26.18" effort="0.0" lower="-3.471" upper="1.202" velocity="5.236" />
+	</joint>
+	<joint name="Joint4" type="revolute">
+		<axis xyz="1.000 0.000 0.000" />
+		<parent link="Link3" />
+		<child link="Link4" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.042" />
+		<limit acceleration="34.905" effort="0.0" lower="-4.692" upper="4.692" velocity="6.981" />
+	</joint>
+	<joint name="Joint5" type="revolute">
+		<axis xyz="0.000 1.000 0.000" />
+		<parent link="Link4" />
+		<child link="Link5" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.351 0.000 0.000" />
+		<limit acceleration="35.345" effort="0.0" lower="-2.249" upper="2.249" velocity="7.069" />
+	</joint>
+	<joint name="Joint6" type="revolute">
+		<axis xyz="1.000 0.000 0.000" />
+		<parent link="Link5" />
+		<child link="Link6" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.082 0.000 0.000" />
+		<limit acceleration="52.36" effort="0.0" lower="-6.2630" upper="6.26300" velocity="10.472" />
+	</joint>
+
+	<joint name="jointEE" type="fixed">
+		<parent link="Link6" />
+		<child link="ee_link" />
+		<origin rpy="0.000 1.570796327 0.000" xyz="0.000 0.000 0.000" />
+	</joint>
+	<!-- end of joint list -->
+
+</robot>

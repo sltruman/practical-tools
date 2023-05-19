@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="ABB_IRB2600_12_165">
+	<material name="ABBOrange">
+		<color rgba="0.737 0.349 0.161 1.000" />
+	</material>
+	<material name="ABBGray">
+		<color rgba="0.500 0.500 0.500 1.000" />
+	</material>
+
+    <!-- link list -->
+	<link name="base_link">
+		<visual>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/BaseLink.stl" />
+			</geometry>
+			<material name="ABBOrange" />
+		</visual>
+		<collision>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/BaseLink.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link1">
+		<visual>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link1.stl" />
+			</geometry>
+			<material name="ABBOrange" />
+		</visual>
+		<collision>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link1.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link2">
+		<visual>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link2.stl" />
+			</geometry>
+			<material name="ABBOrange" />
+		</visual>
+		<collision>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link2.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link3">
+		<visual>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link3.stl" />
+			</geometry>
+			<material name="ABBOrange" />
+		</visual>
+		<collision>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link3.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link4">
+		<visual>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link4.stl" />
+			</geometry>
+			<material name="ABBOrange" />
+		</visual>
+		<collision>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link4.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link5">
+		<visual>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link5.stl" />
+			</geometry>
+			<material name="ABBOrange" />
+		</visual>
+		<collision>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link5.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link6">
+		<visual>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link6.stl" />
+			</geometry>
+			<material name="ABBGray" />
+		</visual>
+		<collision>
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link6.stl" />
+			</geometry>
+		</collision>
+	</link>
+    <!-- end of link list -->
+
+    <!-- joint list -->
+	<link name="ee_link" />
+	<joint name="Joint1" type="revolute">
+		<axis xyz="0.000 0.000 1.000" />
+		<parent link="base_link" />
+		<child link="Link1" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.445" />
+		<limit acceleration="15.27" effort="0.0" lower="-3.1215" upper="3.12159" velocity="3.054" />
+	</joint>
+	<joint name="Joint2" type="revolute">
+		<axis xyz="0.000 1.000 0.000" />
+		<parent link="Link1" />
+		<child link="Link2" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.150 0.000 0.000" />
+		<limit acceleration="15.27" effort="0.0" lower="-1.638" upper="2.685" velocity="3.054" />
+	</joint>
+	<joint name="Joint3" type="revolute">
+		<axis xyz="0.000 1.000 0.000" />
+		<parent link="Link2" />
+		<child link="Link3" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.700" />
+		<limit acceleration="15.27" effort="0.0" lower="-3.1215" upper="1.289" velocity="3.054" />
+	</joint>
+	<joint name="Joint4" type="revolute">
+		<axis xyz="1.000 0.000 0.000" />
+		<parent link="Link3" />
+		<child link="Link4" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.115" />
+		<limit acceleration="31.4150" effort="0.0" lower="-6.961" upper="6.961" velocity="6.283" />
+	</joint>
+	<joint name="Joint5" type="revolute">
+		<axis xyz="0.000 1.000 0.000" />
+		<parent link="Link4" />
+		<child link="Link5" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.795 0.000 0.000" />
+		<limit acceleration="31.4150" effort="0.0" lower="-2.074" upper="2.074" velocity="6.283" />
+	</joint>
+	<joint name="Joint6" type="revolute">
+		<axis xyz="1.000 0.000 0.000" />
+		<parent link="Link5" />
+		<child link="Link6" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.085 0.000 0.000" />
+		<limit acceleration="43.6350" effort="0.0" lower="-6.961" upper="6.961" velocity="8.727" />
+	</joint>
+	<joint name="jointEE" type="fixed">
+		<parent link="Link6" />
+		<child link="ee_link" />
+		<origin rpy="0.000 1.570796327 0.000" xyz="0.000 0.000 0.000" />
+	</joint>
+    <!-- end of joint list -->
+
+</robot>

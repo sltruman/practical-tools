@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="Motoman_MH12">
+	<material name="MotomanBlue">
+		<color rgba="0.12941 0.14902 0.74902 1" />
+	</material>
+
+    <!-- link list -->
+	<link name="base_link">
+		<visual name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/BaseLink.stl" />
+			</geometry>
+			<material name="MotomanBlue" />
+		</visual>
+		<collision name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/BaseLink.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link1">
+		<visual name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link1.stl" />
+			</geometry>
+			<material name="MotomanBlue" />
+		</visual>
+		<collision name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link1.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link2">
+		<visual name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link2.stl" />
+			</geometry>
+			<material name="MotomanBlue" />
+		</visual>
+		<collision name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link2.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link3">
+		<visual name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link3.stl" />
+			</geometry>
+			<material name="MotomanBlue" />
+		</visual>
+		<collision name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link3.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link4">
+		<visual name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link4.stl" />
+			</geometry>
+			<material name="MotomanBlue" />
+		</visual>
+		<collision name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link4.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link5">
+		<visual name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link5.stl" />
+			</geometry>
+			<material name="MotomanBlue" />
+		</visual>
+		<collision name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link5.stl" />
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link6">
+		<visual name="visual">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Visual/Link6.stl" />
+			</geometry>
+			<material name="MotomanBlue" />
+		</visual>
+		<collision name="collision">
+			<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+			<geometry>
+				<mesh filename="../Collision/Link6.stl" />
+			</geometry>
+		</collision>
+	</link>
+    <!-- end of link list -->
+
+    <!-- joint list -->
+	<link name="ee_link" />
+	<joint name="Joint1" type="revolute">
+		<axis xyz="0.000 0.000 1.000" />
+		<parent link="base_link" />
+		<child link="Link1" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.450" />
+		<limit acceleration="19.1985" effort="648.27" lower="-2.947" upper="2.947" velocity="3.8397" />
+	</joint>
+	<joint name="Joint2" type="revolute">
+		<axis xyz="0.000 1.000 0.000" />
+		<parent link="Link1" />
+		<child link="Link2" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.155 0.000 0.000" />
+		<limit acceleration="17.453" effort="874.65" lower="-1.5508" upper="2.6852" velocity="3.4906" />
+	</joint>
+	<joint name="Joint3" type="revolute">
+		<axis xyz="0.000 -1.000 0.000" />
+		<parent link="Link2" />
+		<child link="Link3" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.614" />
+		<limit acceleration="19.1985" effort="257.25" lower="-1.4635" upper="2.5979" velocity="3.8397" />
+	</joint>
+	<joint name="Joint4" type="revolute">
+		<axis xyz="-1.000 0.000 0.000" />
+		<parent link="Link3" />
+		<child link="Link4" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.640 0.000 0.200" />
+		<limit acceleration="35.779" effort="74.97" lower="-3.1215" upper="3.1215" velocity="7.1558" />
+	</joint>
+	<joint name="Joint5" type="revolute">
+		<axis xyz="0.000 -1.000 0.000" />
+		<parent link="Link4" />
+		<child link="Link5" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.000 0.000 0.000" />
+		<limit acceleration="35.779" effort="44.69" lower="-2.3362" upper="2.3362" velocity="7.1558" />
+	</joint>
+	<joint name="Joint6" type="revolute">
+		<axis xyz="-1.000 0.000 0.000" />
+		<parent link="Link5" />
+		<child link="Link6" />
+		<origin rpy="0.000 -0.000 0.000" xyz="0.100 0.000 0.000" />
+		<limit acceleration="53.2325" effort="14.8" lower="-6.2632" upper="6.2632" velocity="10.6465" />
+	</joint>
+
+	<joint name="jointEE" type="fixed">
+		<parent link="Link6" />
+		<child link="ee_link" />
+		<origin rpy="3.141592654 -1.570796327 0.000" xyz="0.000 0.000 0.000" />
+	</joint>
+    <!-- end of joint list -->
+
+</robot>

@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<robot name="ABB_IRB1200_5_90">
+  <material name="ABBWhite">
+    <color rgba="0.9254902 0.9254902 0.9058824 1" />
+  </material>
+
+  <!-- link list -->
+  <link name="base_link">
+    <collision name="collision">
+      <geometry>
+        <mesh filename="../Collision/BaseLink.stl" />
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <geometry>
+        <mesh filename="../Visual/BaseLink.dae" />
+      </geometry>
+    </visual>
+  </link>
+  <link name="Link1">
+    <collision name="collision">
+      <geometry>
+        <mesh filename="../Collision/Link1.stl" />
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <geometry>
+        <mesh filename="../Visual/Link1.dae" />
+      </geometry>
+    </visual>
+  </link>
+  <link name="Link2">
+    <collision name="collision">
+      <geometry>
+        <mesh filename="../Collision/Link2.stl" />
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <geometry>
+        <mesh filename="../Visual/Link2.dae" />
+      </geometry>
+    </visual>
+  </link>
+  <link name="Link3">
+    <collision name="collision">
+      <geometry>
+        <mesh filename="../Collision/Link3.stl" />
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <geometry>
+        <mesh filename="../Visual/Link3.dae" />
+      </geometry>
+    </visual>
+  </link>
+  <link name="Link4">
+    <collision name="collision">
+      <geometry>
+        <mesh filename="../Collision/Link4.stl" />
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <geometry>
+        <mesh filename="../Visual/Link4.dae" />
+      </geometry>
+    </visual>
+  </link>
+  <link name="Link5">
+    <collision name="collision">
+      <geometry>
+        <mesh filename="../Collision/Link5.stl" />
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <geometry>
+        <mesh filename="../Visual/Link5.dae" />
+      </geometry>
+    </visual>
+  </link>
+  <link name="Link6">
+    <collision name="collision">
+      <geometry>
+        <mesh filename="../Collision/Link6.stl" />
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <geometry>
+        <mesh filename="../Visual/Link6.dae" />
+      </geometry>
+    </visual>
+  </link>
+  <link name="ee_link" />
+  <!-- end of link list -->
+
+  <!-- joint list -->
+  <joint name="Joint1" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.3991" />
+    <axis xyz="0 0 1" />
+    <parent link="base_link" />
+    <child link="Link1" />
+    <limit effort="0" lower="-2.967" upper="2.967" velocity="5.027" acceleration="0" jerk="0" />
+  </joint>
+  <joint name="Joint2" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0" />
+    <axis xyz="0 1 0" />
+    <parent link="Link1" />
+    <child link="Link2" />
+    <limit effort="0" lower="-1.745" upper="2.268" velocity="4.189" acceleration="0" jerk="0" />
+  </joint>
+  <joint name="Joint3" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.448" />
+    <axis xyz="0 1 0" />
+    <parent link="Link2" />
+    <child link="Link3" />
+    <limit effort="0" lower="-3.490" upper="1.221" velocity="5.236" acceleration="0" jerk="0" />
+  </joint>
+  <joint name="Joint4" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.042" />
+    <axis xyz="1 0 0" />
+    <parent link="Link3" />
+    <child link="Link4" />
+    <limit effort="0" lower="-4.712" upper="4.712" velocity="6.981" acceleration="0" jerk="0" />
+  </joint>
+  <joint name="Joint5" type="revolute">
+    <origin rpy="0 0 0" xyz="0.451 0 0" />
+    <axis xyz="0 1 0" />
+    <parent link="Link4" />
+    <child link="Link5" />
+    <limit effort="0" lower="-2.268" upper="2.268" velocity="7.069" acceleration="0" jerk="0" />
+  </joint>
+  <joint name="Joint6" type="revolute">
+    <origin rpy="0 0 0" xyz="0.082 0 0" />
+    <axis xyz="1 0 0" />
+    <parent link="Link5" />
+    <child link="Link6" />
+    <limit effort="0" lower="-6.981" upper="6.981" velocity="10.472" acceleration="0" jerk="0" />
+  </joint>
+  <joint name="jointEE" type="fixed">
+    <parent link="Link6" />
+    <child link="ee_link" />
+    <origin rpy="0 1.57079632679 0" xyz="0 0 0" />
+  </joint>
+  <!-- end of joint list -->
+
+</robot>
