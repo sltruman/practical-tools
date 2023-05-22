@@ -235,13 +235,17 @@ class Camera3DReal(ActiveObject):
         if 'fov' not in kwargs: kwargs['fov'] = math.degrees(20)
         if 'pixels_w' not in kwargs: kwargs['pixels_w'] = 1024
         if 'pixels_h' not in kwargs: kwargs['pixels_h'] = 768
+        if 'roi' not in kwargs: kwargs['roi'] = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
         if 'sample_num' not in kwargs: kwargs['sample_num'] = 100000
 
         super().__init__(scene, **kwargs)
         self.focal = self.profile['focal']
+        self.fov = self.profile['fov']
         self.pixels_w = self.profile['pixels_w']
         self.pixels_h = self.profile['pixels_h']
+        self.roi = self.profile['roi']
         self.sample_num = self.profile['sample_num']
+        self.sensor_h = np.tan(self.fov / 2) * self.focal * 2
 
         self.point_ids = list()
         self.rgb_pixels = bytes()
