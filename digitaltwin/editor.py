@@ -72,9 +72,13 @@ class Editor:
         }
 
         object_info.update(extra_params)
+
+        try:
+            import digitaltwin
+            active_obj = eval(f'digitaltwin.{kind}(self.scene,**object_info)')
+        except :
+            return {}
         
-        import digitaltwin
-        active_obj = eval(f'digitaltwin.{kind}(self.scene,**object_info)')
         self.scene.active_objs[active_obj.id] = active_obj
         
         name = active_obj.profile['name']
@@ -86,7 +90,7 @@ class Editor:
         active_obj.profile['name'] = name
         self.scene.active_objs_by_name[active_obj.profile['name']] = active_obj
         return active_obj.properties()
-    
+        
     def remove(self,name):
         active_obj = self.scene.active_objs_by_name[name]
 
