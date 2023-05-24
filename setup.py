@@ -5,12 +5,12 @@ from setuptools import setup
 
 setup(
     name='pysimflow',
-    version='0.0.36',
+    version='0.0.38',
     author='sl.truman',
     author_email='sl.truman@live.com',
     url='',
     description=u'',
-    packages=['digitaltwin'],
+    packages=['digitaltwin','data'],
     install_requires=[
         'numpy',
         'pybullet',

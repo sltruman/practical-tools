@@ -4,8 +4,8 @@ from scipy.spatial.transform import Rotation
 import xml.dom.minidom as xml
 import os 
 
-from .active_obj import ActiveObject
-from .end_effector import Gripper,Suction
+from digitaltwin.active_obj import ActiveObject
+from digitaltwin.end_effector import Gripper,Suction
 
 class Robot(ActiveObject):
     def __init__(self,scene,**kwargs):
