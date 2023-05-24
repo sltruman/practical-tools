@@ -21,9 +21,9 @@ class ActiveObject:
         pass
 
     def __del__(self):
-        p.removeBody(self.id)
+        if 'id' in vars(self): p.removeBody(self.id)
         pass
-
+ 
     def properties(self):
         return dict(kind='ActiveObject',name=self.name,base=self.base,pos=self.pos,rot=self.rot,scale=self.scale,user_data=self.user_data if 'user_data' in vars(self) else '')
     

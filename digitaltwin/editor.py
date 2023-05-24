@@ -13,7 +13,7 @@ class Editor:
             mouseX,mouseY = x*width,y*height
 
             camPos = [
-                camTarget[0] - dist * camForward[0], 
+                camTarget[0] - dist * camForward[0],
                 camTarget[1] - dist * camForward[1],
                 camTarget[2] - dist * camForward[2]
             ]
@@ -52,13 +52,13 @@ class Editor:
         if not rayInfo: return dict(name='',id=-1,pos=[0.,0.,0.])
         id,linkindex,fraction,pos,norm = rayInfo[0]
         if id not in self.scene.active_objs: return dict(name='',id=-1,pos=pos)
-        return dict(name=self.scene.active_objs[id].profile['name'],id=id,pos=pos)
+        return dict(name=self.scene.active_objs[id].name,id=id,pos=pos)
         
     def move(self,name,pos):
         self.scene.active_objs_by_name[name].properties()
         pass
 
-    def select(self,name)->dict:
+    def select(self,name):
         return self.scene.active_objs_by_name[name].properties()
 
     def add(self,kind,base,pos,rot,scale,extra_params={}):
@@ -81,14 +81,14 @@ class Editor:
         
         self.scene.active_objs[active_obj.id] = active_obj
         
-        name = active_obj.profile['name']
+        name = active_obj.name
         i = 1
         while name in self.scene.active_objs_by_name:
-            name = active_obj.profile['name'] + str(i)
+            name = active_obj.name + str(i)
             i+=1
         
-        active_obj.profile['name'] = name
-        self.scene.active_objs_by_name[active_obj.profile['name']] = active_obj
+        active_obj.name = name
+        self.scene.active_objs_by_name[active_obj.name] = active_obj
         return active_obj.properties()
         
     def remove(self,name):
@@ -101,6 +101,6 @@ class Editor:
     def rename(self,name,new_name):
         active_obj = self.scene.active_objs_by_name[name]
         del self.scene.active_objs_by_name[name]
-        active_obj.profile['name'] = new_name
+        active_obj.name = new_name
         self.scene.active_objs_by_name[new_name] = active_obj
 

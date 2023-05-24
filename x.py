@@ -1,12 +1,12 @@
 from time import time,sleep
 from digitaltwin import Scene,Workflow,Editor
-# from pysimflow import Scene,Workflow,Editor
 
 from threading import Thread
 import numpy as np
 import cv2
+import digitaltwin_data
 
-scene = Scene(1024,768)
+scene = Scene(1024,768,digitaltwin_data.get_data_path())
 editor = Editor(scene)
 workflow = Workflow(scene)
 
@@ -20,6 +20,8 @@ def updating():
 
 t = Thread(target=updating)
 t.start()
+
+editor.add('Robot','robots/1/1.urdf',[0,0,0],[0,0,0],[0,0,0])
 
 robot = scene.active_objs_by_name['robot']
 camera = scene.active_objs_by_name['camera']

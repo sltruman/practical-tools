@@ -84,7 +84,8 @@ class Scene:
       self.profile['ground_z'] = self.ground_z
       active_objects = list()
       for obj in self.active_objs_by_name.values():
-        active_objects.append(obj.properties())
+        obj.profile = obj.properties()
+        active_objects.append(obj.profile)
       self.profile['active_objects'] = active_objects
       with open(self.scene_path,'w') as f: json.dump(self.profile,f,indent=2) 
 

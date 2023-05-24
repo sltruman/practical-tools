@@ -8,7 +8,7 @@ from .active_obj import ActiveObject
 class Placer(ActiveObject):
     def __init__(self,scene,**kwargs):
         if 'workpiece_texture' not in kwargs: kwargs['workpiece_texture'] = '' 
-        if 'workpiece' not in kwargs: kwargs['workpiece'] = 'workpieces/lego.urdf' 
+        if 'workpiece' not in kwargs: kwargs['workpiece'] = 'workpieces/lego/lego.urdf' 
         if 'center' not in kwargs: kwargs['center'] = [0,0,0]
         if 'interval' not in kwargs: kwargs['interval'] = 1
         if 'amount' not in kwargs: kwargs['amount'] = 10
@@ -41,19 +41,19 @@ class Placer(ActiveObject):
         self.objs.clear()
 
     def set_workpiece(self,base):
-        self.profile['workpiece'] = base
+        self.workpiece = base
 
     def set_workpiece_texture(self,img_path):
-        self.profile['workpiece_texture'] = img_path
+        self.workpiece_texture = img_path
 
     def set_center(self,center):
-        self.profile['center'] = center
+        self.center = center
 
     def set_amount(self,num):
-        self.profile['amount'] = num
+        self.amount = num
 
     def set_interval(self,seconds):
-        self.profile['interval'] = seconds
+        self.interval = seconds
 
     def signal_generate(self,*args,**kwargs):
         def task():
