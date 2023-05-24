@@ -109,16 +109,16 @@ class Workflow():
                 next = wf["run"]
 
             if not next: 
-                print('Workflow stopped',flush=True)
+                print('Workflow finished.',flush=True)
                 return
 
-            act = declare[next]
-            name = act['name']
-            fun = act['fun']
-            args = act['args'] if 'args' in act else {}
-            obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
-            
             try:
+                act = declare[next]
+                name = act['name']
+                fun = act['fun']
+                args = act['args'] if 'args' in act else {}
+                obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
+                
                 print('error', err,flush=True)
                 print('signal',fun,flush=True)
                 print('val',val,flush=True)
@@ -126,7 +126,7 @@ class Workflow():
                 eval(f'obj.signal_{fun}(*val,**args)')
             except:
                 traceback.print_exc()
-                print('Workflow stopped',flush=True)
+                print('Workflow stopped!',flush=True)
                 return 
 
             self.scene.actions.append((task,(next,)))

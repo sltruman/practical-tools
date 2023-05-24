@@ -22,6 +22,15 @@ class Robot(ActiveObject):
         self.pickup = False
         pass
     
+    def properties(self):
+        properties = super().properties()
+        properties.update(kind='Robot',speed=self.speed,
+                          end_effector=self.end_effector,
+                          joint_damping=self.joint_damping,
+                          current_joint_poses=self.current_joint_poses,
+                          reset_joint_poses=self.reset_joint_poses)
+        return properties
+
     def update(self,dt):
         super().update(dt)
         if self.end_effector_obj:
@@ -31,11 +40,11 @@ class Robot(ActiveObject):
 
     def restore(self):
         super().restore()
-        p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, self.reset_joint_poses)
+        p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, self.reset_joint_poses)
         self.end_effector_obj.do(False)
 
     def set_base(self,base):
-        base_temp = self.base = self.profile['base'] = base
+        base_temp = self.base = base
         
         ee_kind = ""
         mimic_name = ''
@@ -79,7 +88,7 @@ class Robot(ActiveObject):
 
         if 'id' in vars(self): p.removeBody(self.id)
         print('robot urdf',base_temp)
-        self.id = p.loadURDF(base_temp, self.profile['pos'], p.getQuaternionFromEuler(self.profile['rot']),useFixedBase=True)
+        self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
 
         if ee_kind == 'Gripper': self.end_effector_obj = Gripper(self.id,gears)
         elif ee_kind == 'Suction': self.end_effector_obj = Suction(self.id)
@@ -92,20 +101,20 @@ class Robot(ActiveObject):
             pass
 
         num_joints = p.getNumJoints(self.id)
-        self.active_joints = []
+        self.active_joint_indexes = []
         for i in range(num_joints):
             ji = p.getJointInfo(self.id, i)
             jointName,jointType = ji[1],ji[2]
             if (jointType != p.JOINT_REVOLUTE and jointType != p.JOINT_PRISMATIC and jointType != p.JOINT_SPHERICAL): continue
             if i < len(self.reset_joint_poses): p.resetJointState(self.id, i, self.reset_joint_poses[i])
-            self.active_joints.append(i)
+            self.active_joint_indexes.append(i)
 
-        if len(self.active_joints) > len(self.joint_damping): 
-            self.joint_damping.extend([0]*(len(self.active_joints)-len(self.joint_damping)))
-            self.reset_joint_poses.extend([0]*(len(self.active_joints)-len(self.reset_joint_poses)))
+        if len(self.active_joint_indexes) > len(self.joint_damping): 
+            self.joint_damping.extend([0]*(len(self.active_joint_indexes)-len(self.joint_damping)))
+            self.reset_joint_poses.extend([0]*(len(self.active_joint_indexes)-len(self.reset_joint_poses)))
         else: 
-            self.joint_damping = self.joint_damping[:len(self.active_joints)]
-            self.reset_joint_poses = self.reset_joint_poses[:len(self.active_joints)]
+            self.joint_damping = self.joint_damping[:len(self.active_joint_indexes)]
+            self.reset_joint_poses = self.reset_joint_poses[:len(self.active_joint_indexes)]
         
         pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
         axis_x = Rotation.from_quat(orn).apply(np.array([0.05,0,0])) + pos
@@ -124,31 +133,28 @@ class Robot(ActiveObject):
         return self.current_joint_poses
     
     def set_joints(self,joint_poses):
-        p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, joint_poses)
+        if len(self.active_joint_indexes) > len(joint_poses): 
+            joint_poses.extend([0]*(len(self.active_joint_indexes)-len(joint_poses)))
+        else: 
+            joint_poses = joint_poses[:len(self.active_joint_indexes)]
+
+        for i in self.active_joint_indexes: p.resetJointState(self.id, i, joint_poses[i])
+        # p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, joint_poses)
         self.current_joint_poses = joint_poses
-        
-    def set_end_effector_pos(self,pos):
+    
+    def set_end_effector_pose(self,pos,rot):
         pass
 
-    def get_end_effector_pos(self):
+    def get_end_effector_pose(self):
         num_joints = p.getNumJoints(self.id)
         ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
-        ee_pos = np.array(ee_pos)
-        return [ee_pos[0],ee_pos[1],ee_pos[2]]
-
-    def set_end_effector_rot(self,rot):
-        pass
-
-    def get_end_effector_rot(self):
-        num_joints = p.getNumJoints(self.id)
-        _,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
         ee_rot = p.getEulerFromQuaternion(ee_orn)
-        return [ee_rot[0],ee_rot[1],ee_rot[2]]
+        return [ee_pos[0],ee_pos[1],ee_pos[2],ee_rot[0],ee_rot[1],ee_rot[2]]
 
     def set_end_effector(self,base):
         if 'id' not in vars(self): return
-        self.end_effector = self.profile['end_effector'] = base
-        self.set_base(self.profile['base'])
+        self.end_effector = base
+        self.set_base(self.base)
         
     def plan(self,origin,target,dt=1):
         ee_pos,ee_rot = origin
@@ -169,9 +175,9 @@ class Robot(ActiveObject):
             num_joints = p.getNumJoints(self.id)
             ee_index = num_joints-1
             ee_orn = p.getQuaternionFromEuler(o_rot)
-            ll = [-7]*len(self.active_joints)
-            ul = [7]*len(self.active_joints)
-            jr = [7]*len(self.active_joints)
+            ll = [-7]*len(self.active_joint_indexes)
+            ul = [7]*len(self.active_joint_indexes)
+            jr = [7]*len(self.active_joint_indexes)
             
             poses = p.calculateInverseKinematics(self.id, ee_index, ee_pos, ee_orn,
                                                 lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,
@@ -232,7 +238,7 @@ class Robot(ActiveObject):
         ee_index = num_joints-1
 
         def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
+            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
@@ -245,14 +251,14 @@ class Robot(ActiveObject):
         def task2(*point):
             num_joints = p.getNumJoints(self.id)
             ee_index = num_joints-1
-            ll = [-7]*len(self.active_joints)
-            ul = [7]*len(self.active_joints)
-            jr = [7]*len(self.active_joints)
+            ll = [-7]*len(self.active_joint_indexes)
+            ul = [7]*len(self.active_joint_indexes)
+            jr = [7]*len(self.active_joint_indexes)
             
             poses = p.calculateInverseKinematics(self.id, ee_index, point, p.getQuaternionFromEuler([0,0,0]),
                                                 lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.self.current_joint_poses,
                                                 jointDamping=self.joint_damping,maxNumIterations=200)
-            p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
+            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
 
             self.current_joint_poses = poses
             p.addUserDebugPoints([point],[[1,1,1]],2,lifeTime=5)
@@ -289,7 +295,7 @@ class Robot(ActiveObject):
         route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
 
         def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
+            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
@@ -331,7 +337,7 @@ class Robot(ActiveObject):
                 t_rot = kwargs['point'][3:6]
                 
         def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
+            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
@@ -370,7 +376,7 @@ class Robot(ActiveObject):
                 t_rot = kwargs['point'][3:6] + ee_rot
             
         def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
+            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
             pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
@@ -420,12 +426,12 @@ class Robot(ActiveObject):
 
         self.reset_joint_poses
         joint_poses = []
-        for joint in self.active_joints:
+        for joint in self.active_joint_indexes:
             position,velocity,reaction_force,motor_torque = p.getJointState(self.id,joint)
             joint_poses.append(position)
 
         def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joints, p.POSITION_CONTROL, poses)
+            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
             # pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
             # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
             # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos

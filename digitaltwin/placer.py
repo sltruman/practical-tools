@@ -7,14 +7,26 @@ from .active_obj import ActiveObject
 
 class Placer(ActiveObject):
     def __init__(self,scene,**kwargs):
+        if 'workpiece_texture' not in kwargs: kwargs['workpiece_texture'] = '' 
         if 'workpiece' not in kwargs: kwargs['workpiece'] = 'workpieces/lego.urdf' 
         if 'center' not in kwargs: kwargs['center'] = [0,0,0]
         if 'interval' not in kwargs: kwargs['interval'] = 1
         if 'amount' not in kwargs: kwargs['amount'] = 10
         super().__init__(scene,**kwargs)
+
+        self.workpiece_texture = kwargs['workpiece_texture']
+        self.workpiece = kwargs['workpiece']
+        self.center = kwargs['center']
+        self.interval = kwargs['interval']
+        self.amount = kwargs['amount']
+
         self.objs = list()
-        # self.workpiece_texture = kwargs['workpiece_texture']
         self.elapsed = 0
+    
+    def properties(self):
+        properties = super().properties()
+        properties.update(kind='Placer',workpiece=self.workpiece,center=self.center,interval=self.interval,amount=self.amount,workpiece_texture=self.workpiece_texture)
+        return properties
 
     def update(self, dt):
         if not self.actions: return

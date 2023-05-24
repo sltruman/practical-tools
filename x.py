@@ -1,10 +1,10 @@
-from time import time
-from threading import Thread
-import cv2
-import numpy as np
-import math
-
+from time import time,sleep
 from digitaltwin import Scene,Workflow,Editor
+# from pysimflow import Scene,Workflow,Editor
+
+from threading import Thread
+import numpy as np
+import cv2
 
 scene = Scene(1024,768)
 editor = Editor(scene)
@@ -21,26 +21,24 @@ def updating():
 t = Thread(target=updating)
 t.start()
 
-rgba,depth = scene.active_objs_by_name['camera'].rtt()
-intrinsics = scene.active_objs_by_name['camera'].get_intrinsics()
-extrinsics = scene.active_objs_by_name['camera'].get_extrinsics()
+robot = scene.active_objs_by_name['robot']
+camera = scene.active_objs_by_name['camera']
+print(robot.properties())
+print(camera.properties())
 
-properties = editor.add('Camera3DReal',"./cameras/camera3d/camera3d.urdf",[-0.032747,0.564563,1.1767],[0,0,0],[0,0,0])
+route_joint_positions = [
+    [0.0,0,0,0,0,0.0],
+    [0.1,0,0,0,0,0.1],
+    [0.2,0,0,0,0,0.2],
+    [0.3,0,0,0,0,0.3],
+    [0.4,0,0,0,0,0.4],
+    [0.5,0,0,0,0,0.5],
+    [0.6,0,0,0,0,0.6]
+]
 
-scene.active_objs_by_name['camera3dreal'].set_intrinsics(intrinsics)
-scene.active_objs_by_name['camera3dreal'].set_extrinsics(extrinsics)
+for joint_pos in route_joint_positions:
+    robot.set_joints(joint_pos)
+    camera.set_roi(joint_pos[0],0.1,0.5,0,0,0,0.1333,0.1,0.1)
+    camera.draw_roi()
 
-scene.active_objs_by_name['camera3dreal'].draw_point_cloud_from_depth_pixels(depth,rgba,1024,768)
-
-img = np.frombuffer(rgba, dtype=np.uint8).reshape((768, 1024, 4))
-cv2.cvtColor(img, cv2.COLOR_RGBA2BGRA,img)
-cv2.imwrite('rgba.png',img)
-
-depth = np.frombuffer(depth, dtype=np.float32).reshape((768, 1024, 1))
-cv2.imwrite('dep.tiff',depth)
-
-min,max,_,_ = cv2.minMaxLoc(depth)
-gray = (depth * (255 / max)).astype(np.uint8)
-cv2.imwrite('gray.png',gray)
-
-
+    sleep(0.1)

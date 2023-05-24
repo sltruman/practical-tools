@@ -23,8 +23,25 @@ class Camera3D(ActiveObject):
         self.pixels_h = self.profile['pixels_h']
         self.roi = self.profile['roi']
         self.sample_rate = self.profile['sample_rate']
-        self.sensor_h = np.tan(self.fov / 2) * self.focal * 2
-        self.point_ids = list() 
+        self.sensor_h = math.tan(self.fov / 2) * self.focal * 2
+        self.intrinsics = self.get_intrinsics()
+        self.extrinsics = self.get_extrinsics()
+
+        self.roi_pids = list()
+        self.fov_pids = list()
+
+
+    def properties(self):
+        properties = super().properties()
+        properties.update(kind='Camera3D',focal=self.focal,
+                          fov=self.fov,
+                          pixels_w=self.pixels_w,
+                          pixels_h=self.pixels_h,
+                          sample_rate=self.sample_rate,
+                          roi=self.roi,
+                          intrinsics=self.get_intrinsics(),
+                          extrinsics=self.get_extrinsics())
+        return properties
 
     def restore(self):
         super().restore()
@@ -38,15 +55,15 @@ class Camera3D(ActiveObject):
         near = self.focal
         far = 1000
         origin = np.array(pos)
-
+        
         vm = p.computeViewMatrixFromYawPitchRoll(origin,near,math.degrees(yaw),math.degrees(pitch) - 90,math.degrees(roll),2)
         pm = p.computeProjectionMatrixFOV(math.degrees(self.fov),self.pixels_w/self.pixels_h,near,far)
         
+        if self.roi_pids: self.draw_roi(False)
         _,_,pixels,depth_pixels,_ = p.getCameraImage(self.pixels_w,self.pixels_h,flags=-1,viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
         depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :]) - near
-
-        self.draw_roi()
-
+        if self.roi_pids: self.draw_roi(True)
+        
         return pixels.tobytes(),depth_pixels.tobytes()
 
     def get_intrinsics(self):
@@ -67,16 +84,17 @@ class Camera3D(ActiveObject):
         extrinsics = np.identity(4)
         extrinsics[:3,:3] = Rotation.from_euler('xyz',self.rot).as_matrix()
         extrinsics[:3,3] = self.pos
-        return extrinsics
+        return extrinsics.tolist()
     
-    def draw_roi(self):
-        
+    def draw_fov(self,show=True):
+        for pid in self.fov_pids: p.removeUserDebugItem(pid)
+        self.fov_pids = list()
+        if not show: return
+
         origin = np.array(self.pos)
         near = self.focal
         far = 1000
-        w = self.pixels_w
-        h = self.pixels_h
-        ratio = w / h
+        ratio = self.pixels_w / self.pixels_h
         
         horizontal = np.array([self.sensor_h * ratio, 0, 0])
         vertical = np.array([0, self.sensor_h, 0])
@@ -86,6 +104,7 @@ class Camera3D(ActiveObject):
             [1,0,0],
             [0,-1,0],
             [0,0,-1]]
+        
         for j in range(2):
             for i in range(2):
                 u = float(i) / (2-1)
@@ -94,8 +113,12 @@ class Camera3D(ActiveObject):
                 target = origin + target_dr
                 l = np.linalg.norm(target - origin)
                 dr = (target - origin) / l * far
-                p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=5)
+                self.fov_pids.append(p.addUserDebugLine(origin, target + dr,[1,0,0],1,lifeTime=0))
 
+    def draw_roi(self,show=True):
+        for pid in self.roi_pids: p.removeUserDebugItem(pid)
+        self.roi_pids = list()
+        if not show: return
         x,y,z,rx,ry,rz,w,h,d = self.roi
 
         pos = np.array(self.pos)
@@ -119,31 +142,30 @@ class Camera3D(ActiveObject):
             [0,0,-1]]
         pn = pos + Rotation.from_euler('xyz',self.rot).apply(origin @ axes + R.apply([p0,p1,p2,p3,p4,p5,p6,p7]) @ axes)
 
-        self.pids = [
-            p.addUserDebugLine(pn[0],pn[2],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[0],pn[3],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[0],pn[4],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[1],pn[5],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[1],pn[6],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[1],pn[7],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[2],pn[6],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[2],pn[7],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[3],pn[7],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[4],pn[6],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[5],pn[3],[1,1,0],1,lifeTime=5),
-            p.addUserDebugLine(pn[5],pn[4],[1,1,0],1,lifeTime=5)
+        self.roi_pids = [
+            p.addUserDebugLine(pn[0],pn[2],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[0],pn[3],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[0],pn[4],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[1],pn[5],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[1],pn[6],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[1],pn[7],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[2],pn[6],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[2],pn[7],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[3],pn[7],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[4],pn[6],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[5],pn[3],[1,1,0],1,lifeTime=0),
+            p.addUserDebugLine(pn[5],pn[4],[1,1,0],1,lifeTime=0)
         ]
     
     def set_focal(self,focal):
         self.focal = focal
-        self.draw_roi()
+        self.fov = math.atan(self.sensor_h / 2 / self.focal) * 2
 
     def get_roi(self):
         return self.roi
 
     def set_roi(self,x,y,z,rx,ry,rz,w,h,d):
         self.roi = [x,y,z,rx,ry,rz,w,h,d]
-        self.draw_roi()
         pass
 
     def signal_capture(self,*args,**kwargs):
@@ -246,11 +268,25 @@ class Camera3DReal(ActiveObject):
         self.roi = self.profile['roi']
         self.sample_num = self.profile['sample_num']
         self.sensor_h = np.tan(self.fov / 2) * self.focal * 2
+        self.intrinsics = self.get_intrinsics()
+        self.extrinsics = self.get_extrinsics()
 
         self.point_ids = list()
         self.rgb_pixels = bytes()
         self.depth_pixels = bytes()
-        
+    
+    def properties(self):
+        properties = super().properties()
+        properties.update(kind='Camera3DReal',focal=self.focal,
+                          fov=self.fov,
+                          pixels_w=self.pixels_w,
+                          pixels_h=self.pixels_h,
+                          sample_rate=self.sample_num,
+                          roi=self.roi,
+                          intrinsics=self.get_intrinsics(),
+                          extrinsics=self.get_extrinsics())
+        return properties
+
     def restore(self):
         super().restore()
         self.clear_point_cloud()
@@ -298,6 +334,19 @@ class Camera3DReal(ActiveObject):
         self.set_extrinsics(extrinsics)
         pass
 
+    def get_intrinsics(self):
+        fx = self.pixels_w / 2 / math.tan(self.fov / 2)
+        fy = self.pixels_h / 2 / math.tan(self.fov / 2)
+        cx = self.pixels_w/2
+        cy = self.pixels_h/2
+
+        intrinsics = [
+            [fy,0.0,cx],
+            [0.0,fy,cy],
+            [0.0,0.0,1.0],
+        ]
+        return intrinsics
+
     def set_intrinsics(self,intrinsics):
         self.intrinsics = intrinsics
         m = np.array(intrinsics)
@@ -310,7 +359,13 @@ class Camera3DReal(ActiveObject):
         self.pixels_w = cx * 2
         self.pixels_y = cy * 2
         self.fov = math.atan(self.pixels_w / 2 / fx) * 2
-        
+    
+    def get_extrinsics(self):
+        extrinsics = np.identity(4)
+        extrinsics[:3,:3] = Rotation.from_euler('xyz',self.rot).as_matrix()
+        extrinsics[:3,3] = self.pos
+        return extrinsics.tolist()
+    
     def set_extrinsics(self,extrinsics):
         self.extrinsics = extrinsics
         m = np.array(extrinsics)
@@ -357,7 +412,7 @@ class Camera3DReal(ActiveObject):
             point_id = p.addUserDebugPoints(point_cloud[beg:beg+offset],point_cloud_color[beg:beg+offset,0:3],1,lifeTime=0)
             self.point_ids.append(point_id)
             beg += offset
-        pass
+
 
     def draw_point_cloud(self,vertexes,colors):
         R = Rotation.from_euler('xyz',self.rot)

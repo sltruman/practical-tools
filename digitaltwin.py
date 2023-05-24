@@ -26,7 +26,7 @@ else:
     print(f'Serving on {sock_path}',flush=True)
     sk.listen(1)
     
-    scene = Scene(width,height,data_dir,tmp_dir)    
+    scene = Scene(width,height,data_dir,tmp_dir)
     scene.load(scene_path)
     editor = Editor(scene)
     workflow = Workflow(scene)
@@ -58,8 +58,9 @@ else:
 
             tick = time() - elapsed
             scene.update_for_tick(tick)
-            # tick = round(tick, 3)
-            print(end='',flush=True)
+            tick = round(tick, 3)
+            # if tick > 0.010:
+            #     print(tick,flush=True)
     except (ConnectionResetError,BrokenPipeError):
         pass
     except:

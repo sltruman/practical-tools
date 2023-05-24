@@ -27,6 +27,10 @@ class Scene:
     self.id = p.connect(p.GUI,options=f'--width={width} --height={height} --headless')
     p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
     p.setPhysicsEngineParameter(erp=1,contactERP=1,frictionERP=1)
+
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    p.resetDebugVisualizerCamera(3,yaw,pitch,target)
+
     self.reset()
 
   def __del__(self):
@@ -66,6 +70,7 @@ class Scene:
     
     self.plane = p.loadURDF(os.path.join(self.data_dir,"pybullet_objects/plane.urdf"), [0, 0, self.profile['ground_z']], useFixedBase=True)
     for object_info in self.profile['active_objects']:
+      print('add object:',object_info,flush=True)
       kind = object_info['kind']
       
       active_obj = None

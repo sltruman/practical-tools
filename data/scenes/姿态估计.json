@@ -3,7 +3,7 @@
         {
             "kind":"Placer",
             "name":"placer",
-            "base":"./objects/tray/traybox.urdf",
+            "base":"./objects/tray/tray.urdf",
             "pos":[0,-0.5,0.001],
             "rot":[0,0,0],
             "center":[0.0,-0.5,0.25],

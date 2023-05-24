@@ -9,12 +9,15 @@ class ActiveObject:
         self.result = None,
         self.scene = scene
         self.profile = kwargs
+        
+        self.name = self.profile['name']
+        self.base = self.profile['base']
+        self.pos = self.profile['pos']
+        self.rot = self.profile['rot']
+        self.scale = self.profile['scale']
+        self.user_data = self.profile['user_data'] if 'user_data' in self.profile else ''
 
-        self.base = kwargs['base']
-        self.pos = kwargs['pos']
-        self.rot = kwargs['rot']
-        self.scale = kwargs['scale']
-        self.set_base(kwargs['base'])
+        self.set_base(self.base)
         pass
 
     def __del__(self):
@@ -22,7 +25,7 @@ class ActiveObject:
         pass
 
     def properties(self):
-        return self.profile
+        return dict(kind='ActiveObject',name=self.name,base=self.base,pos=self.pos,rot=self.rot,scale=self.scale,user_data=self.user_data if 'user_data' in vars(self) else '')
     
     def update(self,dt):
         if not self.actions: return
