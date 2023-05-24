@@ -1,4 +1,4 @@
-<h1 align="center">Digital-Twin</h1>
+<h1 align="center">Simflow</h1>
 
 [TOC]
 
@@ -10,9 +10,7 @@
 
 ## 1.1 安装
 
-下载源代码：`git clone http://120.24.55.96:3000/MixedAI/GraspSim`
-
-安装依赖：`pip3 install -r requirements.txt`
+下载源代码：`pip3 install pysimflow`
 
 ## 1.2 快速开始
 
