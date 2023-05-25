@@ -4,7 +4,7 @@ from digitaltwin import Scene,Workflow
 scene = Scene(1024,768)
 workflow = Workflow(scene)
 
-scene.load('./data/scenes/无序抓取.json')
+scene.load('./digitaltwin_data/scenes/无序抓取.json')
 workflow.start()
 
 import time

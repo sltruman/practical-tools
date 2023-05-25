@@ -8,7 +8,7 @@ import os
 import socket as s
 
 class Scene:
-  def __init__(self,width=1024,height=768,data_dir='./data',tmp_dir='.'):
+  def __init__(self,width=1024,height=768,data_dir='./digitaltwin_data',tmp_dir='.'):
     self.tmp_dir = tmp_dir
     self.data_dir = data_dir
 
@@ -27,11 +27,13 @@ class Scene:
     self.id = p.connect(p.GUI,options=f'--width={width} --height={height} --headless')
     p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
     p.setPhysicsEngineParameter(erp=1,contactERP=1,frictionERP=1)
+    p.setTimeStep(self.timestep)
+    p.setGravity(0, 0, -9.81)
 
     w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
     p.resetDebugVisualizerCamera(3,yaw,pitch,target)
-
-    self.reset()
+    
+    self.plane = p.loadURDF(os.path.join(self.data_dir,"pybullet_objects/plane.urdf"), [0, 0, self.ground_z], useFixedBase=True)
 
   def __del__(self):
     self.play(False)
@@ -43,45 +45,28 @@ class Scene:
   def get_profile(self):
     return self.profile
 
-  def reset(self):
-    p.resetSimulation()
-    del self.active_objs
-    del self.active_objs_by_name
-    
-    self.active_objs = dict()
-    self.active_objs_by_name = dict()
-
-    p.setGravity(0, 0, -9.81)
-    p.setTimeStep(self.timestep)
-    self.plane = p.loadURDF(os.path.join(self.data_dir,"pybullet_objects/plane.urdf"), [0, 0, self.ground_z], useFixedBase=True)
-    self.load(self.scene_path)
-    pass
-
   def load(self,scene_path):
     if not scene_path: return
-
-    p.resetSimulation()
-    p.setGravity(0, 0, -9.81)
 
     self.scene_path = scene_path
     with open(scene_path,'r') as f: self.profile = json.load(f)
 
     if 'ground_z' not in self.profile: self.profile['ground_z'] = 0
-    
-    self.plane = p.loadURDF(os.path.join(self.data_dir,"pybullet_objects/plane.urdf"), [0, 0, self.profile['ground_z']], useFixedBase=True)
+    if 'user_data' not in self.profile: self.profile['user_data'] = ''
+    self.ground_z = self.profile['ground_z']
+    self.user_data = self.profile['user_data']
+
     for object_info in self.profile['active_objects']:
       print('add object:',object_info,flush=True)
       kind = object_info['kind']
-      
       active_obj = None
       active_obj = eval(f'digitaltwin.{kind}(self,**object_info)')
       self.active_objs[active_obj.id] = active_obj
       if 'name' in object_info: self.active_objs_by_name[object_info['name']] = active_obj
 
-
   def save(self):
-      self.profile['active_objects']
       self.profile['ground_z'] = self.ground_z
+      self.profile['user_data'] = self.user_data
       active_objects = list()
       for obj in self.active_objs_by_name.values():
         obj.profile = obj.properties()
@@ -191,12 +176,14 @@ class Scene:
     return objs
   
   def set_ground_z(self,z):
-    self.profile['ground_z'] = z
+    self.ground_z = z
     p.resetBasePositionAndOrientation(self.plane,[0,0,z],p.getQuaternionFromEuler([0,0,0]))
     pass
 
   def set_ground_texture(self,texture):
-    self.profile['ground_texture'] = texture
+    self.ground_texture = texture
     p.changeVisualShape(self.plane,-1,textureUniqueId=p.loadTexture(texture))
     pass
 
+  def set_user_data(self,val):
+    self.user_data = val

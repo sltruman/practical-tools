@@ -274,6 +274,10 @@ class Camera3DReal(ActiveObject):
         self.point_ids = list()
         self.rgb_pixels = bytes()
         self.depth_pixels = bytes()
+
+    def __del__(self):
+        self.clear_point_cloud()
+        super().__del__()
     
     def properties(self):
         properties = super().properties()

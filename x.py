@@ -1,16 +1,19 @@
 from time import time,sleep
 from digitaltwin import Scene,Workflow,Editor
+import os
 
 from threading import Thread
 import numpy as np
 import cv2
 import digitaltwin_data
 
-scene = Scene(1024,768,digitaltwin_data.get_data_path())
+data_dir = digitaltwin_data.get_data_path()
+
+scene = Scene(1024,768,data_dir)
 editor = Editor(scene)
 workflow = Workflow(scene)
 
-scene.load('./data/scenes/标定测试.json')
+scene.load(os.path.join(data_dir,'scenes/标定测试.json'))
 
 def updating():
     import time
@@ -20,8 +23,6 @@ def updating():
 
 t = Thread(target=updating)
 t.start()
-
-editor.add('Robot','robots/1/1.urdf',[0,0,0],[0,0,0],[0,0,0])
 
 robot = scene.active_objs_by_name['robot']
 camera = scene.active_objs_by_name['camera']
@@ -39,8 +40,9 @@ route_joint_positions = [
 ]
 
 for joint_pos in route_joint_positions:
-    robot.set_joints(joint_pos)
-    camera.set_roi(joint_pos[0],0.1,0.5,0,0,0,0.1333,0.1,0.1)
-    camera.draw_roi()
+    # scene.set_ground_z(scene.ground_z+0.01)
+    # robot.set_joints(joint_pos)
+    # camera.set_roi(joint_pos[0],0.1,0.5,0,0,0,0.1333,0.1,0.1)
+    # camera.draw_roi()
 
-    sleep(0.1)
+    sleep(0.5)

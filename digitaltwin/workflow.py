@@ -125,7 +125,7 @@ class Workflow():
                 print('args',args,flush=True)
                 eval(f'obj.signal_{fun}(*val,**args)')
             except:
-                traceback.print_exc()
+                print(traceback.format_exc(),flush=True)
                 print('Workflow stopped!',flush=True)
                 return 
 

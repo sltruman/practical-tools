@@ -9,7 +9,7 @@ eye_to_hand_transform = [
     [0.0,0.0,0.0,1.0]]
 
 scene = Scene(1024, 768)
-scene.load('./data/scenes/算法插件.json')
+scene.load('./digitaltwin_data/scenes/算法插件.json')
 workflow = Workflow(scene)
 
 scene.active_objs_by_name['camera'].set_calibration(projection,eye_to_hand_transform)

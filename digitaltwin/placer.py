@@ -3,7 +3,8 @@ import numpy as np
 import random
 import py3dbp as bp
 import random
-from .active_obj import ActiveObject
+import os
+from digitaltwin.active_obj import ActiveObject
 
 class Placer(ActiveObject):
     def __init__(self,scene,**kwargs):
@@ -58,9 +59,9 @@ class Placer(ActiveObject):
     def signal_generate(self,*args,**kwargs):
         def task():
             rot = np.array([random.randint(0,314),random.randint(0,314),random.randint(0,314)]) / 100.
-            self.objs.append(p.loadURDF(self.profile['workpiece'],self.profile['center'],p.getQuaternionFromEuler(rot)))
+            self.objs.append(p.loadURDF(os.path.join(self.scene.data_dir,self.workpiece),self.center,p.getQuaternionFromEuler(rot)))
         
-        for i in range(self.profile['amount']): self.actions.append((task, ()))
+        for i in range(self.amount): self.actions.append((task, ()))
 
         def task1():
             num = 0 

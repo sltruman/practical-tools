@@ -2,7 +2,7 @@ import time
 from digitaltwin import Scene,Editor, Workflow
 
 scene = Scene(1024, 768)
-scene.load('./data/scenes/空.json')
+scene.load('./digitaltwin_data/scenes/空.json')
 editor = Editor(scene)
 workflow = Workflow(scene)
 

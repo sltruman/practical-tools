@@ -46,25 +46,24 @@ else:
                     if req[-1] != 0xa:
                         buf = req
                         raise BlockingIOError
-
                     res = eval(req.decode())
                     if type(res) == tuple: 
                         for v in res: conn.sendall(v)
                     elif type(res) == dict or type(res) == list: 
                         conn.sendall(json.dumps(res).encode() + b'\n')
                 buf = b''
-            except SyntaxError: traceback.print_exc()
+            except SyntaxError: print(traceback.print_exc(),flush=True)
             except BlockingIOError: pass
 
             tick = time() - elapsed
             scene.update_for_tick(tick)
-            tick = round(tick, 3)
-            # if tick > 0.010:
+            # tick = round(tick, 3)
+            # if tick < 0.010:
             #     print(tick,flush=True)
     except (ConnectionResetError,BrokenPipeError):
         pass
     except:
-        traceback.print_exc()
+        print(traceback.print_exc(),flush=True)
         pass
 
     del workflow

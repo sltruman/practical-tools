@@ -5,7 +5,7 @@ from threading import Thread
 scene = Scene(1024,768)
 workflow = Workflow(scene)
 
-scene.load('./data/scenes/标定测试.json')
+scene.load('./digitaltwin_data/scenes/标定测试.json')
 
 def updating():
     import time

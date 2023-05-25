@@ -24,11 +24,15 @@ class Robot(ActiveObject):
     
     def properties(self):
         properties = super().properties()
+        
+        x,y,z,rx,ry,rz = self.get_end_effector_pose()
         properties.update(kind='Robot',speed=self.speed,
                           end_effector=self.end_effector,
                           joint_damping=self.joint_damping,
                           current_joint_poses=self.current_joint_poses,
-                          reset_joint_poses=self.reset_joint_poses)
+                          reset_joint_poses=self.reset_joint_poses,
+                          end_effector_pos=[x,y,z],end_effector_rot=[rx,ry,rz]
+                          )
         return properties
 
     def update(self,dt):
@@ -89,7 +93,6 @@ class Robot(ActiveObject):
         if 'id' in vars(self): p.removeBody(self.id)
         print('robot urdf',base_temp)
         self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
-
         if ee_kind == 'Gripper': self.end_effector_obj = Gripper(self.id,gears)
         elif ee_kind == 'Suction': self.end_effector_obj = Suction(self.id)
         else: 
@@ -103,6 +106,8 @@ class Robot(ActiveObject):
         num_joints = p.getNumJoints(self.id)
         self.active_joint_indexes = []
         for i in range(num_joints):
+            p.setCollisionFilterPair(self.scene.plane,self.id,-1,i,0)
+        
             ji = p.getJointInfo(self.id, i)
             jointName,jointType = ji[1],ji[2]
             if (jointType != p.JOINT_REVOLUTE and jointType != p.JOINT_PRISMATIC and jointType != p.JOINT_SPHERICAL): continue
@@ -128,7 +133,7 @@ class Robot(ActiveObject):
     def set_speed(self,value):
         if round(value) == 0.000: return 
         self.speed = value
-    
+     
     def get_joints(self):
         return self.current_joint_poses
     
@@ -142,8 +147,15 @@ class Robot(ActiveObject):
         # p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, joint_poses)
         self.current_joint_poses = joint_poses
     
-    def set_end_effector_pose(self,pos,rot):
-        pass
+    def set_end_effector_pose(self,pose):
+        ll = [-7]*len(self.active_joint_indexes)
+        ul = [7]*len(self.active_joint_indexes)
+        jr = [7]*len(self.active_joint_indexes)
+        
+        num_joints = p.getNumJoints(self.id)
+        ee_index = num_joints-1
+        joint_poses = p.calculateInverseKinematics(self.id, ee_index, pose[0:3], p.getQuaternionFromEuler(pose[3:6]),lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,maxNumIterations=200)
+        self.set_joints(list(joint_poses))
 
     def get_end_effector_pose(self):
         num_joints = p.getNumJoints(self.id)
