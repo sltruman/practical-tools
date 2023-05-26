@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<!--FOR GRIPPER, THERE IS NO LINK INERTIA DEFINED HERE-->
+<robot name="universal_robot" kind="PlaceHolder">
+  <link name="placeholder">
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+      <material name="red">
+        <color rgba="0 1 0 0.5"/>
+      </material>
+    </visual>
+  </link>
+  <joint name="joint_placeholder" type="fixed">
+    <parent link="placeholder"/>
+    <child link="base"/>
+    <origin rpy="0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+    <axis xyz="0 -1 0"/>
+  </joint>
+
+
+  <link name="base">
+  	<inertial>
+       <origin rpy="0 0 0" xyz="0 0 0.00"/>
+       <mass value=".01"/>
+       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="base.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="base.obj"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint_r" type="fixed">
+    <parent link="base"/>
+    <child link="finger_r"/>
+    <origin rpy="0 0 0" xyz="0.02 -0.065 0.265"/>
+    <limit effort="20" lower="0.00" upper="0.01" velocity="0.2"/>
+  </joint>
+    <link name="finger_r">
+  	<inertial>
+       <origin rpy="0 0 0" xyz="0 0 0.00"/>
+       <mass value=".01"/>
+       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="finger_r.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="finger_r.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  
+
+  <joint name="joint_l" type="fixed">
+    <parent link="base"/>
+    <child link="finger_l"/>
+    <origin rpy="0 0 0" xyz="-0.02 -0.065 0.265"/>
+    <limit effort="20" lower="0.00" upper="0.01" velocity="0.2"/>
+  </joint>
+
+
+  <link name="finger_l">
+  	<inertial>
+       <origin rpy="0 0 0" xyz="0 0 0.00"/>
+       <mass value=".01"/>
+       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="finger_l.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="finger_l.obj"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint_ee" type="fixed">
+    <parent link="base"/>
+    <child link="ee"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.15 0.32"/>
+    <limit effort="20" lower="0.00" upper="0.01" velocity="0.2"/>
+  </joint>
+  <link name="ee">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>
+      <mass value=".01"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+   </inertial>
+  </link>
+</robot>

@@ -137,7 +137,7 @@
         <limit lower="-7.9412" upper="7.9412" effort="33.30" velocity="12.2143"/>
     </joint>
     <joint name="jointEE" type="fixed">
-        <origin xyz="0.100 0 0" rpy="3.1415926 -1.570796 0"/>       <!-- tool shift -->
+        <origin xyz="0.100 0 0" rpy="-3.1415926 -1.570796 0"/>       <!-- tool shift -->
         <parent link="link_6_t"/>
         <child link="ee_link"/>
     </joint>
