@@ -6,6 +6,7 @@ class Gripper:
     def __init__(self,robot_id,gears):
         self.action = lambda *args:None,None
         self.idle = True
+        self.picking = False
         self.elapsed = 0
         self.robot_id = robot_id
         self.gears = gears
@@ -19,7 +20,7 @@ class Gripper:
             mimic_id = self.joints[mimic_name][0]
             joint_id,name,type,lower,upper,max_force,max_velocity = self.joints[joint_name]
             c = p.createConstraint(robot_id, mimic_id, robot_id, joint_id, jointType=p.JOINT_GEAR,jointAxis=[0, 1, 0], parentFramePosition=[0, 0, 0], childFramePosition=[0, 0, 0])
-            p.changeConstraint(c, gearRatio=-ratio, maxForce=max_force, erp=1)
+            p.changeConstraint(c, gearRatio=ratio, maxForce=max_force, erp=1)
         pass
 
     def update(self,dt):
@@ -47,5 +48,7 @@ class Gripper:
                 p.setJointMotorControl2(self.robot_id, id, p.POSITION_CONTROL, targetPosition=value * ratio,force=max_force,maxVelocity=max_velocity)
         self.action = (task,(pickup))
         self.idle = False
-
+        self.picking = pickup
         
+    def get_properties(self):
+        return dict(king='Gripper',picking=self.picking)

@@ -5,6 +5,7 @@ import pybullet as p
 class Suction:
     def __init__(self,robot_id):
         self.robot_id = robot_id
+        self.picking = False
         self.action = lambda *args:None,None
         self.idle = True
         self.elapsed = 0
@@ -49,3 +50,7 @@ class Suction:
         else:
             self.action = lambda *args:None,()
         pass
+        self.picking = pickup
+
+    def get_properties(self):
+        return dict(king='Suction',picking=self.picking)

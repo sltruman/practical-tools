@@ -59,6 +59,8 @@ class Robot(ActiveObject):
                 filename = mesh.getAttribute('filename')
                 mesh.setAttribute('filename',os.path.join(self.scene.data_dir,os.path.dirname(base),filename))
 
+            num_joints = len(node_robot.getElementsByTagName('link'))
+
             if self.end_effector:
                 link_ee = node_robot.getElementsByTagName('link')[-1]
                 link_ee_name = link_ee.getAttribute('name')
@@ -79,7 +81,7 @@ class Robot(ActiveObject):
                         node_mimic = node_mimics[0]
                         mimic_name = node_mimic.getAttribute('joint')
                         joint_name = joint.getAttribute('name')
-                        multiplier = int(node_mimic.getAttribute('multiplier')) if node_mimic.hasAttribute('multiplier') else 0
+                        multiplier = int(node_mimic.getAttribute('multiplier')) if node_mimic.hasAttribute('multiplier') else 1
                         offset = 0#int(node_mimic.getAttribute('offset'))
                         gears.append((mimic_name,joint_name,multiplier))
                 node_robot.removeChild(link_ee).unlink()
@@ -91,19 +93,19 @@ class Robot(ActiveObject):
             f.close()
 
         if 'id' in vars(self): p.removeBody(self.id)
-        print('robot urdf',base_temp)
+        print('robot urdf',base_temp,flush=True)
         self.id = p.loadURDF(base_temp, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
         if ee_kind == 'Gripper': self.end_effector_obj = Gripper(self.id,gears)
         elif ee_kind == 'Suction': self.end_effector_obj = Suction(self.id)
         else: 
-            class PlaceHolder:
+            class EndEffector:
                 def __init__(self): self.idle = True
                 def update(self,dt):pass
                 def do(self,pickup):pass
-            self.end_effector_obj = PlaceHolder()
+                def get_properties(self): return dict(king='EndEffector')
+            self.end_effector_obj = EndEffector()
             pass
 
-        num_joints = p.getNumJoints(self.id)
         self.active_joint_indexes = []
         for i in range(num_joints):
             p.setCollisionFilterPair(self.scene.plane,self.id,-1,i,0)
@@ -143,8 +145,8 @@ class Robot(ActiveObject):
         else: 
             joint_poses = joint_poses[:len(self.active_joint_indexes)]
 
-        for i in self.active_joint_indexes: p.resetJointState(self.id, i, joint_poses[i])
-        # p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, joint_poses)
+        # for i in self.active_joint_indexes: p.resetJointState(self.id, i, joint_poses[i])
+        p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, joint_poses)
         self.current_joint_poses = joint_poses
     
     def set_end_effector_pose(self,pose):

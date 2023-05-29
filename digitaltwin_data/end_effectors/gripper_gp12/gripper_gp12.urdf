@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!--FOR GRIPPER, THERE IS NO LINK INERTIA DEFINED HERE-->
-<robot name="universal_robot" kind="PlaceHolder">
+<robot name="universal_robot" kind="Gripper">
   <link name="placeholder">
     <visual>
       <geometry>
@@ -37,17 +37,20 @@
     </collision>
   </link>
 
-  <joint name="joint_r" type="fixed">
+  <joint name="joint_r" type="prismatic">
     <parent link="base"/>
     <child link="finger_r"/>
     <origin rpy="0 0 0" xyz="0.02 -0.065 0.265"/>
-    <limit effort="20" lower="0.00" upper="0.01" velocity="0.2"/>
+    <limit effort="20" lower="0.00" upper="-0.02" velocity="0.2"/>
+    <mimic joint="joint_l" multiplier="1" offset="0"/>
   </joint>
-    <link name="finger_r">
+
+  <link name="finger_r">
   	<inertial>
        <origin rpy="0 0 0" xyz="0 0 0.00"/>
        <mass value=".01"/>
        <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        
     </inertial>
     <visual>
       <geometry>
@@ -62,13 +65,12 @@
   </link>
   
 
-  <joint name="joint_l" type="fixed">
+  <joint name="joint_l" type="prismatic">
     <parent link="base"/>
     <child link="finger_l"/>
     <origin rpy="0 0 0" xyz="-0.02 -0.065 0.265"/>
-    <limit effort="20" lower="0.00" upper="0.01" velocity="0.2"/>
+    <limit effort="20" lower="0.00" upper="0.02" velocity="0.2"/>
   </joint>
-
 
   <link name="finger_l">
   	<inertial>

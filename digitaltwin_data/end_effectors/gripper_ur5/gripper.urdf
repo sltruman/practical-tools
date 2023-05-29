@@ -358,7 +358,7 @@
   <joint name="joint_ee" type="fixed">
     <parent link="robotiq_arg2f_base_link"/>
     <child link="ee_link"/>
-    <origin rpy="3.14 0.0 0.0" xyz="0.0 0.0 0.14"/>
+    <origin rpy="0 0.0 0.0" xyz="0.0 0.0 0.14"/>
   </joint>
   <link name="ee_link"/>
 </robot>
