@@ -300,7 +300,7 @@ class Camera3DReal(ActiveObject):
         self.signal_capture()
         
     def signal_check(self,*args,**kwargs):
-        self.result = None,self.profile['eye_to_hand_transform']
+        self.result = None,self.extrinsics
 
     def signal_capture(self,*args,**kwargs):
         try:
@@ -417,7 +417,6 @@ class Camera3DReal(ActiveObject):
             self.point_ids.append(point_id)
             beg += offset
 
-
     def draw_point_cloud(self,vertexes,colors):
         R = Rotation.from_euler('xyz',self.rot)
         T = self.pos
@@ -431,7 +430,7 @@ class Camera3DReal(ActiveObject):
             if offset > 10000: offset = 10000
             point_id = p.addUserDebugPoints(vertexes[beg:beg+offset],colors[beg:beg+offset],1,lifeTime=0)
             self.point_ids.append(point_id)
-        beg += offset
+            beg += offset
         pass
 
     def clear_point_cloud(self):

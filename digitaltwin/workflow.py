@@ -127,10 +127,8 @@ class Workflow():
             except:
                 print(traceback.format_exc(),flush=True)
                 print('Workflow stopped!',flush=True)
-                return 
-
+                return
             self.scene.actions.append((task,(next,)))
-
         task(None)
 
     def stop(self):

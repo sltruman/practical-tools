@@ -8,7 +8,7 @@
             "rot":[0,0,3.14],
             "reset_joint_poses":[-1.57,0.0,-0.3925,-0.785,1.57,0],
             "joint_damping":[ 0, 1, 0.9, 0.8, 0.7, 0.0],
-            "end_effector":"./end_effectors/gripper/gripper.urdf",
+            "end_effector":"./end_effectors/gripper_ur5/gripper_ur5.urdf",
             "speed":1.0
         },
         {

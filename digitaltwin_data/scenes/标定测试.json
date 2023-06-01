@@ -29,9 +29,24 @@
     ],
 
     "workflow": {
-        "run":null,
+        "run":"1",
         "declare":{
-
+            "1":{"kind":"Robot","fun":"move","name":"robot","args":{
+                "mode":"joint",
+                "joints":[-1.57,-0.0175,-2.2864,0.7505,1.57,0]
+            },"next":"2"},
+            "2":{"kind":"Robot","fun":"move","name":"robot","args":{
+                "mode":"joint",
+                "joints":[-1.57,-0.4887,-1.6406,0.5934,1.57,0]
+            },"next":"3"},
+            "3":{"kind":"Robot","fun":"move","name":"robot","args":{
+                "mode":"joint",
+                "joints":[-1.1868,-0.5061,-1.6232,0.576,1.57,0.384]
+            },"next":"4"},
+            "4":{"kind":"Robot","fun":"move","name":"robot","args":{
+                "mode":"joint",
+                "joints":[-1.0123,-0.1047,-2.1817,0.733,1.57,0.5585]
+            },"next":"1"}
         }
     }
 }

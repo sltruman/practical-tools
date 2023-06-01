@@ -119,7 +119,7 @@ class Editor:
   </link>\
 </robot>')
 
-        self.add('ActiveObject','objects/cube/cube.urdf',pos,rot,[1,1,1])
+        return self.add('ActiveObject','objects/cube/cube.urdf',pos,rot,[1,1,1])
         pass
 
     def add_cylinder(self,pos,rot,radius,length):
@@ -149,7 +149,7 @@ class Editor:
   </link>\n\
 </robot>')
 
-        self.add('ActiveObject','objects/cylinder/cylinder.urdf',pos,rot,[1,1,1])
+        return self.add('ActiveObject','objects/cylinder/cylinder.urdf',pos,rot,[1,1,1])
         pass
 
     def add_box(self,pos,rot,size,thickness):
@@ -250,7 +250,7 @@ f 4/18/8 2/17/8 13/22/8 14/21/8\n\
 f 2/17/9 6/13/9 16/16/9 13/22/9\n\
 f 8/14/4 4/18/4 14/21/4 15/15/4')
                     
-        self.add('ActiveObject','objects/box/box.urdf',pos,rot,[1,1,1])
+        return self.add('ActiveObject','objects/box/box.urdf',pos,rot,[1,1,1])
         pass
 
     def remove(self,name):

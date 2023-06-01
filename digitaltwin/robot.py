@@ -31,8 +31,7 @@ class Robot(ActiveObject):
                           joint_damping=self.joint_damping,
                           current_joint_poses=self.current_joint_poses,
                           reset_joint_poses=self.reset_joint_poses,
-                          end_effector_pos=[x,y,z],end_effector_rot=[rx,ry,rz]
-                          )
+                          end_effector_pos=[x,y,z],end_effector_rot=[rx,ry,rz])
         return properties
 
     def update(self,dt):
@@ -106,30 +105,37 @@ class Robot(ActiveObject):
             self.end_effector_obj = EndEffector()
             pass
 
+        self.used_joint_indexes = []
         self.active_joint_indexes = []
-        for i in range(num_joints):
+        self.joint_velocities = []
+        for i in range(p.getNumJoints(self.id)):
             p.setCollisionFilterPair(self.scene.plane,self.id,-1,i,0)
-        
             ji = p.getJointInfo(self.id, i)
-            jointName,jointType = ji[1],ji[2]
+            jointName,jointType,jointVelocity = ji[1],ji[2],ji[11]
             if (jointType != p.JOINT_REVOLUTE and jointType != p.JOINT_PRISMATIC and jointType != p.JOINT_SPHERICAL): continue
-            if i < len(self.reset_joint_poses): p.resetJointState(self.id, i, self.reset_joint_poses[i])
             self.active_joint_indexes.append(i)
-
-        if len(self.active_joint_indexes) > len(self.joint_damping): 
-            self.joint_damping.extend([0]*(len(self.active_joint_indexes)-len(self.joint_damping)))
-            self.reset_joint_poses.extend([0]*(len(self.active_joint_indexes)-len(self.reset_joint_poses)))
-        else: 
-            self.joint_damping = self.joint_damping[:len(self.active_joint_indexes)]
-            self.reset_joint_poses = self.reset_joint_poses[:len(self.active_joint_indexes)]
+            self.joint_velocities.append(jointVelocity)
+            if i < num_joints: self.used_joint_indexes.append(i)
         
+        if len(self.active_joint_indexes) > len(self.joint_damping): self.joint_damping.extend([0]*(len(self.active_joint_indexes)-len(self.joint_damping)))
+        else: self.joint_damping = self.joint_damping[:len(self.active_joint_indexes)]
+
+        if len(self.used_joint_indexes) > len(self.reset_joint_poses): self.reset_joint_poses.extend([0]*(len(self.used_joint_indexes)-len(self.reset_joint_poses)))
+        else: self.reset_joint_poses = self.reset_joint_poses[:len(self.used_joint_indexes)]
+
+        self.set_joints(self.reset_joint_poses)
+        
+        if 'end_effector_axis' in vars(self):
+            p.removeUserDebugItem(self.end_effector_axis[0])
+            p.removeUserDebugItem(self.end_effector_axis[1])
+            p.removeUserDebugItem(self.end_effector_axis[2])
+
         pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
         axis_x = Rotation.from_quat(orn).apply(np.array([0.05,0,0])) + pos
         axis_y = Rotation.from_quat(orn).apply(np.array([0,0.05,0])) + pos
         axis_z = Rotation.from_quat(orn).apply(np.array([0,0,0.05])) + pos
-        p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=20)
-        p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=20)
-        p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=20)
+        self.end_effector_axis = p.addUserDebugLine(pos,axis_x,[1,0,0],2),p.addUserDebugLine(pos,axis_y,[0,1,0],2),p.addUserDebugLine(pos,axis_z,[0,0,1],2)
+
         self.home_pos,self.home_rot = pos,p.getEulerFromQuaternion(orn)
     
     def set_speed(self,value):
@@ -137,27 +143,19 @@ class Robot(ActiveObject):
         self.speed = value
      
     def get_joints(self):
-        return self.current_joint_poses
+        return self.current_joint_poses[:len(self.used_joint_indexes)]
     
     def set_joints(self,joint_poses):
-        if len(self.active_joint_indexes) > len(joint_poses): 
-            joint_poses.extend([0]*(len(self.active_joint_indexes)-len(joint_poses)))
-        else: 
-            joint_poses = joint_poses[:len(self.active_joint_indexes)]
-
-        # for i in self.active_joint_indexes: p.resetJointState(self.id, i, joint_poses[i])
-        p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, joint_poses)
-        self.current_joint_poses = joint_poses
+        joint_poses = joint_poses[:len(self.used_joint_indexes)]
+        for i in self.used_joint_indexes: p.resetJointState(self.id, i, joint_poses[i])
+        p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, joint_poses)
+        self.current_joint_poses = joint_poses[:len(self.used_joint_indexes)]
     
     def set_end_effector_pose(self,pose):
-        ll = [-7]*len(self.active_joint_indexes)
-        ul = [7]*len(self.active_joint_indexes)
-        jr = [7]*len(self.active_joint_indexes)
-        
         num_joints = p.getNumJoints(self.id)
         ee_index = num_joints-1
-        joint_poses = p.calculateInverseKinematics(self.id, ee_index, pose[0:3], p.getQuaternionFromEuler(pose[3:6]),lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,maxNumIterations=200)
-        self.set_joints(list(joint_poses))
+        joint_poses = p.calculateInverseKinematics(self.id, ee_index, pose[0:3], p.getQuaternionFromEuler(pose[3:6]),restPoses=self.reset_joint_poses,maxNumIterations=200)
+        self.set_joints(list(joint_poses)[:len(self.used_joint_indexes)])
 
     def get_end_effector_pose(self):
         num_joints = p.getNumJoints(self.id)
@@ -170,33 +168,23 @@ class Robot(ActiveObject):
         self.end_effector = base
         self.set_base(self.base)
         
-    def plan(self,origin,target,dt=1):
+    def plan(self,origin,target,s=1):
         ee_pos,ee_rot = origin
-        o_pos,o_rot = target
-        o_pos = np.array(o_pos)
-        p.addUserDebugLine(ee_pos,o_pos,[0,1,0],2,lifeTime=5) 
-
+        pick_pos,pick_rot = target
+        pick_orn = p.getQuaternionFromEuler(pick_rot)
+        
         route_poses = list()
-        while np.linalg.norm(o_pos - ee_pos) != 0:
-            direction = o_pos - ee_pos
-            length = abs(np.linalg.norm(direction))
-            if length < (self.scene.timestep * dt * self.speed): 
-                increment_direction = direction
-            else: 
-                increment_direction = direction / length * (self.scene.timestep * dt * self.speed)
-            ee_pos += increment_direction
-
-            num_joints = p.getNumJoints(self.id)
-            ee_index = num_joints-1
-            ee_orn = p.getQuaternionFromEuler(o_rot)
-            ll = [-7]*len(self.active_joint_indexes)
-            ul = [7]*len(self.active_joint_indexes)
-            jr = [7]*len(self.active_joint_indexes)
+        end_poses = p.calculateInverseKinematics(self.id, p.getNumJoints(self.id)-1, pick_pos, pick_orn, restPoses=self.reset_joint_poses, maxNumIterations=200)
+        end_poses = list(end_poses)[:len(self.used_joint_indexes)]
+        
+        num = int(1 / s / self.scene.timestep)
+        for n in range(num):
+            poses = []
+            t = n / num
+            for i in range(len(self.current_joint_poses)):
+                poses.append(np.interp(t,[0,1],[self.current_joint_poses[i],end_poses[i]]))
             
-            poses = p.calculateInverseKinematics(self.id, ee_index, ee_pos, ee_orn,
-                                                lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.reset_joint_poses,
-                                                jointDamping=self.joint_damping,maxNumIterations=200)
-            route_poses.append(poses)
+            route_poses.append(poses[:len(self.used_joint_indexes)])
         return route_poses
 
     def signal_pick_plan(self,*args,**kwargs):
@@ -252,29 +240,18 @@ class Robot(ActiveObject):
         ee_index = num_joints-1
 
         def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
+            p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
-            # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
-            # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
-            # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
 
         def task2(*point):
             num_joints = p.getNumJoints(self.id)
             ee_index = num_joints-1
-            ll = [-7]*len(self.active_joint_indexes)
-            ul = [7]*len(self.active_joint_indexes)
-            jr = [7]*len(self.active_joint_indexes)
             
             poses = p.calculateInverseKinematics(self.id, ee_index, point, p.getQuaternionFromEuler([0,0,0]),
-                                                lowerLimits=ll,upperLimits=ul,jointRanges=jr,restPoses=self.self.current_joint_poses,
-                                                jointDamping=self.joint_damping,maxNumIterations=200)
-            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
+                                                restPoses=self.current_joint_poses,jointDamping=self.joint_damping,maxNumIterations=200)[:len(self.used_joint_indexes)]
+            p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
 
-            self.current_joint_poses = poses
+            self.current_joint_poses = list(poses)
             p.addUserDebugPoints([point],[[1,1,1]],2,lifeTime=5)
 
         route_poses,route_points = args
@@ -305,30 +282,33 @@ class Robot(ActiveObject):
             self.result = 'failed', 
             return
 
+        if 'speed' not in kwargs: kwargs['speed'] = 1
+        speed = kwargs['speed']
+
         pick_pos,pick_rot = pick_points[0]
-        route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
+        pick_orn = p.getQuaternionFromEuler(pick_rot)
+        route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot), speed)
+
+        if 'axis' in vars(self):
+            p.removeUserDebugItem(self.axis[0])
+            p.removeUserDebugItem(self.axis[1])
+            p.removeUserDebugItem(self.axis[2])
+        
+        axis_x = Rotation.from_euler('xyz',pick_rot).apply([0.05,0,0]) + pick_pos
+        axis_y = Rotation.from_euler('xyz',pick_rot).apply([0,0.05,0]) + pick_pos
+        axis_z = Rotation.from_euler('xyz',pick_rot).apply([0,0,0.05]) + pick_pos
+        self.axis = [
+            p.addUserDebugLine(pick_pos,axis_x,[1,0,0],2),
+            p.addUserDebugLine(pick_pos,axis_y,[0,1,0],2),
+            p.addUserDebugLine(pick_pos,axis_z,[0,0,1],2)
+        ]
 
         def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
+            p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
-            # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
-            # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
-            # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
 
         for poses in route_poses: self.actions.append((task,poses))
-        
-        def output(last_pos):
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            pos = np.linalg.norm(pos)
-            if round(last_pos - pos,6) != 0.000000:
-                self.actions.append((output,(pos,)))
-                return
-            self.result = None,
-        
+        def output(last_pos): self.result = None,
         self.actions.append((output,(0,)))
         pass
 
@@ -344,34 +324,29 @@ class Robot(ActiveObject):
         ee_rot = p.getEulerFromQuaternion(ee_orn)
         t_pos = ee_pos
         t_rot = ee_rot
+        poses = []
+        
+        def task(poses):
+            p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
+            self.current_joint_poses = poses
+
+        if 'speed' not in kwargs: kwargs['speed'] = 1
+        speed = kwargs['speed']
 
         if 'mode' in kwargs:
             if 'point' == kwargs['mode']:
                 t_pos = kwargs['point'][0:3]
                 t_rot = kwargs['point'][3:6]
-                
-        def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
-            self.current_joint_poses = poses
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
-            # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
-            # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
-            # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
-    
-        route_poses = self.plan((ee_pos,ee_rot),(t_pos,t_rot))
-        for poses in route_poses: self.actions.append((task,(poses)))
-        
-        def output(last_pos):
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            pos = np.linalg.norm(pos)
-            if round(last_pos - pos,6) != 0.000000:
-                self.actions.append((output,(pos,)))
-                return
-
-            self.result = None,
+                route_poses = self.plan((ee_pos,ee_rot),(t_pos,t_rot))
+                for poses in route_poses: self.actions.append((task,(poses,)))
+            else:
+                poses = kwargs['joints'][:len(self.used_joint_indexes)]
+                self.actions.append((task,(poses,)))
+        else:
+            route_poses = self.plan((ee_pos,ee_rot),(t_pos,t_rot),speed)
+            for poses in route_poses: self.actions.append((task,(poses,)))
+            
+        def output(last_pos): self.result = None,
         self.actions.append((output,(0,)))
         pass
     
@@ -388,44 +363,33 @@ class Robot(ActiveObject):
             if 'point' == kwargs['mode']:
                 t_pos = kwargs['point'][0:3] + ee_pos
                 t_rot = kwargs['point'][3:6] + ee_rot
-            
-        def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
+            else:
+                poses = kwargs['joints']
+        
+        if 'speed' not in kwargs: kwargs['speed'] = 1
+        speed = kwargs['speed']
+
+        def task(poses):
+            p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
-            # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0.1)
-            # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0.1)
-            # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0.1)
 
         route_poses = self.plan((ee_pos,ee_rot),(t_pos,t_rot))
-        for poses in route_poses: self.actions.append((task,(poses)))
+        for poses in route_poses: self.actions.append((task,(poses,)))
         
-        def output(last_pos):
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            pos = np.linalg.norm(pos)
-            if round(last_pos - pos,6) != 0.000000:
-                self.actions.append((output,(pos,)))
-                return
-
-            self.result = None,
+        def output(last_pos): self.result = None,
         self.actions.append((output,(0,)))
         pass
     
     def signal_do(self,*args,**kwargs):
-        def task(): self.end_effector_obj.do(kwargs['pickup'])
-        self.actions.append((task,()))
+        self.end_effector_obj.do(kwargs['pickup'])
         pass
 
     def signal_pick(self,*args,**kwargs):
-        def task(): self.end_effector_obj.do(True)
-        self.actions.append((task,()))
+        self.end_effector_obj.do(True)
         pass
+    
     def signal_place(self,*args,**kwargs):
-        def task(): self.end_effector_obj.do(False)
-        self.actions.append((task,()))
+        self.end_effector_obj.do(False)
         pass
     
     def signal_home(self):
@@ -440,26 +404,22 @@ class Robot(ActiveObject):
 
         self.reset_joint_poses
         joint_poses = []
-        for joint in self.active_joint_indexes:
+        for joint in self.used_joint_indexes:
             position,velocity,reaction_force,motor_torque = p.getJointState(self.id,joint)
             joint_poses.append(position)
 
-        def task(*poses):
-            p.setJointMotorControlArray(self.id, self.active_joint_indexes, p.POSITION_CONTROL, poses)
-            # pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            # axis_x = Rotation.from_quat(orn).apply([0.05,0,0]) + pos
-            # axis_y = Rotation.from_quat(orn).apply([0,0.05,0]) + pos
-            # axis_z = Rotation.from_quat(orn).apply([0,0,0.05]) + pos
+        def task(poses):
+            p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
+            self.current_joint_poses = poses
 
-        num = int(1 / self.scene.timestep) 
-        for t in range(num):
+        num = int(1 / self.speed / self.scene.timestep)
+        for n in range(num):
             poses = []
-            t /= num
-            for i in range(len(self.reset_joint_poses)): 
-                pose = (1 - t) * joint_poses[i] + t * self.reset_joint_poses[i]
-                poses.append(pose)
-            self.actions.append((task,(poses)))
-        
+            t = n / num
+            for i in range(len(self.used_joint_indexes)):
+                poses.append(np.interp(t,[0,1],[self.current_joint_poses[i],self.reset_joint_poses[i]]))
+            self.actions.append((task,(poses,)))
+
         def output(): self.result = None,
         self.actions.append((output,()))
         pass

@@ -55,6 +55,8 @@ class Scene:
     if 'user_data' not in self.profile: self.profile['user_data'] = ''
     self.ground_z = self.profile['ground_z']
     self.user_data = self.profile['user_data']
+    
+    p.resetBasePositionAndOrientation(self.plane,[0,0,self.ground_z],p.getQuaternionFromEuler([0,0,0]))
 
     for object_info in self.profile['active_objects']:
       print('add object:',object_info,flush=True)

@@ -13,5 +13,7 @@ def updating():
         scene.update_for_tick(1/180.)
         time.sleep(1/180.)
 
+workflow.start()
+
 t = Thread(target=updating)
 t.start()

@@ -40,55 +40,31 @@ class Vision:
             except BlockingIOError: self.actions.append((task,(buf,)))
             except (ConnectionResetError,BrokenPipeError):
                 for pick_point in pick_points:
-                    pick_point = np.array(eye_to_hand_transform) @ pick_point
+                    pick_point = eye_to_hand_transform @ np.array(pick_point)
                     R = pick_point[:3, :3]
                     T = pick_point[:3, 3]
                     pos = T[0],T[1],T[2]
                     rot = Rotation.from_matrix(R).as_euler('xyz')
                     rot = rot[0],rot[1],rot[2]
                     self.result[1].append((pos,rot))
-                
                 sk.close()
-                print('result',self.result,flush=True)
             except SyntaxError:pass
 
         self.actions.append((task,(buf,)))
 
     def signal_check(self,eye_to_hand_transform,**kwargs):
-        pick_point = np.array([
-            [
-                -0.9887560750387239,
-                0.12562077883053305,
-                0.08112494548381188,
-                -0.4233139448208764
-            ],
-            [
-                -0.11740765221281402,
-                -0.9881244942661896,
-                0.09912473127180772,
-                0.042676409622790214
-            ],
-            [
-                0.09261366620834495,
-                0.08848554733528002,
-                0.9917628892188634,
-                1.4373725607760217
-            ],
-            [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ]])
-
         self.result = None,[]
 
+        pick_points = kwargs['pick_points']
+        if not pick_points: 
+            self.result = 'failed',
+            return
+
+        pick_point = np.array(pick_points.pop(0))
         pick_point = eye_to_hand_transform @ pick_point
-        print(pick_point)
         R = pick_point[:3, :3]
         T = pick_point[:3, 3]
         pos = T[0],T[1],T[2]
         rot = Rotation.from_matrix(R).as_euler('xyz')
         rot = rot[0],rot[1],rot[2]
-        self.result[1].append((pos,rot))    
-        print(self.result)
+        self.result[1].append((pos,rot))

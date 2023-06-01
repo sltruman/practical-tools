@@ -47,7 +47,7 @@ class Stacker(ActiveObject):
             item_width, item_height, item_depth = item.get_dimension()
             item_pos = self.lower_left + [float(item.position[0] + item_width / 2), float(item.position[1] + item_height / 2), float(item.position[2] + item_depth / 2)]
             item_shape = p.createCollisionShape(p.GEOM_BOX, halfExtents=[item_width/2, item_height/2, item_depth/2])
-            item_id = p.createMultiBody(item.weight, item_shape, -1, item_pos, p.getQuaternionFromEuler([0, 0, 0]))            
+            item_id = p.createMultiBody(item.weight, item_shape, -1, item_pos, p.getQuaternionFromEuler([0, 0, 0]))
             self.objs.append(item_id)
 
         for item in self.packer.bins[0].bin_fitted_items:

@@ -21,6 +21,7 @@ class ActiveObject:
         pass
 
     def __del__(self):
+        self.actions.clear()
         if 'id' in vars(self): p.removeBody(self.id)
         pass
  

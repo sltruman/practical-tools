@@ -9,7 +9,7 @@
             "rot":[0,0,0],
             "reset_joint_poses":[1.57,0.0,0,0,0,-1.57],
             "joint_damping":[ 0, 1, 0.9, 0.8, 0.7, 0.0],
-            "end_effector":"./end_effectors/gripper_gp12/gripper_gp12.urdf",
+            "end_effector":"./end_effectors/gripper_gp12-straight/gripper_gp12-straight.urdf",
             "speed":1.0
         },
         {
@@ -18,7 +18,7 @@
             "base":"./cameras/camera3d/camera3d_inv.urdf",
             "pos":[-0.032747,-0.564563,1.1767],
             "rot":[0.0,0.0,-1.57],
-            "sample_num": 200000
+            "sample_num": 50000
         }
     ],
 
