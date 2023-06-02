@@ -31,7 +31,6 @@ class Stacker(ActiveObject):
             item_depth = self.box_size[2] + random.randint(-self.random_factor[2]*100,self.random_factor[2]*100) / 100 * self.box_size[2] 
             item_weight = 0.1
             self.packer.add_item(bp.Item('item'+str(idx), item_width, item_height, item_depth, item_weight))
-        
         self.packer.pack(bigger_first=True)
 
     def update(self, dt):

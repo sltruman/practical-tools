@@ -26,7 +26,7 @@
         "run":"1",
         "declare":{
             "1":{"kind":"Camera3DReal","fun":"check","name":"camera","next":"2"},
-            "2":{"kind":"Vision","fun":"check","name":"PickLight","next":"3","args":{
+            "2":{"kind":"Vision","fun":"check","name":"PickLight","next":"21","args":{
                 "pick_points":[
                     [
                         [
@@ -160,22 +160,27 @@
                     ]
                 ]}
             },
+            "21":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
+                "mode":"joint",
+                "point":[0.0,0.0,0.25,0,0,0],
+                "target":"next"
+            },"next":"3"},
             "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"4"},
             "4":{"kind":"Robot","fun":"pick","name":"robot","next":"5"},
             "5":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
-                    "mode":"point",
+                    "mode":"joint",
                     "point":[0.0,0.0,0.25,0,0,0]
                 },"next":"6"},
             "6":{"kind":"Robot","fun":"move","name":"robot","args":{
-                    "mode":"point",
+                    "mode":"joint",
                     "point":[0,-1,0.15,3.14,0,0]
                 },"next":"7"},
             "7":{"kind":"Robot","fun":"move","name":"robot","args":{
-                    "mode":"point",
+                    "mode":"joint",
                     "point":[0,-1,0.15,3.14,0,0]
                 },"next":"8"},
             "8":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
-                    "mode":"point",
+                    "mode":"joint",
                     "point":[0.0,0.0,-0.25,0,0,0]
                 },"next":"9"},
             "9":{"kind":"Robot","fun":"place","name":"robot","next":"10"},

@@ -10,26 +10,25 @@ class Workflow():
         self.nodes = [
             {'kind':'Robot','names':[],'funs':[
                 {'label':'Motion','f':'pick_move','errs':[],'args':[ #拾取移动
-                    {'name':'mode','kind':'String'}, #模式，关节：joint 点：point
+                    {'name':'mode','kind':'String'}, #模式，关节：joint 线：linear
                     {'name':'speed','kind':'Flaot'}, #速度，0.0 ~ 1.0
                     {'name':'vision_flow','kind':'String'}, #视觉流程
                     {'name':'pickup','kind':'Bool'} #拾取设置
                     ]},
                 {'label':'Motion','f':'move','errs':[],'args':[ #移动
-                    {'name':'mode','kind':'String'}, #模式，关节：joint 点：point
+                    {'name':'mode','kind':'String'}, #模式，关节：joint 线：linear
                     {'name':'speed','kind':'Flaot'}, #速度，值：0.0 ~ 1.0，默认：0.2
-                    {'name':'pickup','kind':'Bool'}, #拾取设置，？？
+                    {'name':'pickup','kind':'Bool'}, #拾取设置
                     {'name':'joints','kind':'List'}, #关节位置，[弧度值1,...弧度值n]
                     {'name':'point','kind':'List'}, #点位置，[x,y,z,rx,ry,rz]
                     {'name':'home','kind':'Bool'}, #回到home
                     ]},
                 {'label':'Motion','f':'move_relatively','errs':[],'args':[ #相对移动
-                    {'name':'mode','kind':'String'}, #模式，关节：joint 点：point
+                    {'name':'mode','kind':'String'}, #模式，关节：joint 线：linear
                     {'name':'speed','kind':'Flaot'}, #速度，值：0.0 ~ 1.0，默认：0.2
-                    {'name':'pickup','kind':'Bool'}, #拾取设置，？？
-                    {'name':'joints','kind':'List'}, #关节位置，[弧度值1,...弧度值n]
-                    {'name':'point','kind':'List'}, #点位置，[x,y,z,rx,ry,rz]
+                    {'name':'pickup','kind':'Bool'}, #拾取设置
                     {'name':'target','kind':'String'}, #相对目标，当前任务：task_current，下一个任务：next，选择的任务：selected，工具坐标系：frame_end_effector，机械臂坐标系：frame_robot，全局坐标系：frame_global
+                    {'name':'point','kind':'List'},  #点位置，[x,y,z,rx,ry,rz]
                     ]},
                 {'label':'EndEffector','f':'pick','errs':[],'args':[]},  #开
                 {'label':'EndEffector','f':'place','errs':[],'args':[]}  #合
