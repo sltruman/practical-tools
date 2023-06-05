@@ -130,7 +130,7 @@ class Robot(ActiveObject):
             p.removeUserDebugItem(self.end_effector_axis[1])
             p.removeUserDebugItem(self.end_effector_axis[2])
 
-        pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        pos,orn,_,_,_,_ = p.getLinkState(self.id,p.getNumJoints(self.id)-1)
         axis_x = Rotation.from_quat(orn).apply(np.array([0.05,0,0])) + pos
         axis_y = Rotation.from_quat(orn).apply(np.array([0,0.05,0])) + pos
         axis_z = Rotation.from_quat(orn).apply(np.array([0,0,0.05])) + pos
