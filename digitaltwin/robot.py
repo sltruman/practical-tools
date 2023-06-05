@@ -182,7 +182,7 @@ class Robot(ActiveObject):
         if mode=='joint':
             end_poses = p.calculateInverseKinematics(self.id, ee_index, target_pos, target_orn, restPoses=self.reset_joint_poses, maxNumIterations=200)
             end_poses = list(end_poses)[:len(self.used_joint_indexes)]
-            num = int(1 / s / self.scene.timestep)
+            num = int(1 / s / self.scene.timestep) + 1
             for n in range(num):
                 poses = []
                 t = n / num
@@ -190,7 +190,7 @@ class Robot(ActiveObject):
                     poses.append(np.interp(t,[0,1],[self.current_joint_poses[i],end_poses[i]]))
                 route_poses.append(poses[:len(self.used_joint_indexes)])
         else:
-            num = int(1 / s / self.scene.timestep)
+            num = int(1 / s / self.scene.timestep) + 1
             for n in range(num):
                 poses = []
                 t = n / num
@@ -214,6 +214,7 @@ class Robot(ActiveObject):
 
                 poses = p.calculateInverseKinematics(self.id, ee_index, pos, orn, restPoses=self.reset_joint_poses, maxNumIterations=200)
                 route_poses.append(list(poses)[:len(self.used_joint_indexes)])
+
         return route_poses
 
     def signal_pick_plan(self,*args,**kwargs):
@@ -353,7 +354,7 @@ class Robot(ActiveObject):
         pass
 
     def signal_move(self,*args,**kwargs):
-        if 'home' in kwargs:
+        if 'home' in kwargs and kwargs['home']:
             self.signal_home()
             return 
         
@@ -512,7 +513,7 @@ class Robot(ActiveObject):
             p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
 
-        num = int(1 / self.speed / self.scene.timestep)
+        num = int(1 / self.speed / self.scene.timestep) + 1
         for n in range(num):
             poses = []
             t = n / num
