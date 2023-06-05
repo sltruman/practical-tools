@@ -12,7 +12,7 @@ class Box(ActiveObject):
 
     def properties(self):
         properties = super().properties()
-        properties.update(kind='Cylinder',radius=self.radius,length=self.length)
+        properties.update(kind='Box',size=self.size,thickness=self.thickness)
         return properties
 
     def set_base(self,base):

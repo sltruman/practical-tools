@@ -77,7 +77,7 @@ class Editor:
         try:
             import digitaltwin
             active_obj = eval(f'digitaltwin.{kind}(self.scene,**object_info)')
-        except :
+        except:
             return {}
         
         self.scene.active_objs[active_obj.id] = active_obj
