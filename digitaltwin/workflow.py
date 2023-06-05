@@ -9,29 +9,39 @@ class Workflow():
         self.running = False
         self.nodes = [
             {'kind':'Robot','names':[],'funs':[
-                {'label':'Motion','f':'pick_move','errs':[],'args':[ #拾取移动
-                    {'name':'mode','kind':'String'}, #模式，关节：joint 线：linear
-                    {'name':'speed','kind':'Flaot'}, #速度，0.0 ~ 1.0
-                    {'name':'vision_flow','kind':'String'}, #视觉流程
-                    {'name':'pickup','kind':'Bool'} #拾取设置
+                {'label':'Motion', #动作
+                 'f':'pick_move','errs':[], #拾取移动
+                 'args':[ #附加参数
+                        {'name':'mode','kind':'String'}, #运动模式，关节：joint 线：linear
+                        {'name':'speed','kind':'Flaot'}, #速度，0.0 ~ 1.0
+                        {'name':'pickup','kind':'Bool'}, #拾取设置
+                        {'name':'vision_flow','kind':'String'} #视觉流程
                     ]},
-                {'label':'Motion','f':'move','errs':[],'args':[ #移动
-                    {'name':'mode','kind':'String'}, #模式，关节：joint 线：linear
+                {'label':'Motion', #动作
+                 'f':'move','errs':[], #移动
+                 'args':[ #附加参数
+                    {'name':'mode','kind':'String'}, #运动模式，关节：joint 线：linear
                     {'name':'speed','kind':'Flaot'}, #速度，值：0.0 ~ 1.0，默认：0.2
                     {'name':'pickup','kind':'Bool'}, #拾取设置
                     {'name':'joints','kind':'List'}, #关节位置，[弧度值1,...弧度值n]
-                    {'name':'point','kind':'List'}, #点位置，[x,y,z,rx,ry,rz]
-                    {'name':'home','kind':'Bool'}, #回到home
+                    {'name':'point','kind':'List'},  #点位置，[x,y,z,rx,ry,rz] #米，弧度
+                    {'name':'home','kind':'Bool'},   #回到休息点，为true，忽略其他参数
                     ]},
-                {'label':'Motion','f':'move_relatively','errs':[],'args':[ #相对移动
-                    {'name':'mode','kind':'String'}, #模式，关节：joint 线：linear
-                    {'name':'speed','kind':'Flaot'}, #速度，值：0.0 ~ 1.0，默认：0.2
-                    {'name':'pickup','kind':'Bool'}, #拾取设置
-                    {'name':'target','kind':'String'}, #相对目标，当前任务：task_current，下一个任务：next，选择的任务：selected，工具坐标系：frame_end_effector，机械臂坐标系：frame_robot，全局坐标系：frame_global
-                    {'name':'point','kind':'List'},  #点位置，[x,y,z,rx,ry,rz]
+                {'label':'Motion', #动作
+                 'f':'move_relatively','errs':[], #相对移动
+                 'args':[ #附加参数
+                        {'name':'mode','kind':'String'}, #模式，关节：joint 线：linear
+                        {'name':'speed','kind':'Flaot'}, #速度，值：0.0 ~ 1.0，默认：0.2
+                        {'name':'pickup','kind':'Bool'}, #拾取设置
+                        {'name':'target','kind':'String'}, #相对目标，当前任务：task_current，下一个任务：task_next，选择的任务：selected，工具坐标系：frame_end_effector，机械臂坐标系：frame_robot，全局坐标系：frame_global
+                        {'name':'point','kind':'List'},  #点位置，[x,y,z,rx,ry,rz] #米，弧度
                     ]},
-                {'label':'EndEffector','f':'pick','errs':[],'args':[]},  #开
-                {'label':'EndEffector','f':'place','errs':[],'args':[]}  #合
+                {'label':'EndEffector',
+                 'f':'pick','errs':[], #开
+                 'args':[]}, 
+                {'label':'EndEffector',
+                 'f':'place','errs':[], #合
+                 'args':[]} 
                 ]},
             {'kind':'Camera3DReal','names':[],'funs':[  #相机
                 {'label':'Vision','f':'capture','errs':["failed"],'args':[ #拍照
@@ -94,7 +104,7 @@ class Workflow():
                 if not last_obj.idle():
                     self.scene.actions.append((task,(last,)))
                     return
-                
+
                 res = last_obj.result
                 err,val = res[0],res[1:]
                 if 'next' in act and not err:
@@ -108,6 +118,7 @@ class Workflow():
                 next = wf["run"]
 
             if not next: 
+                if err: print('error',err,flush=True)
                 print('Workflow finished.',flush=True)
                 return
 
@@ -117,12 +128,21 @@ class Workflow():
                 fun = act['fun']
                 args = act['args'] if 'args' in act else {}
                 obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
-                
-                print('error', err,flush=True)
-                print('signal',fun,flush=True)
+
+                print('err',err,flush=True)
+                print('sig',fun,flush=True)
                 print('val',val,flush=True)
                 print('args',args,flush=True)
+
+                args['declare'] = declare
+                args['cursor'] = next
+                args['plugins'] = self.active_plugins_by_name
+
                 eval(f'obj.signal_{fun}(*val,**args)')
+                
+                del args['declare']
+                del args['cursor']
+                del args['plugins']
             except:
                 print(traceback.format_exc(),flush=True)
                 print('Workflow stopped!',flush=True)

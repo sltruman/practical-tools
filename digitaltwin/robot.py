@@ -301,12 +301,23 @@ class Robot(ActiveObject):
 
     def signal_pick_move(self,*args,**kwargs):
         if not args: 
-            self.result = 'failed', 
-            return
+            active_plugins = kwargs['plugins']
+            picklight = active_plugins['PickLight']
+            _,pickpose = picklight.result
+            args = pickpose,
+        
+        num_joints = p.getNumJoints(self.id)
+        ee_index = num_joints-1
+        ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
+        ee_pos = np.array(ee_pos)
+        ee_rot = p.getEulerFromQuaternion(ee_orn)
 
         if 'speed' not in kwargs: kwargs['speed'] = 1
         speed = kwargs['speed']
-        if speed == 0: self.result = 'failed', 
+        if speed == 0: 
+            if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
+            self.result = None,[ee_pos[0],ee_pos[1],ee_pos[2],ee_rot[0],ee_rot[1],ee_rot[2]]
+            return
 
         if 'mode' not in kwargs: kwargs['mode'] = 'joint'
         mode = kwargs['mode']
@@ -335,7 +346,9 @@ class Robot(ActiveObject):
             self.current_joint_poses = poses
 
         for poses in route_poses: self.actions.append((task,poses))
-        def output(last_pos): self.result = None,
+        def output(last_pos): 
+            if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
+            self.result = None,
         self.actions.append((output,(0,)))
         pass
 
@@ -349,6 +362,14 @@ class Robot(ActiveObject):
         ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
         ee_pos = np.array(ee_pos)
         ee_rot = p.getEulerFromQuaternion(ee_orn)
+
+        if 'speed' not in kwargs: kwargs['speed'] = 1
+        speed = kwargs['speed']
+        if speed == 0: 
+            if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
+            self.result = None,[ee_pos[0],ee_pos[1],ee_pos[2],ee_rot[0],ee_rot[1],ee_rot[2]]
+            return
+
         t_pos = ee_pos
         t_rot = ee_rot
         poses = []
@@ -356,10 +377,6 @@ class Robot(ActiveObject):
         def task(poses):
             p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
             self.current_joint_poses = poses
-
-        if 'speed' not in kwargs: kwargs['speed'] = 1
-        speed = kwargs['speed']
-        if speed == 0: self.result = 'failed', 
         
         if 'mode' not in kwargs: kwargs['mode'] = 'joint'
         mode = kwargs['mode']
@@ -370,7 +387,7 @@ class Robot(ActiveObject):
             route_poses = self.plan(t_pos,t_rot,speed,mode)
             for poses in route_poses: self.actions.append((task,(poses,)))
         else:
-            end_poses = kwargs['joints'][:len(self.used_joint_indexes)]
+            end_poses = kwargs['joints'][:len(self.current_joint_poses)]
             num = int(1 / speed / self.scene.timestep)
             route_poses = []
             for n in range(num):
@@ -380,9 +397,11 @@ class Robot(ActiveObject):
                     poses.append(np.interp(t,[0,1],[self.current_joint_poses[i],end_poses[i]]))
                 self.actions.append((task,(poses,)))
             
-        def output(last_pos): self.result = None,
+        def output(last_pos): 
+            if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
+            self.result = None,
         self.actions.append((output,(0,)))
-        pass
+        pass    
     
     def signal_move_relatively(self,*args,**kwargs):
         num_joints = p.getNumJoints(self.id)
@@ -390,20 +409,52 @@ class Robot(ActiveObject):
         ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
         ee_rot = p.getEulerFromQuaternion(ee_orn)
 
-        if 'target' not in kwargs: kwargs['target'] = 'current'
-        target = kwargs['target']
-        if target == 'next':
-            print('next',args)
+        if args: 
             pick_point = args[0]
-            if not pick_point: 
+            ee_pos = pick_point[0:3]
+            ee_rot = pick_point[3:6]
+            ee_orn = p.getQuaternionFromEuler(ee_rot)
+
+        if 'target' not in kwargs: kwargs['target'] = 'task_current'
+        target = kwargs['target']
+
+        if target == 'task_next':
+            declare = kwargs['declare']
+            cursor = kwargs['cursor']
+            active_plugins = kwargs['plugins']
+
+            act = declare[cursor]
+            next = act['next']
+            act_next = declare[next]
+
+            if act_next['fun'] == 'move_relatively':
                 self.result = 'failed', 
                 return
-            
-            ee_pos,ee_rot = pick_point[0:3],pick_point[3:6]
+            elif act_next['fun'] == 'move':
+                move_args = act_next['args']
+                if 'point' not in move_args:
+                    self.result = 'non-suports relative to move of mode of joint!',
+                    return
+                
+                pick_point = move_args['point']
+            elif act_next['fun'] == 'pick_move':
+                picklight = active_plugins['PickLight']
+                _,pick_point = picklight.result
+
+                if not pick_point: 
+                    self.result = 'failed', 
+                    return
+                
+            ee_pos = pick_point[0:3]
+            ee_rot = pick_point[3:6]
+            ee_orn = p.getQuaternionFromEuler(ee_rot)
 
         if 'speed' not in kwargs: kwargs['speed'] = 1
         speed = kwargs['speed']
-        if speed == 0: self.result = 'failed', 
+        if speed == 0: 
+            if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
+            self.result = None,[ee_pos[0],ee_pos[1],ee_pos[2],ee_rot[0],ee_rot[1],ee_rot[2]]
+            return
 
         if 'mode' not in kwargs: kwargs['mode'] = 'joint'
         mode = kwargs['mode']
@@ -423,7 +474,9 @@ class Robot(ActiveObject):
 
         for poses in route_poses: self.actions.append((task,(poses,)))
         
-        def output(last_pos): self.result = None,[ee_pos[0],ee_pos[1],ee_pos[2],ee_rot[0],ee_rot[1],ee_rot[2]]
+        def output(last_pos): 
+            if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
+            self.result = None,[ee_pos[0],ee_pos[1],ee_pos[2],ee_rot[0],ee_rot[1],ee_rot[2]]
         self.actions.append((output,(0,)))
         pass
     

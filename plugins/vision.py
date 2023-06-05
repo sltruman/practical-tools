@@ -40,7 +40,7 @@ class Vision:
             except (ConnectionResetError,BrokenPipeError):
                 print('pick points', pick_points,flush=True)
                 pick_point = np.array(pick_points[0]['mat'])
-                pick_point = eye_to_hand_transform @ pick_point['mat']
+                pick_point = eye_to_hand_transform @ pick_point
                 R = pick_point[:3, :3]
                 T = pick_point[:3, 3]
                 pos = T[0],T[1],T[2]
