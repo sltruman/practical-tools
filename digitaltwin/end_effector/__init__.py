@@ -1,2 +1,2 @@
-from .suction import Suction
-from .gripper import Gripper
+from digitaltwin.end_effector.suction import Suction
+from digitaltwin.end_effector.gripper import Gripper

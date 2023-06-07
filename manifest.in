@@ -1,0 +1,10 @@
+recursive-include digitaltwin_data/cameras *.*
+recursive-include digitaltwin_data/containers *.*
+recursive-include digitaltwin_data/end_effectors *.*
+recursive-include digitaltwin_data/engines *.*
+recursive-include digitaltwin_data/objects *.*
+recursive-include digitaltwin_data/pybullet_objects *.*
+recursive-include digitaltwin_data/robots *.*
+recursive-include digitaltwin_data/scenes *.*
+recursive-include digitaltwin_data/workpiece_textures *.*
+recursive-include digitaltwin_data/workpieces *.*

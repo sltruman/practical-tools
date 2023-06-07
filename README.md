@@ -6,13 +6,15 @@
 
 # 1 概述
 
-        本文的目标在于梳理并定义前端业务接口规范，用于避免SDK开发者在不完全了解前端业务的情况下开发出不兼容的接口。 此外，附带一套简易的工作流测试框架。
+        一套简易的机械臂仿真工作流测试框架。
 
 ## 1.1 安装
 
-下载源代码：`pip3 install pysimflow`
+`pip3 install pysimflow`
 
-## 1.2 快速开始
+### 1.2 示例工作流
+
+源代码：
 
 获取一堆工件的深度图：`python3 test.py`
 
@@ -28,62 +30,47 @@
 
 # 2 工作计划
 
-| 目标                | 任务                    | 问题                             | 备注                          |
-| ----------------- | --------------------- | ------------------------------ | --------------------------- |
-| 接口定义              | 场景查看                  | 载入/重置                          |                             |
-|                   |                       | 获取物体标识                         |                             |
-|                   |                       | 获取场景画面                         |                             |
-|                   |                       | 暂停/继续仿真                        |                             |
-|                   |                       | 平移/旋转/缩放/焦点                    |                             |
-|                   |                       | 视图切换-前后左右                      |                             |
-|                   |                       | 绘制原点/碰撞点                       | 实现较为复杂                      |
-|                   |                       | 关闭场景                           |                             |
-|                   | 场景编辑                  | 坐标检测                           |                             |
-|                   |                       | 选择/添加/删除/保存                    |                             |
-|                   |                       | 透明化                            |                             |
-|                   |                       | 移动/旋转/缩放                       |                             |
-|                   | 物体                    | 位置/姿态                          |                             |
-|                   |                       | 标识                             |                             |
-|                   |                       | 模型更换                           |                             |
-|                   |                       | 纹理更换                           |                             |
-|                   | 物体.机械臂                | 获取/设置末端执行器                     |                             |
-|                   |                       | 获取/设置末端执行器-位置/姿态               |                             |
-|                   |                       | 设置末端执行器数字输出                    |                             |
-|                   |                       | 获取/设置关节位置                      |                             |
-|                   |                       | 获取/设置速度                        |                             |
-|                   |                       | 设置当前位置为休息点                     |                             |
-|                   |                       | 前往休息点                          |                             |
-|                   | 物体.相机                 | 获取相机画面                         |                             |
-|                   |                       | 获取/设置标定参数                      |                             |
-|                   |                       | 设置/清除点云                        |                             |
-|                   | 物体.码垛器                | 区域参数                           |                             |
-|                   |                       | 工件更换                           |                             |
-|                   | 物体.放置器                | 区域参数                           |                             |
-|                   |                       | 获取/设置工件                        |                             |
-|                   |                       | 获取/设置工件纹理                      |                             |
-|                   |                       | 获取/设置放置点                       |                             |
-|                   |                       | 获取/设置总计工件数                     |                             |
-|                   |                       | 获取/设置缩放因子                      |                             |
-|                   |                       | 获取/设置放置模式                      |                             |
-|                   | 工作流                   | 获取可用节点                         |                             |
-|                   |                       | 设置/获取                          |                             |
-|                   |                       | 启动/停止                          | 结束后崩溃                       |
-|                   | ..................... | .............................. |                             |
-| SimEngine<br/>陈君辉 | 验收要求                  | 载入物体的示例                        | 可以调节位置和姿态，并且与地面发生物理交互，如碰撞   |
-|                   |                       | 获取RGBD图的示例                     | 显示RGB图，深度图展现为灰度图的形式         |
-|                   |                       | 获取物体姿态的示例                      | 通过射线检测物体的存在，然后把该物体的姿态轴画出来即可 |
-|                   |                       | 吸盘吸附物体的示例                      | 对力的控制功能                     |
-|                   |                       | 夹爪拾取物体的示例                      | 对摩擦的控制功能                    |
-|                   |                       | 控制一个关节的运动，使另一个关节进行同步运动         | 对关节同步的控制功能                  |
-|                   | ..................... |                                |                             |
-| DexSim<br/>李瑶     | 验收要求                  | 一堆工件生成的示例                      |                             |
-|                   |                       | 一堆工件的深度图示例                     |                             |
-|                   |                       | 一堆工件的姿态示例                      |                             |
-|                   |                       | 控制机械臂+吸盘去拾取工件                  |                             |
-|                   |                       | 控制机械臂+夹爪去拾取工件                  |                             |
-|                   |                       |                                |                             |
+| 目标     | 任务     | 问题               | 备注  |
+| ------ | ------ | ---------------- | --- |
+| 前端接口实现 | 场景查看   | 载入/重置            |     |
+|        |        | 获取物体标识           |     |
+|        |        | 获取场景画面           |     |
+|        |        | 暂停/继续仿真          |     |
+|        |        | 平移/旋转/缩放/焦点      |     |
+|        |        | 视图切换-前后左右        |     |
+|        |        | 绘制原点/碰撞点         |     |
+|        |        | 关闭场景             |     |
+|        | 场景编辑   | 坐标检测             |     |
+|        |        | 选择/添加/删除/保存      |     |
+|        |        | 透明化              |     |
+|        |        | 移动/旋转/缩放         |     |
+|        | 物体     | 位置/姿态            |     |
+|        |        | 标识               |     |
+|        |        | 模型更换             |     |
+|        |        | 纹理更换             |     |
+|        | 物体.机械臂 | 获取/设置末端执行器       |     |
+|        |        | 获取/设置末端执行器-位置/姿态 |     |
+|        |        | 设置末端执行器数字输出      |     |
+|        |        | 获取/设置关节位置        |     |
+|        |        | 获取/设置速度          |     |
+|        |        | 设置/前往休息点         |     |
+|        | 物体.相机  | 获取相机画面           |     |
+|        |        | 获取/设置标定参数        |     |
+|        |        | 设置/清除点云          |     |
+|        | 物体.码垛器 | 区域参数             |     |
+|        |        | 工件更换             |     |
+|        | 物体.放置器 | 区域参数             |     |
+|        |        | 获取/设置工件          |     |
+|        |        | 获取/设置工件纹理        |     |
+|        |        | 获取/设置放置点         |     |
+|        |        | 获取/设置总计工件数       |     |
+|        |        | 获取/设置缩放因子        |     |
+|        |        | 获取/设置放置模式        |     |
+|        | 工作流    | 获取可用节点           |     |
+|        |        | 设置/获取            |     |
+|        |        | 启动/停止            |     |
 
-# 3 业务流程
+# 3 功能接口
 
 ## 3.1 场景-载入场景并获取画面
 
@@ -149,6 +136,33 @@ sequenceDiagram
     ui->ui: 将纹理绘制到窗口上
 ```
 
+### Python
+
+```python
+import os
+from digitaltwin import Scene
+import digitaltwin_data
+
+data_dir = digitaltwin_data.get_data_path()
+scene = Scene(1024,768,data_dir)
+scene.load(os.path.join(data_dir,'scenes/空.json'))
+
+rgba = scene.rtt()
+```
+
+### C++
+
+```cpp
+#include "digitaltwin.hpp"
+using namespace digitaltwin; 
+
+auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
+scene->load("./digitaltwin_data/scenes/空.json"); 
+
+Texture texture;
+scene->rtt(texture); 
+```
+
 ## 3.2 场景-启动/停止
 
         当场景布置完毕后，执行启动即可持续进行物理运算。停止则暂停物理运算。
@@ -162,6 +176,47 @@ sequenceDiagram
     note left of bullet: 相关函数：stepSimulation
     ui->>scene: 停止()
     scene->scene: 停止场景更新的任务
+```
+
+### Python
+
+```python
+from threading import Thread
+from digitaltwin import Scene,Workflow,Editor
+import digitaltwin_data
+import os
+
+data_dir = digitaltwin_data.get_data_path()
+scene = Scene(1024,768,data_dir)
+scene.load(os.path.join(data_dir,'scenes/空.json'))
+
+playing = True
+
+def updating():
+    import time
+    while playing:
+        scene.update_for_tick(1/180.)
+        time.sleep(1/180.)
+
+t = Thread(target=updating)
+t.start()
+playing = False
+```
+
+### C++
+
+```cpp
+#include "digitaltwin.hpp"
+using namespace digitaltwin; 
+
+auto scene = make_shared<Scene>(1024,768,"./digitaltwin","./digitaltwin_data");
+scene->load("./digitaltwin_data/scenes/空.json"); 
+
+scene->play(false);
+
+//做些什么...
+
+scene->play();
 ```
 
 ## 3.3 场景-视口控制
@@ -184,6 +239,46 @@ sequenceDiagram
     scene->scene: 计算相机位置相对于焦点位置的距离
     scene->bullet: 重新设置相机的位置
     note left of bullet: 相关函数：resetDebugVisualizerCamera
+```
+
+### Python
+
+```python
+from threading import Thread
+from digitaltwin import Scene,Workflow,Editor
+import digitaltwin_data
+import os
+import time
+
+data_dir = digitaltwin_data.get_data_path()
+scene = Scene(1024,768,data_dir)
+scene.load(os.path.join(data_dir,'scenes/空.json'))
+
+def updating():
+    import time
+    while True:
+        scene.update_for_tick(1/180.)
+        time.sleep(1/180.)
+
+t = Thread(target=updating)
+t.start()
+
+while True:
+    time.sleep(0.1)
+    scene.rotate(0.001,0)
+```
+
+### C++
+
+```cpp
+#include "digitaltwin.hpp"
+using namespace digitaltwin; 
+
+auto scene = make_shared<Scene>(1024,768,"./digitaltwin","./digitaltwin_data");
+scene->load("./digitaltwin_data/scenes/空.json"); 
+
+scene->rotate(0.1,0.0); 
+scene->pan(0.1,0.0);
 ```
 
 ## 3.4 场景-获取选中物体的信息
@@ -221,9 +316,111 @@ sequenceDiagram
     ui->ui: 显示物体属性
 ```
 
+### Python
+
+```python
+from threading import Thread
+from digitaltwin import Scene,Workflow,Editor
+import digitaltwin_data
+import os
+import time
+
+data_dir = digitaltwin_data.get_data_path()
+scene = Scene(1024,768,data_dir)
+editor = Editor(scene)
+scene.load(os.path.join(data_dir,'scenes/标定测试.json'))
+
+def updating():
+    import time
+    while True:
+        scene.update_for_tick(1/180.)
+        time.sleep(1/180.)
+
+t = Thread(target=updating)
+t.start()
+
+obj = editor.ray(0.5,0.5)
+print(obj)
+
+robot = scene.active_objs_by_name[obj['name']]
+print(robot.properties())
+```
+
+### C++
+
+```cpp
+#include "digitaltwin.hpp"
+using namespace digitaltwin; 
+
+auto scene = make_shared<Scene>(1024,768,"./digitaltwin","./digitaltwin_data");
+auto editor = make_shared<Editor>(scene.get());
+scene->load("./digitaltwin_data/scenes/标定测试.json"); 
+
+RayInfo hit;
+editor->ray(0.5,0.5,hit);
+
+auto objs = scene->get_active_objs();
+auto obj = objs[hit.name];
+cout << obj.get_name() << endl;
+
+
+```
+
 ## 3.5 场景-保存
 
-        当对场景进行了编辑之后，调用此函数来进行保存。
+        当对场景的物体进行修改之后，调用此函数来进行保存。
+
+### Python
+
+```python
+from threading import Thread
+from digitaltwin import Scene,Workflow,Editor
+import digitaltwin_data
+import os
+import time
+
+data_dir = digitaltwin_data.get_data_path()
+scene = Scene(1024,768,data_dir)
+editor = Editor(scene)
+scene.load(os.path.join(data_dir,'scenes/标定测试.json'))
+
+def updating():
+    import time
+    while True:
+        scene.update_for_tick(1/180.)
+        time.sleep(1/180.)
+
+t = Thread(target=updating)
+t.start()
+
+plane = scene.active_objs_by_name['plane']
+
+plane.set_pos([0,0,1])
+scene.save()
+```
+
+### C++
+
+```cpp
+#include "digitaltwin.hpp"
+using namespace digitaltwin; 
+
+auto scene = make_shared<Scene>(1024,768,"./digitaltwin","./digitaltwin_data");
+auto editor = make_shared<Editor>(scene.get());
+scene->load("./digitaltwin_data/scenes/标定测试.json"); 
+
+RayInfo hit;
+editor->ray(0.5,0.5,hit);
+
+auto objs = scene->get_active_objs();
+auto obj = objs[hit.name];
+obj.set_pos({0,0,1});
+scene.save();
+
+
+```
+
+
 
 ## 3.5 物体-更换模型
 
@@ -243,9 +440,27 @@ sequenceDiagram
     note left of bullet: 相关函数：loadURDF
 ```
 
+### Python
+
+```python
+
+```
+
+### C++
+
+```cpp
+#include "digitaltwin.hpp"
+using namespace digitaltwin; 
+
+auto scene = make_shared<Scene>(1024,768,"./digitaltwin","./digitaltwin_data");
+auto editor = make_shared<Editor>(scene.get());
+scene->load("./digitaltwin_data/scenes/标定测试.json"); 
+
+```
+
 ## 3.6 物体.机器人-更换抓手
 
-        用户在为不同工件采用不同的机器人抓手。
+        用户为不同工件采用不同的机器人抓手。
 
 ```mermaid
 sequenceDiagram
@@ -261,6 +476,38 @@ sequenceDiagram
     note left of bullet: 相关函数：loadURDF
     obj->bullet: 创建关节约束，关联抓手到机器人末端
     note left of bullet: 相关函数：createConstraint
+```
+
+### Python
+
+```python
+from threading import Thread
+from digitaltwin import Scene,Workflow,Editor
+import digitaltwin_data
+import os
+
+data_dir = digitaltwin_data.get_data_path()
+scene = Scene(1024,768,data_dir)
+editor = Editor(scene)
+scene.load(os.path.join(data_dir,'scenes/标定测试.json'))
+
+def updating():
+    import time
+    while True:
+        scene.update_for_tick(1/180.)
+        time.sleep(1/180.)
+
+t = Thread(target=updating)
+t.start()
+
+robot = scene.active_objs_by_name['robot']
+robot.set_end_effector('end_effectors/gripper_ur5/gripper_ur5.urdf')
+```
+
+### C++
+
+```cpp
+
 ```
 
 ## 3.7 物体.相机-捕获画面
@@ -669,3 +916,7 @@ workflow.get_active_obj_nodes()\n
 ## 3.13 工作流-启动/停止
 
         让整个场景工作起来，调用启动函数。需要突然终止则调用停止函数。
+
+## 3.14 工作流-移动节点
+
+3.1
