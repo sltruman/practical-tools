@@ -5,6 +5,7 @@ import py3dbp as bp
 import random
 import os
 from digitaltwin.active_obj import ActiveObject
+import time 
 
 class Placer(ActiveObject):
     def __init__(self,scene,**kwargs):
@@ -55,6 +56,13 @@ class Placer(ActiveObject):
 
     def set_interval(self,seconds):
         self.interval = seconds
+
+    def generate(self,*args,**kwargs):
+        def task():
+            rot = np.array([random.randint(0,314),random.randint(0,314),random.randint(0,314)]) / 100.
+            self.objs.append(p.loadURDF(os.path.join(self.scene.data_dir,self.workpiece),self.center,p.getQuaternionFromEuler(rot)))
+        for i in range(self.amount): self.actions.append((task, ()))
+        while not self.idle(): time.sleep(1/180)
 
     def signal_generate(self,*args,**kwargs):
         def task():
