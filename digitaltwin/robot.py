@@ -247,8 +247,7 @@ class Robot(ActiveObject):
             points.append(point)
             
         for i in range(len(points)-2):
-            p.addUserDebugLine(points[i][0:3],points[i+1][0:3],[0,1,0],1,lifeTime=0)
-            
+            self.actions.append((lambda i: p.addUserDebugLine(points[i][0:3],points[i+1][0:3],[0,1,0],1,lifeTime=0),(i,)))
         return route_poses
 
     def signal_pick_plan(self,*args,**kwargs):
