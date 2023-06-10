@@ -125,19 +125,22 @@ class Robot(ActiveObject):
 
         self.set_joints(self.reset_joint_poses)
         
-        if 'end_effector_axis' in vars(self):
-            p.removeUserDebugItem(self.end_effector_axis[0])
-            p.removeUserDebugItem(self.end_effector_axis[1])
-            p.removeUserDebugItem(self.end_effector_axis[2])
+        if 'lines' in vars(self):
+            for line in self.lines:
+                p.removeUserDebugItem(line)
+
+        self.lines = list()
 
         pos,orn,_,_,_,_ = p.getLinkState(self.id,p.getNumJoints(self.id)-1)
         axis_x = Rotation.from_quat(orn).apply(np.array([0.05,0,0])) + pos
         axis_y = Rotation.from_quat(orn).apply(np.array([0,0.05,0])) + pos
         axis_z = Rotation.from_quat(orn).apply(np.array([0,0,0.05])) + pos
-        self.end_effector_axis = p.addUserDebugLine(pos,axis_x,[1,0,0],2),p.addUserDebugLine(pos,axis_y,[0,1,0],2),p.addUserDebugLine(pos,axis_z,[0,0,1],2)
+        self.lines.extend([p.addUserDebugLine(pos,axis_x,[1,0,0],2),
+                          p.addUserDebugLine(pos,axis_y,[0,1,0],2),
+                          p.addUserDebugLine(pos,axis_z,[0,0,1],2)])
 
         self.home_pos,self.home_rot = pos,p.getEulerFromQuaternion(orn)
-    
+
     def set_speed(self,value):
         if round(value) == 0.000: return 
         self.speed = value
@@ -167,6 +170,29 @@ class Robot(ActiveObject):
         if 'id' not in vars(self): return
         self.end_effector = base
         self.set_base(self.base)
+
+    def end_pose_from_joint_poses(self,joint_poses):
+        pos = np.array([0,0,0])
+        rot = np.array([0,0,0])
+        i = p.getNumJoints(self.id)-1
+        
+        while i > -1:
+            _,_,l_pos,l_orn,_,_,_,_ = p.getLinkState(self.id,i,True)
+            pos = pos + l_pos
+            rot = (Rotation.from_quat(l_orn) * Rotation.from_euler('xyz',rot)).as_euler('xyz')
+            _,_,_,_,_,_,_,_,_,_,_,_,_,j_axis,j_pos,j_orn,parent_link_index = p.getJointInfo(self.id, i)
+            R = Rotation.from_quat(j_orn)
+            if i in self.used_joint_indexes:
+                R = R * Rotation.from_rotvec(np.array(j_axis) * joint_poses[self.used_joint_indexes.index(i)])
+
+            pos = R.apply(pos) + j_pos
+            rot = (R * Rotation.from_euler('xyz',rot)).as_euler('xyz')
+            i = parent_link_index
+            
+        pos = Rotation.from_euler('xyz',self.rot).apply(pos) + self.pos
+        rot = (Rotation.from_euler('xyz',self.rot) * Rotation.from_euler('xyz',rot)).as_euler('xyz')
+
+        return [pos[0],pos[1],pos[2],rot[0],rot[1],rot[2]]
         
     def plan(self,target_pos,target_rot,s=1,mode='joint'):
         target_orn = p.getQuaternionFromEuler(target_rot)
@@ -214,7 +240,15 @@ class Robot(ActiveObject):
 
                 poses = p.calculateInverseKinematics(self.id, ee_index, pos, orn, restPoses=self.reset_joint_poses, maxNumIterations=200)
                 route_poses.append(list(poses)[:len(self.used_joint_indexes)])
-
+        
+        points = []
+        for poses in route_poses:
+            point = self.end_pose_from_joint_poses(poses)
+            points.append(point)
+            
+        for i in range(len(points)-2):
+            p.addUserDebugLine(points[i][0:3],points[i+1][0:3],[0,1,0],1,lifeTime=0)
+            
         return route_poses
 
     def signal_pick_plan(self,*args,**kwargs):
@@ -327,20 +361,14 @@ class Robot(ActiveObject):
         pick_pos,pick_rot = pick_pose[0:3],pick_pose[3:6]
         pick_orn = p.getQuaternionFromEuler(pick_rot)
         route_poses = self.plan( pick_pos, pick_rot, speed, mode)
-
-        if 'axis' in vars(self):
-            p.removeUserDebugItem(self.axis[0])
-            p.removeUserDebugItem(self.axis[1])
-            p.removeUserDebugItem(self.axis[2])
         
         axis_x = Rotation.from_euler('xyz',pick_rot).apply([0.05,0,0]) + pick_pos
         axis_y = Rotation.from_euler('xyz',pick_rot).apply([0,0.05,0]) + pick_pos
         axis_z = Rotation.from_euler('xyz',pick_rot).apply([0,0,0.05]) + pick_pos
-        self.axis = [
-            p.addUserDebugLine(pick_pos,axis_x,[1,0,0],2),
-            p.addUserDebugLine(pick_pos,axis_y,[0,1,0],2),
-            p.addUserDebugLine(pick_pos,axis_z,[0,0,1],2)
-        ]
+        
+        self.lines.extend([p.addUserDebugLine(pick_pos,axis_x,[1,0,0],2),
+                           p.addUserDebugLine(pick_pos,axis_y,[0,1,0],2),
+                           p.addUserDebugLine(pick_pos,axis_z,[0,0,1],2)])
 
         def task(*poses):
             p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
@@ -429,25 +457,30 @@ class Robot(ActiveObject):
             act_next = declare[next]
 
             if act_next['fun'] == 'move_relatively':
-                self.result = 'failed', 
+                self.result = 'link error.', 
                 return
             elif act_next['fun'] == 'move':
                 move_args = act_next['args']
-                if 'point' not in move_args:
-                    self.result = 'non-suports relative to move of mode of joint!',
+                if 'point' in move_args:
+                    pick_pose = move_args['point']
+                elif 'joints' in move_args:
+                    joints = move_args['joints']
+                    n = len(self.used_joint_indexes) - len(joints)
+                    if n > 0: joints.extend([0] * n)
+                    pick_pose = self.end_pose_from_joint_poses(joints)
+                else:
+                    self.result = 'parameters error.', 
                     return
-                
-                pick_point = move_args['point']
             elif act_next['fun'] == 'pick_move':
                 picklight = active_plugins['PickLight']
-                _,pick_point = picklight.result
+                _,pick_pose = picklight.result
 
-                if not pick_point: 
+                if not pick_pose: 
                     self.result = 'failed', 
                     return
-                
-            ee_pos = pick_point[0:3]
-            ee_rot = pick_point[3:6]
+            
+            ee_pos = pick_pose[0:3]
+            ee_rot = pick_pose[3:6]
             ee_orn = p.getQuaternionFromEuler(ee_rot)
 
         if 'speed' not in kwargs: kwargs['speed'] = 1
@@ -494,6 +527,12 @@ class Robot(ActiveObject):
         pass
     
     def signal_home(self):
+        if 'lines' in vars(self):
+            for line in self.lines:
+                p.removeUserDebugItem(line)
+        
+        self.lines = list()
+
         num_joints = p.getNumJoints(self.id)
         ee_index = num_joints-1
         ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
