@@ -104,7 +104,7 @@ class Robot(ActiveObject):
                 def get_properties(self): return dict(king='EndEffector')
             self.end_effector_obj = EndEffector()
             pass
-
+        
         self.used_joint_indexes = []
         self.active_joint_indexes = []
         self.joint_velocities = []
@@ -208,7 +208,7 @@ class Robot(ActiveObject):
         if mode=='joint':
             end_poses = p.calculateInverseKinematics(self.id, ee_index, target_pos, target_orn, restPoses=self.reset_joint_poses, maxNumIterations=200)
             end_poses = list(end_poses)[:len(self.used_joint_indexes)]
-            num = int(1 / s / self.scene.timestep) + 1
+            num = round(1 / self.scene.timestep)
             for n in range(num):
                 poses = []
                 t = n / num
@@ -216,7 +216,7 @@ class Robot(ActiveObject):
                     poses.append(np.interp(t,[0,1],[self.current_joint_poses[i],end_poses[i]]))
                 route_poses.append(poses[:len(self.used_joint_indexes)])
         else:
-            num = int(1 / s / self.scene.timestep) + 1
+            num = round(1 / self.scene.timestep)
             for n in range(num):
                 poses = []
                 t = n / num
@@ -245,9 +245,12 @@ class Robot(ActiveObject):
         for poses in route_poses:
             point = self.end_pose_from_joint_poses(poses)
             points.append(point)
+
+        def task(i):
+            self.lines.append(p.addUserDebugLine(points[i][0:3],points[i+1][0:3],[0,1,0],1,lifeTime=0))
             
-        for i in range(len(points)-2):
-            self.actions.append((lambda i: p.addUserDebugLine(points[i][0:3],points[i+1][0:3],[0,1,0],1,lifeTime=0),(i,)))
+        for i in range(len(points)-1):
+            self.actions.append((task,(i,)))
         return route_poses
 
     def signal_pick_plan(self,*args,**kwargs):
@@ -298,41 +301,6 @@ class Robot(ActiveObject):
         def output(): self.result = None,route_poses,None
         self.actions.append((output,()))
 
-    def signal_plan_move(self,*args,**kwargs):
-        num_joints = p.getNumJoints(self.id)
-        ee_index = num_joints-1
-
-        def task(*poses):
-            p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
-            self.current_joint_poses = poses
-
-        def task2(*point):
-            num_joints = p.getNumJoints(self.id)
-            ee_index = num_joints-1
-            
-            poses = p.calculateInverseKinematics(self.id, ee_index, point, p.getQuaternionFromEuler([0,0,0]),
-                                                restPoses=self.current_joint_poses,jointDamping=self.joint_damping,maxNumIterations=200)[:len(self.used_joint_indexes)]
-            p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
-
-            self.current_joint_poses = list(poses)
-            p.addUserDebugPoints([point],[[1,1,1]],2,lifeTime=5)
-
-        route_poses,route_points = args
-        if route_poses:
-            for poses in route_poses: self.actions.append((task,poses))
-        else:
-            for point in route_points: self.actions.append((task2,point))
-        
-        def output(last_pos):
-            pos,orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
-            pos = np.linalg.norm(pos)
-            if round(last_pos - pos,6) != 0.000000:
-                self.actions.append((output,(pos,)))
-                return
-            self.result = None,
-        self.actions.append((output,(0,)))
-        pass
-
     def signal_pick_move(self,*args,**kwargs):
         if not args: 
             active_plugins = kwargs['plugins']
@@ -375,8 +343,15 @@ class Robot(ActiveObject):
 
         for poses in route_poses: self.actions.append((task,poses))
         def output(last_pos): 
+            pos,_,_,_,_,_,_,_ = p.getLinkState(self.id,ee_index,True)
+            pos = np.linalg.norm(pos)
+            if round(last_pos - pos,6) != 0.000000:
+                self.actions.append((output,(pos,)))
+                return
+            
             if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
             self.result = None,
+        
         self.actions.append((output,(0,)))
         pass
 
@@ -426,8 +401,15 @@ class Robot(ActiveObject):
                 self.actions.append((task,(poses,)))
             
         def output(last_pos): 
+            pos,_,_,_,_,_ = p.getLinkState(self.id,ee_index)
+            pos = np.linalg.norm(pos)
+            if round(last_pos - pos,6) != 0.000000:
+                self.actions.append((output,(pos,)))
+                return
+            
             if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
             self.result = None,
+        
         self.actions.append((output,(0,)))
         pass    
     
@@ -508,8 +490,15 @@ class Robot(ActiveObject):
         for poses in route_poses: self.actions.append((task,(poses,)))
         
         def output(last_pos): 
+            pos,_,_,_,_,_ = p.getLinkState(self.id,ee_index)
+            pos = np.linalg.norm(pos)
+            if round(last_pos - pos,6) != 0.000000:
+                self.actions.append((output,(pos,)))
+                return
+            
             if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
-            self.result = None,[ee_pos[0],ee_pos[1],ee_pos[2],ee_rot[0],ee_rot[1],ee_rot[2]]
+            self.result = None,
+        
         self.actions.append((output,(0,)))
         pass
     
