@@ -119,7 +119,8 @@ class Scene:
       dt -= self.timestep
 
   def rotate(self,x,y):
-    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    width,height,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    x,y=x*width,y*height
     yaw -= x
 
     pitch -= y / 2
@@ -169,6 +170,7 @@ class Scene:
   
   def pan(self,x,y):
     width, height, viewMat, projMat, cameraUp, camForward, horizon, vertical, yaw,pitch, dist, camTarget = p.getDebugVisualizerCamera()
+    x,y=x*width,y*height
     oneOverWidth = float(1) / float(width)
     oneOverHeight = float(1) / float(height)
 
