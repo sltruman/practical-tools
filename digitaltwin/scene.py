@@ -30,7 +30,7 @@ class Scene:
     p.setGravity(0, 0, -9.81)
 
     w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    p.resetDebugVisualizerCamera(3,yaw,pitch,target)
+    p.resetDebugVisualizerCamera(3,0,-89.9,target)
     
     self.plane = p.loadURDF(os.path.join(self.data_dir,"pybullet_objects/plane.urdf"), [0, 0, self.ground_z], useFixedBase=True)
 
@@ -56,16 +56,34 @@ class Scene:
     self.user_data = self.profile['user_data']
     
     p.resetBasePositionAndOrientation(self.plane,[0,0,self.ground_z],p.getQuaternionFromEuler([0,0,0]))
-    import digitaltwin
 
+    minimum=[0,0,0]
+    maximum=[0,0,0]
     for object_info in self.profile['active_objects']:
-      print('add object:',object_info,flush=True)
-      kind = object_info['kind']
-      active_obj = None
-      active_obj = eval(f'digitaltwin.{kind}(self,**object_info)')
-      self.active_objs[active_obj.id] = active_obj
-      if 'name' in object_info: self.active_objs_by_name[object_info['name']] = active_obj
+      # def task(object_info):
+        print('add object:',object_info,flush=True)
+        kind = object_info['kind']
+        active_obj = None
+        import digitaltwin
+        active_obj = eval(f'digitaltwin.{kind}(self,**object_info)')
+        self.active_objs[active_obj.id] = active_obj
+        if 'name' in object_info: self.active_objs_by_name[object_info['name']] = active_obj
 
+        lit,big = p.getAABB(active_obj.id)
+        
+        if lit[0] < minimum[0]: minimum[0] = lit[0]
+        if lit[1] < minimum[1]: minimum[1] = lit[1]
+        if lit[2] < minimum[2]: minimum[2] = lit[2]
+        if big[0] > maximum[0]: maximum[0] = big[0]
+        if big[1] > maximum[1]: maximum[1] = big[1]
+        if big[2] > maximum[2]: maximum[2] = big[2]
+
+      # self.actions.append((task,[object_info]))
+
+    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
+    dist = np.linalg.norm(np.array(maximum)-minimum)
+    p.resetDebugVisualizerCamera(dist*1.4,45,-45,target)
+    
   def save(self):
       self.profile['ground_z'] = self.ground_z
       self.profile['user_data'] = self.user_data
@@ -87,10 +105,8 @@ class Scene:
 
   def play(self,run=True):
     self.running = run
-    
-    pass
 
-  def update_for_tick(self,dt):
+  def update_for_tick(self,dt=1/180):
     if not self.running: return
 
     if self.actions:
@@ -98,29 +114,24 @@ class Scene:
         fun(*args)
         self.actions.pop(0)
 
-    while dt >= self.timestep:
+    while self.timestep <= dt:
       for obj in self.active_objs.values():
         obj.update(self.timestep)
         
       p.stepSimulation()
       dt -= self.timestep
 
-  def update(self)  :
-    if not self.running: return
-
-    if self.actions:
-      fun,args = act = self.actions[0]
-      fun(*args)
-      self.actions.pop(0)
-
-    for obj in self.active_objs.values():
-      obj.update(self.timestep)
-    p.stepSimulation()
-
   def rotate(self,x,y):
     w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    yaw -= 360 * x
-    pitch -= 180 * y
+    yaw -= x
+
+    pitch -= y / 2
+    if pitch > -1:
+      pitch = -1
+    
+    if pitch < -89:
+      pitch = -89
+
     p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
     pass
 
@@ -160,10 +171,17 @@ class Scene:
     pass
   
   def pan(self,x,y):
-    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    length = np.array([-x * distance * 3,y * distance * 3,0])
-    pos = target + Rotation.from_euler('xyz',[0,0,yaw],True).apply(length)
-    p.resetDebugVisualizerCamera(distance,yaw,pitch,pos)
+    width, height, viewMat, projMat, cameraUp, camForward, horizon, vertical, yaw,pitch, dist, camTarget = p.getDebugVisualizerCamera()
+    oneOverWidth = float(1) / float(width)
+    oneOverHeight = float(1) / float(height)
+
+    f = 10000 / dist
+    sx = 20000 / f * oneOverWidth
+    sy = 20000 / f * oneOverHeight
+
+    forward = np.array([-float(x) * sx,float(y) * sy,0])
+    pos = camTarget + Rotation.from_euler('xyz',[0,0,yaw],True).apply(forward)
+    p.resetDebugVisualizerCamera(dist,yaw,pitch,pos)
     pass
 
   def zoom(self,f):

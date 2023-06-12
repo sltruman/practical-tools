@@ -241,16 +241,16 @@ class Robot(ActiveObject):
                 poses = p.calculateInverseKinematics(self.id, ee_index, pos, orn, restPoses=self.reset_joint_poses, maxNumIterations=200)
                 route_poses.append(list(poses)[:len(self.used_joint_indexes)])
         
-        points = []
-        for poses in route_poses:
-            point = self.end_pose_from_joint_poses(poses)
-            points.append(point)
+        # points = []
+        # for poses in route_poses:
+        #     point = self.end_pose_from_joint_poses(poses)
+        #     points.append(point)
 
-        def task(i):
-            self.lines.append(p.addUserDebugLine(points[i][0:3],points[i+1][0:3],[0,1,0],1,lifeTime=0))
+        # def task(i):
+        #     self.lines.append(p.addUserDebugLine(points[i][0:3],points[i+1][0:3],[0,1,0],1,lifeTime=0))
             
-        for i in range(len(points)-1):
-            self.actions.append((task,(i,)))
+        # for i in range(len(points)-1):
+        #     self.actions.append((task,(i,)))
         return route_poses
 
     def signal_pick_plan(self,*args,**kwargs):
@@ -419,6 +419,7 @@ class Robot(ActiveObject):
         ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,ee_index)
         ee_rot = p.getEulerFromQuaternion(ee_orn)
 
+
         if args: 
             pick_point = args[0]
             ee_pos = pick_point[0:3]
@@ -436,12 +437,13 @@ class Robot(ActiveObject):
             act = declare[cursor]
             next = act['next']
             act_next = declare[next]
-
+            
             if act_next['fun'] == 'move_relatively':
                 self.result = 'link error.', 
                 return
             elif act_next['fun'] == 'move':
                 move_args = act_next['args']
+
                 if 'point' in move_args:
                     pick_pose = move_args['point']
                 elif 'joints' in move_args:
