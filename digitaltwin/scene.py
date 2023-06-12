@@ -111,7 +111,7 @@ class Scene:
         fun(*args)
         self.actions.pop(0)
 
-    while self.timestep <= dt:
+    while dt <= self.timestep:
       for obj in self.active_objs.values():
         obj.update(self.timestep)
         

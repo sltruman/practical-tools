@@ -33,7 +33,6 @@ class Editor:
 
             rayToCenter = rayFrom + rayForward
             rayTo = rayToCenter - 0.5 * horizon + 0.5 * vertical + float(mouseX) * dHor - float(mouseY) * dVer
-            p.addUserDebugLine(rayFrom,rayTo,[1,0,0])            
         except:
             tb.print_exc()
             return dict(name='',id=-1,pos=[0.,0.,0.])
