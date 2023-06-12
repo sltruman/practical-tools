@@ -396,7 +396,7 @@ int main()
 
     auto objs = scene->get_active_objs();
     auto obj = objs[hit.name];
-    
+
     auto pos = obj->get_pos();
 
     cout << pos[0] << endl
@@ -489,7 +489,6 @@ t.start()
 editor.add_cube([0,0,0],[0,0,0],[1,0.5,0.5])
 editor.add_cylinder([1,0,0],[0,0,0],0.5,0.5)
 editor.add_box([-1,0,0],[0,0,0],[1,1,0.5],0.1)
-
 ```
 
 ### C++
@@ -960,7 +959,7 @@ int main()
     auto robot = dynamic_cast<Robot*>(objs["robot"]);
 
     robot->signal("move","mode='joint',speed=0.1,point=[0,-0.5,0.1,0.785,0,0]");
-    
+
     return 0;
 }
 ```
@@ -1029,7 +1028,7 @@ int main()
 
     Texture texture;
     camera->rtt(texture);
-    
+
     return 0;
 }
 ```
@@ -1097,21 +1096,21 @@ int main()
 {
     auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
     auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
+    scene->load("./digitaltwin_data/scenes/算法插件.json"); 
 
     auto objs = scene->get_active_objs();
     auto camera = dynamic_cast<Camera3DReal*>(objs["camera"]);
 
     auto intrinsics = "[[2393.230224609375,0.0,951.794189453125],[0.0,2393.364501953125,558.6798095703125],[0.0,0.0,1.0]]";
     auto extrinsics = "[[0.08766222494286922,0.9954482545931286,0.037391265631955106,0.7793440568869567],[0.9619166950744155,-0.09434572446817567,0.25654464720919273,-0.2510889858020945],[0.258904627334428,0.013478008089797142,-0.9658088512965427,1.2629839393068865],[0.0,0.0,0.0,1.0]]";
-    
+
     camera->set_calibration(intrinsics,extrinsics);
     camera->set_rtt_func([](vector<unsigned char>& rgb_pixels,vector<float>& depth_pixels,int& width,int& height) {
         width = 1024,height = 768;
         std::string sRGBFilePath = "./20230322110752009.png";
         cv::Mat rgbMat = cv::imread(sRGBFilePath);
         rgb_pixels = rgbMat.reshape(1,1);
-        
+
         std::string sDepthFilePath = "./20230322110752009.tiff";
         cv::Mat depthMat = cv::imread(sDepthFilePath, cv::IMREAD_ANYDEPTH);
         depth_pixels = depthMat.reshape(1,1);

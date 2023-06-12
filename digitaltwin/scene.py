@@ -1,4 +1,3 @@
-import digitaltwin
 import pybullet as p
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -57,6 +56,7 @@ class Scene:
     self.user_data = self.profile['user_data']
     
     p.resetBasePositionAndOrientation(self.plane,[0,0,self.ground_z],p.getQuaternionFromEuler([0,0,0]))
+    import digitaltwin
 
     for object_info in self.profile['active_objects']:
       print('add object:',object_info,flush=True)

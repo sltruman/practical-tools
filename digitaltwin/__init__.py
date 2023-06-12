@@ -1,4 +1,3 @@
-import digitaltwin_data
 from digitaltwin.scene import Scene
 from digitaltwin.workflow import Workflow
 from digitaltwin.robot import Robot

@@ -2,12 +2,12 @@
 # coding: utf-8
 from setuptools import setup
 import re
-result = re.search(r'(\d+)\.(\d+)\.(\d+)', open('__init__.py').read())
+result = re.search(r'(\d+)\.(\d+)\.(\d+)', open('version.in').read())
 major = result.group(1)
 minor = result.group(2)
 patch = int(result.group(3)) + 1
 version = f'{major}.{minor}.{patch}'
-open('__init__.py','w').write(f"__version__='{version}'")
+open('version.in','w').write(version)
 
 setup(
     name='pysimflow',

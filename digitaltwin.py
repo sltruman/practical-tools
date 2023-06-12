@@ -5,7 +5,6 @@ import json
 import traceback
 from time import time,sleep
 import shutil
-from digitaltwin import Scene,Editor,Workflow
 
 if len(sys.argv) < 2:
     print("Useage: program <width> <height> <scene_path> <data_dir> <tmp_dir>")
@@ -25,11 +24,12 @@ else:
     sk.bind(sock_path)
     print(f'Serving on {sock_path}',flush=True)
     sk.listen(1)
-    
+
+    from digitaltwin import Scene,Editor,Workflow
     scene = Scene(width,height,data_dir,tmp_dir)
-    scene.load(scene_path)
     editor = Editor(scene)
     workflow = Workflow(scene)
+    scene.load(scene_path)
     
     conn,addr = sk.accept()
 
@@ -47,10 +47,13 @@ else:
                         buf = req
                         raise BlockingIOError
                     res = eval(req.decode())
-                    if type(res) == tuple: 
-                        for v in res: conn.sendall(v)
+
+                    if type(res) == bytes:
+                        conn.sendall(res)
                     elif type(res) == dict or type(res) == list: 
                         conn.sendall(json.dumps(res).encode() + b'\n')
+                    elif type(res) == tuple: 
+                        for v in res: conn.sendall(v)
                 buf = b''
             except SyntaxError: print(traceback.print_exc(),flush=True)
             except BlockingIOError: pass
