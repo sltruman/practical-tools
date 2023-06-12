@@ -28,9 +28,6 @@ class Scene:
     p.setPhysicsEngineParameter(erp=1,contactERP=1,frictionERP=1)
     p.setTimeStep(self.timestep)
     p.setGravity(0, 0, -9.81)
-
-    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    p.resetDebugVisualizerCamera(3,0,-89.9,target)
     
     self.plane = p.loadURDF(os.path.join(self.data_dir,"pybullet_objects/plane.urdf"), [0, 0, self.ground_z], useFixedBase=True)
 
@@ -57,8 +54,8 @@ class Scene:
     
     p.resetBasePositionAndOrientation(self.plane,[0,0,self.ground_z],p.getQuaternionFromEuler([0,0,0]))
 
-    minimum=[0,0,0]
-    maximum=[0,0,0]
+    minimum=self.ground_z
+    maximum=1.5
     for object_info in self.profile['active_objects']:
       # def task(object_info):
         print('add object:',object_info,flush=True)
@@ -71,18 +68,18 @@ class Scene:
 
         lit,big = p.getAABB(active_obj.id)
         
-        if lit[0] < minimum[0]: minimum[0] = lit[0]
-        if lit[1] < minimum[1]: minimum[1] = lit[1]
-        if lit[2] < minimum[2]: minimum[2] = lit[2]
-        if big[0] > maximum[0]: maximum[0] = big[0]
-        if big[1] > maximum[1]: maximum[1] = big[1]
-        if big[2] > maximum[2]: maximum[2] = big[2]
+        if lit[0] < minimum: minimum = lit[0]
+        if lit[1] < minimum: minimum = lit[1]
+        if lit[2] < minimum: minimum = lit[2]
+        if big[0] > maximum: maximum = big[0]
+        if big[1] > maximum: maximum = big[1]
+        if big[2] > maximum: maximum = big[2]
 
-      # self.actions.append((task,[object_info]))
+    # self.actions.append((task,[object_info]))
 
     w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    dist = np.linalg.norm(np.array(maximum)-minimum)
-    p.resetDebugVisualizerCamera(dist*1.4,45,-45,target)
+    dist = maximum-minimum
+    p.resetDebugVisualizerCamera(dist*1,45,-45,target)
     
   def save(self):
       self.profile['ground_z'] = self.ground_z
