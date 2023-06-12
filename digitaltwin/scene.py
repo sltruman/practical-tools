@@ -78,8 +78,8 @@ class Scene:
     # self.actions.append((task,[object_info]))
 
     w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    dist = maximum-minimum
-    p.resetDebugVisualizerCamera(dist*1,45,-45,target)
+    dist = maximum - minimum
+    p.resetDebugVisualizerCamera(dist*1.2,45,-45,target)
     
   def save(self):
       self.profile['ground_z'] = self.ground_z
