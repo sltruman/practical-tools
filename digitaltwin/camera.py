@@ -188,7 +188,6 @@ class Camera3D(ActiveObject):
             sk = s.socket(s.AF_UNIX,s.SOCK_STREAM)
             sock_path = os.path.join(self.scene.tmp_dir,self.profile['name'] + '.sock')
             sk.connect(sock_path)
-            
             for v in pixels,depth: sk.sendall(v)
         except: 
             pass
@@ -239,13 +238,6 @@ class Camera3D(ActiveObject):
                 pos,orn = p.getBasePositionAndOrientation(id)
                 rot = p.getEulerFromQuaternion(orn)
                 mesh = None#p.getMeshData(id,flags=p.MESH_DATA_SIMULATION_MESH)
-               
-                # axis_x = Rotation.from_quat(orn).apply(np.array([length,0,0])) + pos
-                # axis_y = Rotation.from_quat(orn).apply(np.array([0,length,0])) + pos
-                # axis_z = Rotation.from_quat(orn).apply(np.array([0,0,length])) + pos
-                # p.addUserDebugLine(pos,axis_x,[1,0,0],2,lifeTime=0)
-                # p.addUserDebugLine(pos,axis_y,[0,1,0],2,lifeTime=0)
-                # p.addUserDebugLine(pos,axis_z,[0,0,1],2,lifeTime=0)
                 val.append((pos,rot,None))
             self.result = (None,val) if val else ('failed',)
         self.actions.append((output, ()))

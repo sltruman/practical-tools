@@ -14,7 +14,6 @@ class Scene:
     self.tick = time()
     self.active_objs = dict()
     self.active_objs_by_name = dict()
-    self.viewport_size = width,height,4
     self.width = width
     self.height = height
     self.running = True
@@ -81,7 +80,12 @@ class Scene:
     dist = maximum - minimum
     p.resetDebugVisualizerCamera(dist*1.2,45,-45,target)
     
-  def save(self):
+  def save(self,scene_path=''):
+      if scene_path: self.scene_path = scene_path
+      if not self.scene_path: 
+        print('failed to save and scene path is nothing.',flush=True)
+        return
+
       self.profile['ground_z'] = self.ground_z
       self.profile['user_data'] = self.user_data
       active_objects = list()
@@ -89,7 +93,7 @@ class Scene:
         obj.profile = obj.properties()
         active_objects.append(obj.profile)
       self.profile['active_objects'] = active_objects
-      with open(self.scene_path,'w') as f: json.dump(self.profile,f,indent=2) 
+      with open(self.scene_path,'w') as f: json.dump(self.profile,f,indent=2)
 
   def restore(self):
     for obj in self.active_objs_by_name.values():
@@ -98,7 +102,7 @@ class Scene:
 
   def rtt(self):
     _,_,pixels,_,_ = p.getCameraImage(self.width,self.height,flags=p.ER_NO_SEGMENTATION_MASK,renderer=p.ER_BULLET_HARDWARE_OPENGL)
-    return pixels.tobytes(),
+    return pixels.tobytes()
 
   def play(self,run=True):
     self.running = run
@@ -111,7 +115,7 @@ class Scene:
         fun(*args)
         self.actions.pop(0)
 
-    while dt <= self.timestep:
+    while dt >= self.timestep:
       for obj in self.active_objs.values():
         obj.update(self.timestep)
         

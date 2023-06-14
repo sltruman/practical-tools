@@ -28,7 +28,7 @@ class Stacker(ActiveObject):
         for idx in range(50):
             item_width = self.box_size[0] + random.randint(-self.random_factor[0]*100,self.random_factor[0]*100) / 100 * self.box_size[0] 
             item_height = self.box_size[1] + random.randint(-self.random_factor[1]*100,self.random_factor[1]*100) / 100 * self.box_size[1] 
-            item_depth = self.box_size[2] + random.randint(-self.random_factor[2]*100,self.random_factor[2]*100) / 100 * self.box_size[2] 
+            item_depth =  self.box_size[2] + random.randint(-self.random_factor[2]*100,self.random_factor[2]*100) / 100 * self.box_size[2] 
             item_weight = 0.1
             self.packer.add_item(bp.Item('item'+str(idx), item_width, item_height, item_depth, item_weight))
         self.packer.pack(bigger_first=True)
@@ -50,10 +50,10 @@ class Stacker(ActiveObject):
             self.objs.append(item_id)
         pass
 
-    def signal_generate(self):
+    def signal_generate(self,*args,**kwargs):
         def task(item:bp.Item):
             item_width, item_height, item_depth = item.get_dimension()
-            item_pos = self.lower_left + [float(item.position[0] + item_width / 2), float(item.position[1] + item_height / 2), float(item.position[2] + item_depth / 2)]
+            item_pos = self.lower_left + [float(item.position[0] + item_width / 2), float(item.position[1] + item_height / 2), 0.03+float(item.position[2] + item_depth / 2)]
             item_shape = p.createCollisionShape(p.GEOM_BOX, halfExtents=[item_width/2, item_height/2, item_depth/2])
             item_id = p.createMultiBody(item.weight, item_shape, -1, item_pos, p.getQuaternionFromEuler([0, 0, 0]))
             self.objs.append(item_id)

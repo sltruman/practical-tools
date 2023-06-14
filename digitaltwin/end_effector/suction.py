@@ -27,8 +27,8 @@ class Suction:
             num_joints = p.getNumJoints(self.robot_id)
             ee_index = num_joints-1
             ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.robot_id,ee_index)
-            radius = 0.02
-            axis_z = Rotation.from_quat(ee_orn).apply(np.array([0,0,-radius])) + ee_pos
+            radius = 0.01
+            axis_z = Rotation.from_quat(ee_orn).apply(np.array([0,0,radius])) + ee_pos
             rayInfo = p.rayTest(ee_pos, axis_z)
             p.addUserDebugLine(ee_pos,axis_z,[0,1,0],4,lifeTime=1)
 
@@ -41,15 +41,16 @@ class Suction:
                     ee_pos,o_pos = np.array(ee_pos),np.array(o_pos)
                     direction = ee_pos - o_pos
                     direction = direction / np.linalg.norm(direction)
-                    p.applyExternalForce(o_id,-1,direction * 9.81 ,o_pos,p.WORLD_FRAME)
+                    p.applyExternalForce(o_id,-1,direction * 9.81,o_pos,p.WORLD_FRAME)
                     pass
 
                 if o_id != -1:
-                    self.action = (task,(o_id))
+                    self.action = (task,o_id)
                     self.idle = False
         else:
+            self.idle = False
             self.action = lambda *args:None,()
-        pass
+
         self.picking = pickup
 
     def get_properties(self):

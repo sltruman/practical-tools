@@ -253,7 +253,7 @@ class Robot(ActiveObject):
         #     self.actions.append((task,(i,)))
         return route_poses
 
-    def signal_pick_plan(self,*args,**kwargs):
+    def signal_plan_move(self,*args,**kwargs):
         objs, = args
         def near_obj(o):
             e_pos,e_orn,_,_,_,_ = p.getLinkState(self.id,p.getNumJoints(self.id)-1)
@@ -269,16 +269,10 @@ class Robot(ActiveObject):
             pick_p = np.array(pick_pose['pos'])
             pick_r = Rotation.from_euler("xyz",pick_pose['rot'])
             o = o_pos + o_r.apply(pick_p)
-            # pick_x = o_pos + o_r.apply(pick_p + [0.15,0,0])
-            # pick_y = o_pos + o_r.apply(pick_p + [0,0.15,0])
-            # pick_z = o_pos + o_r.apply(pick_p + [0,0,0.15])
-            # p.addUserDebugLine(o,pick_x,[1,0,0],1,lifeTime=0)
-            # p.addUserDebugLine(o,pick_y,[0,1,0],1,lifeTime=0)
-            # p.addUserDebugLine(o,pick_z,[0,0,1],1,lifeTime=0)
             pick_x = o_pos + o_r.apply(pick_p + pick_r.apply([0.1,0,0]))
             pick_y = o_pos + o_r.apply(pick_p + pick_r.apply([0,0.1,0]))
             pick_z = o_pos + o_r.apply(pick_p + pick_r.apply([0,0,0.1]))
-            p.addUserDebugLine(o,pick_z,[0,0,1],5,lifeTime=5)
+            # p.addUserDebugLine(o,pick_z,[0,0,1],5,lifeTime=5)
             
             axis_up = [0,0,1]
             pick_axis_up = (o_r * pick_r).apply([0,0,1])
@@ -292,14 +286,25 @@ class Robot(ActiveObject):
         pick_rot = pick_r.as_euler('xyz')
 
         num_joints = p.getNumJoints(self.id)
-        ee_pos,ee_orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
-        ee_pos = np.array(ee_pos)
-        ee_rot = p.getEulerFromQuaternion(ee_orn)
+        ee_index = num_joints-1
 
-        route_poses = self.plan( (ee_pos,pick_rot), (pick_pos, pick_rot))
+        route_poses = self.plan(pick_pos, pick_rot)
+        def task(*poses):
+            p.setJointMotorControlArray(self.id, self.used_joint_indexes, p.POSITION_CONTROL, poses)
+            self.current_joint_poses = poses
 
-        def output(): self.result = None,route_poses,None
-        self.actions.append((output,()))
+        for poses in route_poses: self.actions.append((task,poses))
+        def output(last_pos): 
+            pos,_,_,_,_,_,_,_ = p.getLinkState(self.id,ee_index,True)
+            pos = np.linalg.norm(pos)
+            if round(last_pos - pos,6) != 0.000000:
+                self.actions.append((output,(pos,)))
+                return
+            
+            if 'pickup' in kwargs: self.end_effector_obj.do(kwargs['pickup'])
+            self.result = None,
+        
+        self.actions.append((output,(0,)))
 
     def signal_pick_move(self,*args,**kwargs):
         if not args: 
