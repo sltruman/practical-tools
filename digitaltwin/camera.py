@@ -177,8 +177,9 @@ class Camera3D(ActiveObject):
             sock_path = os.path.join(self.scene.tmp_dir,self.profile['name'] + '.sock')
             sk.connect(sock_path)
             for v in pixels,depth: sk.sendall(v)
-        except: return
-        finally:
+        except: 
+            return
+        else:
             sk.close()
 
     def signal_pose_recognize(self,*args,**kwargs):
@@ -189,9 +190,9 @@ class Camera3D(ActiveObject):
             sock_path = os.path.join(self.scene.tmp_dir,self.profile['name'] + '.sock')
             sk.connect(sock_path)
             for v in pixels,depth: sk.sendall(v)
-        except: 
+        except:
             pass
-        finally:
+        else:
             sk.close()
 
         num_joints = p.getNumJoints(self.id)
@@ -242,7 +243,6 @@ class Camera3D(ActiveObject):
             self.result = (None,val) if val else ('failed',)
         self.actions.append((output, ()))
 
-        
 class Camera3DReal(ActiveObject):
     def __init__(self,scene,**kwargs):
         if 'focal' not in kwargs: kwargs['focal'] = 0.010
