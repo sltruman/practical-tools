@@ -14,19 +14,19 @@
 
 源代码：`https://github.com/sltruman/digital-twin`
 
-### 示例工作流
+### 示例
 
-获取一堆工件的深度图：`python3 examples/test.py`
+获取一堆工件的深度图：`python3 examples/depth_image.py`
 
-获取一堆工件的姿态数据：`python3 examples/test0.py`
+获取一堆工件的标注图：`python3 examples/labeled_image.py`
 
-混合拆垛演示：`python3 examples/test1.py`
+混合拆垛演示：`python3 examples/ordered_picking.py`
 
-无序抓取演示：`python3 examples/test2.py`
+无序抓取演示：`python3 examples/unordered_picking.py`
 
-虚拟相机拍摄点云：`python3 examples/test3.py`
+虚拟相机拍摄点云：`python3 examples/point_cloud.py`
 
-标定： `python3 examples/test5.py`
+标定： `python3 examples/calibration.py`
 
 # 2. 工作计划
 
@@ -152,23 +152,6 @@ scene.load(os.path.join(data_dir,'scenes/空.json'))
 rgba = scene.rtt()
 ```
 
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    scene->load("./digitaltwin_data/scenes/空.json"); 
-
-    Texture texture;
-    scene->rtt(texture); 
-    return 0;
-}
-```
-
 ## 场景-启动/停止
 
         当场景布置完毕后，执行启动即可持续进行物理运算。停止则暂停物理运算。
@@ -220,27 +203,6 @@ t = Thread(target=updating)
 t.start()
 ```
 
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    scene->load("./digitaltwin_data/scenes/混合拆垛.json"); 
-
-    this_thread::sleep(chrono::seconds(1));
-    scene->play(false);
-
-    this_thread::sleep(chrono::seconds(2));
-
-    scene->play();
-    return 0;
-}
-```
-
 ## 场景-视口控制
 
         用户会经常使用鼠标或者手势进行镜头控制。
@@ -290,28 +252,6 @@ while True:
     scene.rotate(0.001,0)
     time.sleep(0.1)
     scene.pan(0.001,0)
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    scene->load("./digitaltwin_data/scenes/空.json"); 
-
-    while(true) {
-        scene->rotate(0.001,0.0); 
-        this_thread::sleep_for(chrono::milliseconds(100));
-        scene->pan(0.001,0.0);
-        this_thread::sleep_for(chrono::milliseconds(100));
-    }
-
-    return 0;
-}
 ```
 
 ## 场景-获取选中物体的信息
@@ -379,34 +319,6 @@ robot = scene.active_objs_by_name[obj['name']]
 print(robot.get_pos())
 ```
 
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
-
-    RayInfo hit;
-    editor->ray(0.5,0.5,hit);
-
-    auto objs = scene->get_active_objs();
-    auto obj = objs[hit.name];
-
-    auto pos = obj->get_pos();
-
-    cout << pos[0] << endl
-        << pos[1] <<endl
-        << pos[2] << endl;
-
-    return 0;
-}
-```
-
 ## 场景-保存
 
         当对场景的物体进行修改之后，调用此函数来进行保存。
@@ -437,26 +349,6 @@ plane = scene.active_objs_by_name['plane']
 
 plane.set_pos([0,0,1])
 scene.save()
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto obj = objs['plane'];
-    obj.set_pos({0,0,1});
-    scene.save();
-    return 0;
-}
 ```
 
 ## 场景.编辑-基础模型
@@ -491,26 +383,6 @@ editor.add_cylinder([1,0,0],[0,0,0],0.5,0.5)
 editor.add_box([-1,0,0],[0,0,0],[1,1,0.5],0.1)
 ```
 
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/空.json"); 
-
-    string name;
-    editor->add_cube({0,0,0},{0,0,0},{1,0.5,0.5},name);
-    editor->add_cylinder({1,0,0},{0,0,0},0.5,0.5,name);
-    editor->add_box({-1,0,0},{0,0,0},{1,1,0.5},0.1,name);
-    return 0;
-}
-```
-
 ## 场景.编辑-机械臂
 
 ### Python
@@ -534,27 +406,6 @@ t.start()
 
 obj = editor.add('Robot','robots/gp12/gp12.urdf',[0,0,1],[0,0,0],[1,0,0])
 scene.active_objs_by_name[obj['name']].set_end_effector('end_effectors/gripper_gp12/gripper_gp12.urdf')
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/空.json"); 
-
-    string name;
-    editor->add("Robot",'robots/gp12/gp12.urdf',{0,0,1},{0,0,0},{1,0,0},name);
-
-    auto objs = scene->get_active_objs();
-    dynamic_cast<Robot*>(objs[name])->set_end_effector("end_effectors/gripper_gp12/gripper_gp12.urdf");
-    return 0;
-}
 ```
 
 ## 场景.编辑-删除
@@ -581,25 +432,6 @@ t.start()
 
 obj = editor.add('Robot','robots/gp12/gp12.urdf',[0,0,1],[0,0,0],[1,0,0])
 editor.remove(obj['name'])
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/空.json"); 
-
-    string name;
-    editor->add("Robot",'robots/gp12/gp12.urdf',{0,0,1},{0,0,0},{1,0,0},name);
-    editor->remove(name);
-    return 0;
-}
 ```
 
 ## 物体-更换模型
@@ -645,25 +477,6 @@ t.start()
 
 plane = scene.active_objs_by_name['plane']
 plane.set_base('containers/tray/tray.urdf')
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto plane = objs["plane"];
-    plane->set_base("containers/tray/tray.urdf");
-    return 0;
-}
 ```
 
 ## 物体.机械臂-末端执行器
@@ -712,25 +525,6 @@ robot = scene.active_objs_by_name['robot']
 robot.set_end_effector('end_effectors/gripper_ur5/gripper_ur5.urdf')
 ```
 
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto robot = dynamic_cast<Robot*>(objs["robot"]);
-    robot->set_end_effector("end_effectors/gripper_ur5/gripper_ur5.urdf");
-    return 0;
-}
-```
-
 ## 物体.机械臂-末端执行器-位姿
 
 ### Python
@@ -756,26 +550,6 @@ t.start()
 
 robot = scene.active_objs_by_name['robot']
 robot.set_end_effector_pose([0,-0.5,0.1,0.785,0,0])
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto robot = dynamic_cast<Robot*>(objs["robot"]);
-    robot->set_end_effector_pos({0,-0.5,0.1});
-    robot->set_end_effector_rot({0.785,0,0});
-    return 0;
-}
 ```
 
 ## 物体.机械臂-末端执行器-数字输出
@@ -810,28 +584,6 @@ time.sleep(2)
 robot.end_effector_obj.do(True)
 time.sleep(2)
 robot.end_effector_obj.do(False)
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto robot = dynamic_cast<Robot*>(objs["robot"]);
-    this_thread::sleep_for(chrono::seconds(1));
-    robot->digital_output(true);
-    this_thread::sleep_for(chrono::seconds(1));
-    robot->digital_output(false);
-    return 0;
-}
 ```
 
 ## 物体.机械臂-关节控制
@@ -877,40 +629,6 @@ for joint_pos_list in route_joint_positions:
     time.sleep(0.5)
 ```
 
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto robot = dynamic_cast<Robot*>(objs["robot"]);
-
-    list<vector<float>> route_joint_positions = {
-        {0.0,0,0,0,0,0.0},
-        {.1,0,0,0,0,0.1},
-        {0.2,0,0,0,0,0.2},
-        {0.3,0,0,0,0,0.3},
-        {0.4,0,0,0,0,0.4},
-        {0.5,0,0,0,0,0.5},
-        {0.6,0,0,0,0,0.6}
-    };
-
-    for(auto joint_pos_list : route_joint_positions) {
-        robot->set_joints(joint_pos_list);
-        this_thread::sleep_for(chrono::seconds(1));
-    }
-
-    return 0;
-}
-```
-
 ## 物体.机械臂-速度控制
 
 ### Python
@@ -941,27 +659,6 @@ robot.signal_move(
     mode='joint',
     speed=0.1,
     point=[0,-0.5,0.1,0.785,0,0])
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto robot = dynamic_cast<Robot*>(objs["robot"]);
-
-    robot->signal("move","mode='joint',speed=0.1,point=[0,-0.5,0.1,0.785,0,0]");
-
-    return 0;
-}
 ```
 
 ## 物体.相机-捕获画面
@@ -1009,28 +706,6 @@ camera = scene.active_objs_by_name['camera']
 
 rgba,depth = camera.rtt()
 print(len(rgba),len(depth))
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/标定测试.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto camera = dynamic_cast<Camera3D*>(objs["camera"]);
-
-    Texture texture;
-    camera->rtt(texture);
-
-    return 0;
-}
 ```
 
 ## 物体.相机-设置/清除点云
@@ -1085,48 +760,6 @@ scene.active_objs_by_name['camera'].draw_point_cloud(vs,vcs)
 scene.active_objs_by_name['camera'].clear_point_cloud()
 ```
 
-### C++
-
-```cpp
-#include <opencv2/opencv.hpp>
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/算法插件.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto camera = dynamic_cast<Camera3DReal*>(objs["camera"]);
-
-    auto intrinsics = "[[2393.230224609375,0.0,951.794189453125],[0.0,2393.364501953125,558.6798095703125],[0.0,0.0,1.0]]";
-    auto extrinsics = "[[0.08766222494286922,0.9954482545931286,0.037391265631955106,0.7793440568869567],[0.9619166950744155,-0.09434572446817567,0.25654464720919273,-0.2510889858020945],[0.258904627334428,0.013478008089797142,-0.9658088512965427,1.2629839393068865],[0.0,0.0,0.0,1.0]]";
-
-    camera->set_calibration(intrinsics,extrinsics);
-    camera->set_rtt_func([](vector<unsigned char>& rgb_pixels,vector<float>& depth_pixels,int& width,int& height) {
-        width = 1024,height = 768;
-        std::string sRGBFilePath = "./20230322110752009.png";
-        cv::Mat rgbMat = cv::imread(sRGBFilePath);
-        rgb_pixels = rgbMat.reshape(1,1);
-
-        std::string sDepthFilePath = "./20230322110752009.tiff";
-        cv::Mat depthMat = cv::imread(sDepthFilePath, cv::IMREAD_ANYDEPTH);
-        depth_pixels = depthMat.reshape(1,1);
-
-        width = rgbMat.cols;
-        height = rgbMat.rows;
-        return true;
-    });
-
-    Texture texture;
-    camera->rtt(texture);
-
-    return 0;
-}
-```
-
 ## 物体.码垛器
 
         用于生成码放有序的工件。
@@ -1173,25 +806,6 @@ stacker = scene.active_objs_by_name['stacker']
 stacker.generate()
 ```
 
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/混合拆垛.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto stacker = dynamic_cast<Stacker*>(objs["stacker"]);
-    stacker->signal("generate","");
-    return 0;
-}
-```
-
 ## 物体.放置器
 
         用于生成码放无序的工件。
@@ -1236,25 +850,6 @@ t.start()
 
 placer = scene.active_objs_by_name['placer']
 placer.generate()
-```
-
-### C++
-
-```cpp
-#include "digitaltwin.hpp"
-using namespace digitaltwin; 
-
-int main()
-{
-    auto scene = make_shared<Scene>(1024,768,"./digitaltwin_data/engines/bullet","./digitaltwin_data");
-    auto editor = make_shared<Editor>(scene.get());
-    scene->load("./digitaltwin_data/scenes/混合拆垛.json"); 
-
-    auto objs = scene->get_active_objs();
-    auto placer = dynamic_cast<Placer*>(objs["placer"]);
-    placer->signal("generate","");
-    return 0;
-}
 ```
 
 ## 工作流-示例-深度图/姿态估计/混合拆垛/无序抓取

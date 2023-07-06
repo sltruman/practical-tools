@@ -1,5 +1,6 @@
-import time
+import os
 from digitaltwin import Scene, Workflow,Editor
+import digitaltwin_data
 
 projection = [[
                 2393.230224609375,
@@ -44,7 +45,10 @@ eye_to_hand_transform = [
 
 scene = Scene(1024, 768)
 editor = Editor(scene)
-scene.load('./digitaltwin_data/scenes/算法插件.json')
+
+data_dir = digitaltwin_data.get_data_path()
+scene.load(os.path.join(data_dir,'scenes/算法插件.json'))
+
 workflow = Workflow(scene)
 
 # print(scene.active_objs_by_name['robot'].get_joints())
@@ -66,5 +70,6 @@ scene.active_objs_by_name['camera'].draw_point_cloud(vs,vcs)
 workflow.start()
 
 while True:
+    import time
     scene.update_for_tick(1/180.)
     time.sleep(1/180.)
