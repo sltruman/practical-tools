@@ -1,6 +1,6 @@
 import pybullet as p
 import os
-from digitaltwin.active_obj import ActiveObject
+from practistyle.active_obj import ActiveObject
 
 class Cylinder(ActiveObject):
     def __init__(self,scene,**kwargs):

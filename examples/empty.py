@@ -2,12 +2,12 @@ import sys,os
 sys.path.append('.')
 
 import time
-from digitaltwin import Scene,Editor, Workflow
-import digitaltwin_data
+from practistyle import Scene,Editor, Workflow
+import data
 
 scene = Scene(1024, 768)
 
-data_dir = digitaltwin_data.get_data_path()
+data_dir = data.get_data_path()
 scene.load(os.path.join(data_dir,'scenes/空.json'))
 editor = Editor(scene)
 workflow = Workflow(scene)

@@ -25,7 +25,7 @@ else:
     print(f'Serving on {sock_path}',flush=True)
     sk.listen(1)
 
-    from digitaltwin import Scene,Editor,Workflow
+    from practistyle import Scene,Editor,Workflow
     scene = Scene(width,height,data_dir,tmp_dir)
     editor = Editor(scene)
     workflow = Workflow(scene)

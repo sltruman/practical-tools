@@ -1,5 +1,5 @@
 import os
 
-def get_data_path():
+def path():
   resdir = os.path.dirname(__file__)
   return resdir

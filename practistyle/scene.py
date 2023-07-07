@@ -60,7 +60,7 @@ class Scene:
         print('add object:',object_info,flush=True)
         kind = object_info['kind']
         active_obj = None
-        import digitaltwin
+        import practistyle
         active_obj = eval(f'digitaltwin.{kind}(self,**object_info)')
         self.active_objs[active_obj.id] = active_obj
         if 'name' in object_info: self.active_objs_by_name[object_info['name']] = active_obj

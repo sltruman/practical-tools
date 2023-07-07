@@ -4,7 +4,7 @@ import random
 import py3dbp as bp
 import random
 import os
-from digitaltwin.active_obj import ActiveObject
+from practistyle.active_obj import ActiveObject
 import time 
 
 class Placer(ActiveObject):

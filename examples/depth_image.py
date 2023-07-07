@@ -1,12 +1,12 @@
 from time import time
 import os
-from digitaltwin import Scene,Workflow
-import digitaltwin_data
+from practistyle import Scene,Workflow
+import data
 
 scene = Scene(1024,768)
 workflow = Workflow(scene)
 
-data_dir = digitaltwin_data.get_data_path()
+data_dir = data.get_data_path()
 scene.load(os.path.join(data_dir,'scenes/深度图.json'))
 workflow.start()
 

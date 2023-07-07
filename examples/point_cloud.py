@@ -1,6 +1,6 @@
 import os
-from digitaltwin import Scene, Workflow,Editor
-import digitaltwin_data
+from practistyle import Scene, Workflow,Editor
+import data
 
 projection = [[
                 2393.230224609375,
@@ -46,7 +46,7 @@ eye_to_hand_transform = [
 scene = Scene(1024, 768)
 editor = Editor(scene)
 
-data_dir = digitaltwin_data.get_data_path()
+data_dir = data.get_data_path()
 scene.load(os.path.join(data_dir,'scenes/算法插件.json'))
 
 workflow = Workflow(scene)

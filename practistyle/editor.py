@@ -64,7 +64,7 @@ class Editor:
         object_info.update(extra_params)
 
         try:
-            import digitaltwin
+            import practistyle
             active_obj = eval(f'digitaltwin.{kind}(self.scene,**object_info)')
         except:
             return {}
