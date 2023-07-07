@@ -7,7 +7,7 @@ import os
 import socket as s
 
 class Scene:
-  def __init__(self,width=1024,height=768,data_dir='./digitaltwin_data',tmp_dir='.'):
+  def __init__(self,width=1024,height=768,data_dir='./practistyle/data',tmp_dir='.'):
     self.tmp_dir = tmp_dir
     self.data_dir = data_dir
 
@@ -61,7 +61,7 @@ class Scene:
         kind = object_info['kind']
         active_obj = None
         import practistyle
-        active_obj = eval(f'digitaltwin.{kind}(self,**object_info)')
+        active_obj = eval(f'practistyle.{kind}(self,**object_info)')
         self.active_objs[active_obj.id] = active_obj
         if 'name' in object_info: self.active_objs_by_name[object_info['name']] = active_obj
 

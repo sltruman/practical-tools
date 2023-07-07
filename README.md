@@ -10,7 +10,7 @@
 
 ## 安装
 
-包：`pip3 install practical-style`
+包：`pip3 install practistyle`
 
 源代码：`https://github.com/sltruman/practical-style`
 
