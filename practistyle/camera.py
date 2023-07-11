@@ -58,19 +58,25 @@ class Camera3D(ActiveObject):
         
         vm = p.computeViewMatrixFromYawPitchRoll(origin,near,math.degrees(yaw),math.degrees(pitch) - 90,math.degrees(roll),2)
         pm = p.computeProjectionMatrixFOV(math.degrees(self.fov),self.pixels_w/self.pixels_h,near,far)
-        
-        if self.roi_pids: self.draw_roi(False)
+
         _,_,pixels,depth_pixels,_ = p.getCameraImage(self.pixels_w,self.pixels_h,flags=-1,viewMatrix = vm,projectionMatrix = pm,renderer=p.ER_BULLET_HARDWARE_OPENGL)
-        depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :]) - near
-        if self.roi_pids: self.draw_roi(True)
         
-        return pixels.tobytes(),depth_pixels.tobytes()
+        if type(pixels) == tuple:
+            pixels = bytes(pixels)
+            depth_pixels = np.array(depth_pixels,dtype=np.float32).reshape((self.pixels_h,self.pixels_w,1))
+        else:
+            pixels = pixels.tobytes()
+
+        depth_pixels[:, :] = far * near / (far - (far - near) * depth_pixels[:, :]) - near
+        depth_pixels = depth_pixels.tobytes()
+
+        return pixels,depth_pixels
 
     def get_intrinsics(self):
         fx = self.pixels_w / 2 / math.tan(self.fov / 2)
         fy = self.pixels_h / 2 / math.tan(self.fov / 2)
-        cx = self.pixels_w/2
-        cy = self.pixels_h/2
+        cx = self.pixels_w / 2
+        cy = self.pixels_h / 2
 
         intrinsics = [
             [fy,0.0,cx],
@@ -396,8 +402,8 @@ class Camera3DReal(ActiveObject):
 
         axes = [
             [1,0,0],
-            [0,1,0],
-            [0,0,1]]
+            [0,-1,0],
+            [0,0,-1]]
         
         point_cloud = R.apply(point_cloud @ axes) + T 
         

@@ -102,7 +102,9 @@ class Scene:
 
   def rtt(self):
     _,_,pixels,_,_ = p.getCameraImage(self.width,self.height,flags=p.ER_NO_SEGMENTATION_MASK,renderer=p.ER_BULLET_HARDWARE_OPENGL)
-    return pixels.tobytes()
+    if type(pixels) == tuple: pixels = bytes(pixels)
+    else: pixels = pixels.tobytes()
+    return pixels
 
   def play(self,run=True):
     self.running = run
