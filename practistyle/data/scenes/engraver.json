@@ -1,0 +1,19 @@
+{
+    "ground_z":0,
+    "active_objects": [
+        {
+            "kind":"Camera3D",
+            "name":"camera",
+            "base":"./cameras/camera3d/camera3d.urdf",
+            "pos":[0,0,1.1767],
+            "rot":[0.0,0.0,0.0]
+        },
+        {
+            "kind":"ActiveObject",
+            "name":"checkerboard",
+            "base":"./robots/engraver/engraver.urdf",
+            "pos":[0,0,0.00],
+            "rot":[0,0,0]
+        }
+    ]
+}
