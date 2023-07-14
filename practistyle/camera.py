@@ -97,7 +97,12 @@ class Camera3D(ActiveObject):
         self.fov_pids = list()
         if not show: return
 
-        origin = np.array(self.pos)
+        num_joints = p.getNumJoints(self.id)
+        if num_joints: pos,orn,_,_,_,_ = p.getLinkState(self.id,num_joints-1)
+        else: pos,orn = p.getBasePositionAndOrientation(self.id)
+        rot = p.getEulerFromQuaternion(orn)
+
+        origin = np.array(pos)
         near = self.focal
         far = 1000
         ratio = self.pixels_w / self.pixels_h
@@ -115,7 +120,7 @@ class Camera3D(ActiveObject):
             for i in range(2):
                 u = float(i) / (2-1)
                 v = float(j) / (2-1)
-                target_dr = Rotation.from_euler('xyz',self.rot).apply(lower_left_corner + u*horizontal + v*vertical) @ axes
+                target_dr = Rotation.from_euler('xyz',rot).apply(lower_left_corner + u*horizontal + v*vertical) @ axes
                 target = origin + target_dr
                 l = np.linalg.norm(target - origin)
                 dr = (target - origin) / l * far

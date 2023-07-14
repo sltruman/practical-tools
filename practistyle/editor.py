@@ -51,13 +51,12 @@ class Editor:
     def select(self,name):
         return self.scene.active_objs_by_name[name].properties()
 
-    def add(self,kind,base,pos,rot,scale,extra_params={}):
+    def add(self,kind,base,pos,rot,extra_params={}):
         object_info = {
             "kind": kind,
             "base":base,
             "pos":pos,
             "rot":rot,
-            "scale":[1,1,1],
             "name":kind.lower()
         }
 
@@ -65,7 +64,7 @@ class Editor:
 
         try:
             import practistyle
-            active_obj = eval(f'digitaltwin.{kind}(self.scene,**object_info)')
+            active_obj = eval(f'practistyle.{kind}(self.scene,**object_info)')
         except:
             return {}
         
@@ -81,22 +80,12 @@ class Editor:
         self.scene.active_objs_by_name[active_obj.name] = active_obj
         return active_obj.properties()
 
-    def add_cube(self,pos,rot,size):
-        return self.add('Cube','objects/cube/cube.urdf',pos,rot,[1,1,1],dict(size=size))
-
-    def add_cylinder(self,pos,rot,radius,length):
-        return self.add('Cylinder','objects/cylinder/cylinder.urdf',pos,rot,[1,1,1],dict(radius=radius,length=length))
-       
-    def add_box(self,pos,rot,size,thickness):
-        return self.add('Box','objects/box/box.urdf',pos,rot,[1,1,1],dict(size=size,thickness=thickness))
-
     def remove(self,name):
         active_obj = self.scene.active_objs_by_name[name]
-
         del self.scene.active_objs[active_obj.id]
         del self.scene.active_objs_by_name[name]
-        del active_obj
-        
+        active_obj.remove()
+
     def rename(self,name,new_name):
         active_obj = self.scene.active_objs_by_name[name]
         del self.scene.active_objs_by_name[name]

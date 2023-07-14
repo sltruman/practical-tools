@@ -4,15 +4,23 @@
         {
             "kind":"Camera3D",
             "name":"camera",
-            "base":"./cameras/camera3d/camera3d.urdf",
-            "pos":[0,0,1.1767],
-            "rot":[0.0,0.0,0.0]
+            "base":"./cameras/camera2d/camera2d.urdf",
+            "pos":[0,0,0.50],
+            "rot":[0.0,0.0,0.0],
+            "fov":0.785
+        },
+        {
+            "kind":"ActiveObject",
+            "name":"engraver",
+            "base":"./robots/engraver/engraver.urdf",
+            "pos":[0,0,0.0],
+            "rot":[0,0,0]
         },
         {
             "kind":"ActiveObject",
             "name":"checkerboard",
-            "base":"./robots/engraver/engraver.urdf",
-            "pos":[0,0,0.00],
+            "base":"./objects/checkerboard/checkerboard.urdf",
+            "pos":[0,0,-0.02],
             "rot":[0,0,0]
         }
     ]

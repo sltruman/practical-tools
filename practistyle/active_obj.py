@@ -3,8 +3,6 @@ import os
 
 class ActiveObject:
     def __init__(self,scene,**kwargs):
-        if 'scale' not in kwargs: kwargs['scale'] = [1,1,1]
-
         self.actions = list()
         self.result = None,
         self.scene = scene
@@ -14,19 +12,18 @@ class ActiveObject:
         self.base = self.profile['base']
         self.pos = self.profile['pos']
         self.rot = self.profile['rot']
-        self.scale = self.profile['scale']
         self.user_data = self.profile['user_data'] if 'user_data' in self.profile else ''
 
         self.set_base(self.base)
         pass
 
-    def __del__(self):
+    def remove(self):
         self.actions.clear()
         if 'id' in vars(self): p.removeBody(self.id)
         pass
  
     def properties(self):
-        return dict(kind='ActiveObject',name=self.name,base=self.base,pos=self.pos,rot=self.rot,scale=self.scale,user_data=self.user_data if 'user_data' in vars(self) else '')
+        return dict(kind='ActiveObject',name=self.name,base=self.base,pos=self.pos,rot=self.rot,user_data=self.user_data if 'user_data' in vars(self) else '')
     
     def update(self,dt):
         if not self.actions: return
@@ -63,18 +60,6 @@ class ActiveObject:
 
     def get_rot(self):
         return self.rot
-
-    def set_scale(self,scale):
-        pass
-
-    def get_scale(self,):
-        return [1,1,1]
-    
-    def set_transparence(self,value):
-        pass
-
-    def get_transparence(self):
-        pass 
 
     def set_user_data(self,value):
         self.user_data = value
