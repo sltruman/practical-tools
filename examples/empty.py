@@ -17,10 +17,11 @@ workflow = Workflow(scene)
 obj = editor.add('Robot','robots/ur5/ur5.urdf',[2,0,1],[0,0,0])
 editor.remove('robot')
 
-# name = obj['name']
+# name = obj['name']``
 # scene.active_objs_by_name[name].set_end_effector('end_effectors/gripper2/gripper2.urdf')
 # print(scene.active_objs_by_name[name].get_joints())
 
 while True:
     scene.update_for_tick(1/180.)
     time.sleep(1/180.)
+

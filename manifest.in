@@ -1,4 +1,3 @@
-include version.in
 recursive-include practistyle/data/cameras *.*
 recursive-include practistyle/data/containers *.*
 recursive-include practistyle/data/end_effectors *.*
