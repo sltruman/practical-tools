@@ -61,7 +61,7 @@ class Scene:
         kind = object_info['kind']
         import practistyle
         active_obj = eval(f'practistyle.{kind}(self.data_dir,**object_info)')
-        self.active_objs[active_obj.id] = active_obj
+        self.active_objs[active_obj.name] = active_obj
     
   def save(self,scene_path=''):
       if scene_path: self.scene_path = scene_path
@@ -84,7 +84,6 @@ class Scene:
     pass
 
   def rtt(self):
-
     _,_,pixels,_,_ = p.getCameraImage(self.width,self.height,flags=p.ER_NO_SEGMENTATION_MASK,renderer=p.ER_BULLET_HARDWARE_OPENGL)
     if type(pixels) == tuple: pixels = bytes(pixels)
     else: pixels = pixels.tobytes()

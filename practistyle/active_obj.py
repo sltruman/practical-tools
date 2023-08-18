@@ -27,13 +27,17 @@ class ActiveObject:
 
     def properties(self):
         return dict(kind='ActiveObject',
+                    name=self.name,
                     base=self.base,
                     pos=self.pos,
                     rot=self.rot,
-                    nodes=self.get_nodes(),
+                    links=self.get_links(),
                     user_data=self.user_data if 'user_data' in vars(self) else '')
     
     def update(self,dt):
+        self.pos,orn = p.getBasePositionAndOrientation(self.id)
+        self.rot = p.getEulerFromQuaternion(orn)
+        
         if not self.actions: return
         fun,args = self.actions[0]
         fun(*args)
@@ -53,7 +57,10 @@ class ActiveObject:
         self.id = p.loadURDF(os.path.join(self.data_dir,base), self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
         p.resetBasePositionAndOrientation(self.id,self.pos,p.getQuaternionFromEuler(self.rot))
         if 'name' not in vars(self): self.name = self.id
-
+    
+    def get_pose(self):
+        return self.pos,self.rot
+    
     def set_pos(self,pos):
         self.pos = pos
         p.resetBasePositionAndOrientation(self.id,pos,p.getQuaternionFromEuler(self.rot))
@@ -73,7 +80,7 @@ class ActiveObject:
     def set_user_data(self,value):
         self.user_data = value
 
-    def get_nodes(self):
+    def get_links(self):
         links = []
         shapes = p.getVisualShapeData(self.id)
         _,_,_,_,base,_,_,_ = shapes[0]

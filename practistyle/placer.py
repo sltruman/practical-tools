@@ -60,14 +60,14 @@ class Placer(ActiveObject):
     def generate(self,*args,**kwargs):
         def task():
             rot = np.array([random.randint(0,314),random.randint(0,314),random.randint(0,314)]) / 100.
-            self.objs.append(p.loadURDF(os.path.join(self.scene.data_dir,self.workpiece),self.center,p.getQuaternionFromEuler(rot)))
+            self.objs.append(p.loadURDF(os.path.join(self.data_dir,self.workpiece),self.center,p.getQuaternionFromEuler(rot)))
         for i in range(self.amount): self.actions.append((task, ()))
         while not self.idle(): time.sleep(1/180)
 
     def signal_generate(self,*args,**kwargs):
         def task():
             rot = np.array([random.randint(0,314),random.randint(0,314),random.randint(0,314)]) / 100.
-            self.objs.append(p.loadURDF(os.path.join(self.scene.data_dir,self.workpiece),self.center,p.getQuaternionFromEuler(rot)))
+            self.objs.append(p.loadURDF(os.path.join(self.data_dir,self.workpiece),self.center,p.getQuaternionFromEuler(rot)))
         
         for i in range(self.amount): self.actions.append((task, ()))
 
@@ -83,4 +83,12 @@ class Placer(ActiveObject):
         self.actions.append((output, ()))
         pass
 
-    
+    def get_links(self):
+        nodes = super().get_links()
+
+        for id in self.objs:
+            shapes = p.getVisualShapeData(id)
+            _,_,_,_,base,_,_,_ = shapes[0]
+            pos,orn = p.getBasePositionAndOrientation(id)
+            nodes.append(dict(base=base.decode(),pos=pos,rot=p.getEulerFromQuaternion(orn)))
+        return nodes

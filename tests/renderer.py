@@ -27,12 +27,3 @@ scene.add(light, pose=camera_pose)
 
 r = pyrender.OffscreenRenderer(1024,1024)
 color, depth = r.render(scene)
-
-plt.figure()
-plt.subplot(1,2,1)
-plt.axis('off')
-plt.imshow(color)
-plt.subplot(1,2,2)
-plt.axis('off')
-plt.imshow(depth, cmap=plt.cm.gray_r)
-plt.show()

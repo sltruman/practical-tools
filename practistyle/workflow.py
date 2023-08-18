@@ -96,7 +96,7 @@ class Workflow():
                 act = declare[last]
                 name = act['name']
 
-                last_obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
+                last_obj = self.scene.active_objs[name]
                 if not last_obj.idle():
                     self.scene.actions.append((task,(last,)))
                     return
@@ -123,7 +123,7 @@ class Workflow():
                 name = act['name']
                 fun = act['fun']
                 args = act['args'] if 'args' in act else {}
-                obj = self.scene.active_objs_by_name[name] if name in self.scene.active_objs_by_name else self.active_plugins_by_name[name]
+                obj = self.scene.active_objs[name]
 
                 print('err',err,flush=True)
                 print('sig',fun,flush=True)
@@ -132,13 +132,11 @@ class Workflow():
 
                 args['declare'] = declare
                 args['cursor'] = next
-                args['plugins'] = self.active_plugins_by_name
 
                 eval(f'obj.signal_{fun}(*val,**args)')
                 
                 del args['declare']
                 del args['cursor']
-                del args['plugins']
             except:
                 print(traceback.format_exc(),flush=True)
                 print('Workflow stopped!',flush=True)
