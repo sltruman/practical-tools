@@ -2,16 +2,16 @@ import pybullet as p
 import os
 
 class ActiveObject:
-    def __init__(self,scene,**kwargs):
+    def __init__(self,data_dir,**kwargs):
         self.actions = list()
         self.result = None,
-        self.scene = scene
+        self.data_dir = data_dir
         self.profile = kwargs
-        
-        self.name = self.profile['name']
-        self.base = self.profile['base']
-        self.pos = self.profile['pos']
-        self.rot = self.profile['rot']
+
+        if 'name' in kwargs: self.name = kwargs['name']
+        self.base = kwargs['base']
+        self.pos = kwargs['pos']
+        self.rot = kwargs['rot']
         self.user_data = self.profile['user_data'] if 'user_data' in self.profile else ''
 
         self.set_base(self.base)
@@ -22,8 +22,16 @@ class ActiveObject:
         if 'id' in vars(self): p.removeBody(self.id)
         pass
  
+    def get_properties(self):
+        return self.properties()
+
     def properties(self):
-        return dict(kind='ActiveObject',name=self.name,base=self.base,pos=self.pos,rot=self.rot,user_data=self.user_data if 'user_data' in vars(self) else '')
+        return dict(kind='ActiveObject',
+                    base=self.base,
+                    pos=self.pos,
+                    rot=self.rot,
+                    nodes=self.get_nodes(),
+                    user_data=self.user_data if 'user_data' in vars(self) else '')
     
     def update(self,dt):
         if not self.actions: return
@@ -42,8 +50,9 @@ class ActiveObject:
     def set_base(self,base):
         self.base = base
         if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(os.path.join(self.scene.data_dir,base), self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
+        self.id = p.loadURDF(os.path.join(self.data_dir,base), self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
         p.resetBasePositionAndOrientation(self.id,self.pos,p.getQuaternionFromEuler(self.rot))
+        if 'name' not in vars(self): self.name = self.id
 
     def set_pos(self,pos):
         self.pos = pos
@@ -63,3 +72,16 @@ class ActiveObject:
 
     def set_user_data(self,value):
         self.user_data = value
+
+    def get_nodes(self):
+        links = []
+        shapes = p.getVisualShapeData(self.id)
+        _,_,_,_,base,_,_,_ = shapes[0]
+        pos,orn = p.getBasePositionAndOrientation(self.id)
+        links.append(dict(base=base.decode(),pos=pos,rot=p.getEulerFromQuaternion(orn)))
+
+        for i in range(p.getNumJoints(self.id)):
+            _,_,_,_,pos,orn = p.getLinkState(self.id,i)
+            _,_,_,_,base,_,_,_ = shapes[i+1]
+            links.append(dict(base=base.decode(),pos=pos,rot=p.getEulerFromQuaternion(orn)))
+        return links

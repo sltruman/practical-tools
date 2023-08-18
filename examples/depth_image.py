@@ -1,7 +1,6 @@
 from time import time
 import os
 from practistyle import Scene,Workflow
-import data
 
 scene = Scene(1024,768)
 workflow = Workflow(scene)

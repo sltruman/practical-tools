@@ -7,59 +7,66 @@ import socket as s
 from time import time,sleep
 import traceback
 import json
+import numpy as np
+import trimesh
+import pyrender
+import xml
 
 class Renderer:
-    def __init__(self,scene):
-        self.scene = scene
-        self.p = mp.Process(target=self.run,args=())
-        self.p.start()
+    def __init__(self,context):
+        self.context = context
+        self.viewer_headless = pyrender.OffscreenRenderer(context.width,context.height)
+        self.run()
         pass
 
     def __del__(self):
-        self.p.terminate()
-        self.p.join()
-        pass
-
-    def sync_bodies(self):
         pass
     
-    def draw_points(self):
-        pass
-
-    def draw_lines(self):
-        pass
-
     def run(self):
-        from math import pi, sin, cos
-        from direct.task import Task
-        from direct.showbase.ShowBase import ShowBase
-        from direct.filter.CommonFilters import CommonFilters
-        from direct.filter.FilterManager import FilterManager
-        from panda3d.core import NodePath
+        scene = self.scene = pyrender.Scene(ambient_light=[0.02, 0.02, 0.02],
+                                            bg_color=[0.0, 1.0, 1.0])
 
-        class Panda3DRenderer(ShowBase):
-            def __init__(self):
-                ShowBase.__init__(self)
-                self.scene = self.loader.loadModel("models/environment")
-                self.scene.reparentTo(self.render)
-                self.scene.setScale(0.25, 0.25, 0.25)
-                self.scene.setPos(-8, 42, 0)
-                self.taskMgr.add(self.spinCameraTask, "SpinCameraTask")
-
-                self.buffer = self.win.makeTextureBuffer("hello", 256, 256)
-                self.altCam = self.makeCamera(self.buffer)
-                self.altCam.reparentTo(self.render)
-                self.altCam.setPos(0, -10, 0)
+        light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0],intensity=10)
+        light.shadow_texture = pyrender.Texture()
+        light_pose = np.eye(4)
+        light_pose[:3,:3] = Rotation.from_euler('xyz',[0,0.875,0]).as_matrix()
+        light_pose[:3,3] = [0,0,1.0]
+        scene.add(light, pose=light_pose)
+    
+        for active_obj in self.context.active_objs.values():
+            properties = active_obj.get_properties()
+            links = properties['nodes']
+            for link in links:
+                if not os.path.exists(link['base']): continue
+                tris = trimesh.load(link['base'])
+                node = pyrender.Mesh.from_trimesh(tris)
+                pose = np.eye(4)
+                pose[:3,:3] = Rotation.from_euler('xyz',link['rot']).as_matrix()
+                pose[:3,3] = link['pos']
+                scene.add(node,pose=pose)
                 
-            def spinCameraTask(self, task):
-                angleDegrees = task.time * 6.0
-                angleRadians = angleDegrees * (pi / 180.0)
-                self.camera.setPos(20 * sin(angleRadians), -20 * cos(angleRadians), 3)
-                self.camera.setHpr(angleDegrees, 0, 0)
-                texture = self.buffer.getTexture()
-                print(texture.getRamImageAs('RGBA'))
+        viewer = pyrender.Viewer(scene,viewport_size=self.context.viewport_size)
+        
+    def sync_bodies(self):
+        pass
 
-                return Task.cont
+    def sync_status(self):
+        for active_obj in self.context.active_objs.values():
+            links = active_obj.get_nodes()
+            for link in links:
+                pose = np.eye(4)
+                pose[:3,:3] = Rotation.from_euler('xyz',link['rot']).as_matrix()
+                pose[:3,3] = link['pos']
 
-        app = Panda3DRenderer()
-        app.run()
+    def render_to_texture(self):
+        color, depth = self.viewer_headless.render(self.scene)
+        return color,depth
+
+    def render_to_texture_of_color(self):
+        color, _ = self.viewer_headless.render(self.scene)
+        return color
+
+    def render_to_texture_of_depth(self):
+        _, depth = self.viewer_headless.render(self.scene)
+        return depth
+    

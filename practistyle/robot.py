@@ -52,23 +52,23 @@ class Robot(ActiveObject):
         ee_kind = ""
         mimic_name = ''
         gears = []
-        with xml.parse(os.path.join(self.scene.data_dir,base)) as doc_robot:
+        with xml.parse(os.path.join(self.data_dir,base)) as doc_robot:
             node_robot = doc_robot.getElementsByTagName('robot')[0]
             for mesh in node_robot.getElementsByTagName('mesh'):
                 filename = mesh.getAttribute('filename')
-                mesh.setAttribute('filename',os.path.join(self.scene.data_dir,os.path.dirname(base),filename))
+                mesh.setAttribute('filename',os.path.join(self.data_dir,os.path.dirname(base),filename))
 
             num_joints = len(node_robot.getElementsByTagName('link'))
 
             if self.end_effector:
                 link_ee = node_robot.getElementsByTagName('link')[-1]
                 link_ee_name = link_ee.getAttribute('name')
-                with xml.parse(os.path.join(self.scene.data_dir,self.end_effector)) as doc_ee:
+                with xml.parse(os.path.join(self.data_dir,self.end_effector)) as doc_ee:
                     node_ee = doc_ee.getElementsByTagName('robot')[0]
                     ee_kind = node_ee.getAttribute("kind")
                     for mesh in node_ee.getElementsByTagName('mesh'):
                         filename = mesh.getAttribute('filename')
-                        mesh.setAttribute('filename',os.path.join(self.scene.data_dir,os.path.dirname(self.end_effector),filename))
+                        mesh.setAttribute('filename',os.path.join(self.data_dir,os.path.dirname(self.end_effector),filename))
                     for i,link in enumerate(node_ee.getElementsByTagName('link')):
                         if i == 0: link.setAttribute('name',link_ee.getAttribute('name'))
                         node_robot.appendChild(link)
@@ -109,7 +109,6 @@ class Robot(ActiveObject):
         self.active_joint_indexes = []
         self.joint_velocities = []
         for i in range(p.getNumJoints(self.id)):
-            p.setCollisionFilterPair(self.scene.plane,self.id,-1,i,0)
             ji = p.getJointInfo(self.id, i)
             jointName,jointType,jointVelocity = ji[1],ji[2],ji[11]
             if (jointType != p.JOINT_REVOLUTE and jointType != p.JOINT_PRISMATIC and jointType != p.JOINT_SPHERICAL): continue

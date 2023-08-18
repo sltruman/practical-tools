@@ -4,7 +4,6 @@ from scipy.spatial.transform import Rotation
 from time import time,sleep
 import json
 import os
-import socket as s
 
 class Scene:
   def __init__(self,width=1024,height=768,data_dir='./practistyle/data',tmp_dir='.'):
@@ -16,20 +15,23 @@ class Scene:
     self.active_objs_by_name = dict()
     self.width = width
     self.height = height
+    self.viewport_size = (width,height)
     self.running = True
     self.scene_path = ''
     self.timestep = 1/180.
     self.actions = list()
     self.ground_z = 0
     
-    self.id = p.connect(p.GUI,options=f'--width={width} --height={height} --headless')
+    self.id = p.connect(p.DIRECT,options=f'--width={width} --height={height}')
     p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
     p.setPhysicsEngineParameter(erp=1,contactERP=1,frictionERP=1)
     p.setTimeStep(self.timestep)
     p.setGravity(0, 0, -9.81)
     
-    self.plane = p.loadURDF(os.path.join(self.data_dir,"pybullet_objects/plane.urdf"), [0, 0, self.ground_z], useFixedBase=True)
-
+    import practistyle
+    self.plane = practistyle.ActiveObject(self.data_dir,base='pybullet_objects/plane.urdf',pos=[0,0,self.ground_z],rot=[0,0,0])
+    self.active_objs[self.plane.id] = self.plane
+    
   def __del__(self):
     self.play(False)
     p.resetSimulation()
@@ -51,34 +53,15 @@ class Scene:
     self.ground_z = self.profile['ground_z']
     self.user_data = self.profile['user_data']
     
-    p.resetBasePositionAndOrientation(self.plane,[0,0,self.ground_z],p.getQuaternionFromEuler([0,0,0]))
+    self.plane.set_pos([0,0,self.ground_z])
+    self.plane.set_rot([0,0,0])
 
-    minimum=self.ground_z
-    maximum=1.5
     for object_info in self.profile['active_objects']:
-      # def task(object_info):
         print('add object:',object_info,flush=True)
         kind = object_info['kind']
-        active_obj = None
         import practistyle
-        active_obj = eval(f'practistyle.{kind}(self,**object_info)')
+        active_obj = eval(f'practistyle.{kind}(self.data_dir,**object_info)')
         self.active_objs[active_obj.id] = active_obj
-        if 'name' in object_info: self.active_objs_by_name[object_info['name']] = active_obj
-
-        lit,big = p.getAABB(active_obj.id)
-        
-        if lit[0] < minimum: minimum = lit[0]
-        if lit[1] < minimum: minimum = lit[1]
-        if lit[2] < minimum: minimum = lit[2]
-        if big[0] > maximum: maximum = big[0]
-        if big[1] > maximum: maximum = big[1]
-        if big[2] > maximum: maximum = big[2]
-
-    # self.actions.append((task,[object_info]))
-
-    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    dist = maximum - minimum
-    p.resetDebugVisualizerCamera(dist*1.2,45,-45,target)
     
   def save(self,scene_path=''):
       if scene_path: self.scene_path = scene_path
@@ -101,6 +84,7 @@ class Scene:
     pass
 
   def rtt(self):
+
     _,_,pixels,_,_ = p.getCameraImage(self.width,self.height,flags=p.ER_NO_SEGMENTATION_MASK,renderer=p.ER_BULLET_HARDWARE_OPENGL)
     if type(pixels) == tuple: pixels = bytes(pixels)
     else: pixels = pixels.tobytes()

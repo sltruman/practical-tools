@@ -45,7 +45,6 @@ class Editor:
         return dict(name=self.scene.active_objs[id].name,id=id,pos=pos)
         
     def move(self,name,pos):
-        self.scene.active_objs_by_name[name].properties()
         pass
 
     def select(self,name):
@@ -56,39 +55,22 @@ class Editor:
             "kind": kind,
             "base":base,
             "pos":pos,
-            "rot":rot,
-            "name":kind.lower()
+            "rot":rot
         }
 
         object_info.update(extra_params)
 
         try:
             import practistyle
-            active_obj = eval(f'practistyle.{kind}(self.scene,**object_info)')
+            active_obj = eval(f'practistyle.{kind}(self.scene.data_dir,**object_info)')
         except:
+            tb.print_exc()
             return {}
         
         self.scene.active_objs[active_obj.id] = active_obj
-        
-        name = active_obj.name
-        i = 1
-        while name in self.scene.active_objs_by_name:
-            name = active_obj.name + str(i)
-            i+=1
-        
-        active_obj.name = name
-        self.scene.active_objs_by_name[active_obj.name] = active_obj
         return active_obj.properties()
 
     def remove(self,name):
         active_obj = self.scene.active_objs_by_name[name]
         del self.scene.active_objs[active_obj.id]
-        del self.scene.active_objs_by_name[name]
         active_obj.remove()
-
-    def rename(self,name,new_name):
-        active_obj = self.scene.active_objs_by_name[name]
-        del self.scene.active_objs_by_name[name]
-        active_obj.name = new_name
-        self.scene.active_objs_by_name[new_name] = active_obj
-

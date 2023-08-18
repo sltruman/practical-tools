@@ -856,6 +856,10 @@ placer = scene.active_objs_by_name['placer']
 placer.generate()
 ```
 
+## 物体.雕刻机
+
+
+
 ## 工作流-示例-深度图/姿态估计/混合拆垛/无序抓取
 
         通过简单的两个节点来实现获取深度图的工作流，如下：
