@@ -27,7 +27,7 @@ class ActiveObject:
 
     def properties(self):
         return dict(kind='ActiveObject',
-                    name=self.name,
+                    name=self.name if 'name' in vars(self) else self.id,
                     base=self.base,
                     pos=self.pos,
                     rot=self.rot,

@@ -1,29 +1,39 @@
-import numpy as np
-import trimesh
-import pyrender
-import matplotlib.pyplot as plt
-import xml
+from math import pi, sin, cos
 
-fuze_trimesh = trimesh.load('models/lego/lego.obj')
-mesh = pyrender.Mesh.from_trimesh(fuze_trimesh)
+from direct.showbase.ShowBase import ShowBase
+from direct.task import Task
+class MyApp(ShowBase):
+    def __init__(self):
+        ShowBase.__init__(self)
 
-scene = pyrender.Scene()
-scene.add(mesh)
+        # Load the environment model.
+        self.scene = self.loader.loadModel("models/environment")
+        # Reparent the model to render.
+        self.scene.reparentTo(self.render)
 
-camera = pyrender.PerspectiveCamera(yfov=np.pi / 3.0, aspectRatio=1.0)
-s = np.sqrt(2)/2
-camera_pose = np.array([
-    [0.0, -s,   s,   0.3],
-    [1.0,  0.0, 0.0, 0.0],
-    [0.0,  s,   s,   0.35],
-    [0.0,  0.0, 0.0, 1.0],
-])
+        # Apply scale and position transforms on the model.
+        self.scene.setScale(0.25, 0.25, 0.25)
+        self.scene.setPos(-8, 42, -1)
 
-scene.add(camera, pose=camera_pose)
-light = pyrender.SpotLight(color=np.ones(3), intensity=3.0,
-                            innerConeAngle=np.pi/16.0,
-                            outerConeAngle=np.pi/6.0)
-scene.add(light, pose=camera_pose)
+        obj = self.loader.loadModel("practistyle/data/pybullet_objects/plane.obj")
+        # Reparent the model to render.
+        obj.reparentTo(self.render)
 
-r = pyrender.OffscreenRenderer(1024,1024)
-color, depth = r.render(scene)
+        # Add the spinCameraTask procedure to the task manager.
+        self.taskMgr.add(self.spinCameraTask, "SpinCameraTask")
+        self.p = -45
+        
+        self.cam.setPos(0,0,200)
+        self.cam.setHpr(0,self.p,0)
+        
+
+
+    # Define a procedure to move the camera.
+    def spinCameraTask(self, task):
+        self.p+=0.1
+        self.cam.setHpr(0,self.p,0)
+        return Task.cont
+
+
+app = MyApp()
+app.run()

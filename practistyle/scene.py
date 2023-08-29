@@ -21,6 +21,9 @@ class Scene:
     self.timestep = 1/180.
     self.actions = list()
     self.ground_z = 0
+    self.camera_pos = [0,0,10]
+    self.camera_rot = [0,-1.57,0]
+    
     
     self.id = p.connect(p.DIRECT,options=f'--width={width} --height={height}')
     p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
@@ -119,41 +122,6 @@ class Scene:
     if pitch < -89:
       pitch = -89
 
-    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
-    pass
-
-  def rotate_front(self):
-    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    yaw = 0
-    pitch = -1
-    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
-    pass
-
-  def rotate_back(self):
-    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    yaw = 180
-    pitch = -1
-    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
-    pass
-
-  def rotate_top(self):
-    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    yaw = 0
-    pitch = -89
-    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
-    pass
-
-  def rotate_left(self):
-    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    yaw = -89
-    pitch = -1
-    p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
-    pass
-
-  def rotate_right(self):
-    w,h,vm,pm,up,forward,horizontal,vertical,yaw,pitch,distance,target = p.getDebugVisualizerCamera()
-    yaw = 89
-    pitch = -1
     p.resetDebugVisualizerCamera(distance,yaw,pitch,target)
     pass
   
