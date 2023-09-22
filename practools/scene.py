@@ -37,7 +37,7 @@ class Scene:
   def play(self,run=True):
     self.running = run
 
-  def update(self,dt=1/180):
+  def update(self):
     if not self.running: return
 
     if self.actions:
@@ -45,12 +45,10 @@ class Scene:
         fun(*args)
         self.actions.pop(0)
 
-    while dt >= self.timestep:
-      for obj in self.active_objs.values():
-        obj.update(self.timestep)
-        
-      p.stepSimulation()
-      dt -= self.timestep
+    for obj in self.active_objs.values():
+      obj.update(self.timestep)
+      
+    p.stepSimulation()
 
   def get_active_obj_properties(self):
     objs = dict()

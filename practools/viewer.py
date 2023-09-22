@@ -2,8 +2,13 @@ import os
 import math as m
 import numpy as np
 from scipy.spatial.transform import Rotation
-import panda3d as p3d
-from direct.showbase.ShowBase import *
+from panda3d.core import FrameBufferProperties,WindowProperties,GraphicsPipe,GraphicsOutput,\
+                        Texture,LPoint2,LPoint3,\
+                        CollisionRay,CollisionTraverser,CollisionHandlerQueue,\
+                        CollisionNode,BitMask32
+
+from direct.showbase.ShowBase import ShowBase
+from direct.directtools.DirectSelection import SelectionRay
 
 class Viewer:
     cam_target = np.array([0.0,0.0,0.0])
@@ -18,26 +23,45 @@ class Viewer:
         pass
     
     def run(self,context):
-        self.render = base = ShowBase(fStartDirect=True, windowType='offscreen')
-        base.cam.set_pos(0,0,10)
-        base.cam.look_at(self.cam_target[0],self.cam_target[1],self.cam_target[2])
+        self.base = base = ShowBase(fStartDirect=True,windowType='offscreen')
+        base.cam.setPos(0,0,10)
+        base.cam.setHpr(0,-89,0)
         
-        fb_prop = p3d.core.FrameBufferProperties()
+        # dlight = DirectionalLight('dlight')
+        # dlight.setColor((1, 1, 1, 1))
+        # dlnp = self.base.render.attachNewNode(dlight)
+        # dlnp.setHpr(0, -90, 0)
+        # base.render.setLight(dlnp)
+
+        # shader = Shader.load(Shader.SL_GLSL,
+        #              vertex="myshader.vert",
+        #              fragment="myshader.frag")
+        # self.base.render.setShader(shader)
+
+        self.picker = CollisionTraverser()
+        self.pq = CollisionHandlerQueue()
+
+        pickerNode = CollisionNode('mouseRay')
+        pickerNode.setFromCollideMask(BitMask32.bit(1))
+        self.pickerRay = CollisionRay()
+        pickerNode.addSolid(self.pickerRay)
+
+        self.pickerNP = self.base.cam.attachNewNode(pickerNode)
+        self.picker.addCollider(self.pickerNP,self.pq)
+
+        fb_prop = FrameBufferProperties()
         fb_prop.setRgbColor(True)
-        fb_prop.setRgbaBits(8, 8, 8, 0)
+        fb_prop.setRgbaBits(8, 8, 8, 8)
         fb_prop.setDepthBits(24)
         
-        win_prop = p3d.core.WindowProperties.size(context.viewport_size[0], context.viewport_size[1])
-        self.window = base.graphicsEngine.makeOutput(base.pipe, "viewport", 0, fb_prop, win_prop, p3d.core.GraphicsPipe.BFRefuseWindow)
+        win_prop = WindowProperties.size(context.viewport_size[0], context.viewport_size[1])
+        framebuffer = base.graphicsEngine.makeOutput(base.pipe, "viewport", 0, fb_prop, win_prop, GraphicsPipe.BFRefuseWindow)
         
-        self.render.cam.setPos(0,0,10)
-        self.render.cam.setHpr(0,-89,0)
+        display_region = framebuffer.makeDisplayRegion()
+        display_region.setCamera(self.base.cam)
 
-        self.disp_region = self.window.makeDisplayRegion()
-        self.disp_region.setCamera(self.render.cam)
-        
-        self.viewport_texture = p3d.core.Texture()
-        self.window.addRenderTexture(self.viewport_texture, p3d.core.GraphicsOutput.RTMCopyRam, p3d.core.GraphicsOutput.RTPColor)
+        self.viewport_texture = Texture()
+        framebuffer.addRenderTexture(self.viewport_texture, GraphicsOutput.RTMCopyRam, GraphicsOutput.RTPColor)
         self.update()
 
     def update(self):
@@ -46,16 +70,18 @@ class Viewer:
         for active_obj in self.context.active_objs.values():
             properties = active_obj.get_properties()
             links = properties['links']
-            id = properties['name']
+            id = properties['id']
 
             for i,link in enumerate(links):
                 if not os.path.exists(link['base']): continue
                 name = f'{id}/{i}'
 
                 if name not in nodes:
-                    node = self.render.loader.loadModel(link['base'])
-                    node.setName(name)
-                    node.reparentTo(self.render.render)
+                    node = self.base.loader.loadModel(link['base'])
+                    node.setPythonTag('owner_id',id)
+                    node.setPythonTag('owner_link_index',i-1)
+                    node.reparentTo(self.base.render)
+                    node.setCollideMask(BitMask32.bit(1)) 
                     self.nodes[name] = node
                 else:
                     node = nodes.pop(name)
@@ -63,19 +89,19 @@ class Viewer:
                 x,y,z = link['pos']
                 node.setPos(x,y,z)
                 node.setHpr(np.rad2deg(rz),np.rad2deg(rx),np.rad2deg(ry))
-            
+
         for node in nodes:
             self.nodes.pop(node)
             node.detachNode()
 
-        self.render.graphicsEngine.renderFrame()
+        self.base.graphicsEngine.renderFrame()
         img = np.frombuffer(self.viewport_texture.getRamImageAs('RGBA'),dtype=np.uint8)
         img.shape = (self.context.viewport_size[1],self.context.viewport_size[0],4)
         self.viewport_color_texture = np.flipud(img).tobytes()
 
     def rotate(self,x,y):
-        cam = np.array(self.render.cam.getPos())
-        rz,rx,ry = self.render.cam.getHpr()
+        cam = np.array(self.base.cam.getPos())
+        rz,rx,ry = self.base.cam.getHpr()
         rz += x / 2
         rx += y / 4
         rz %= 360
@@ -84,33 +110,52 @@ class Viewer:
         direction = [0,-np.linalg.norm(cam - self.cam_target),0]
         R = Rotation.from_euler('xyz',[rx,0,rz],True)
         pos = self.cam_target + R.apply(direction)
-        self.render.cam.setPos(pos[0],pos[1],pos[2])
-        self.render.cam.setHpr(rz,rx,ry)
+        self.base.cam.setPos(pos[0],pos[1],pos[2])
+        self.base.cam.setHpr(rz,rx,ry)
         pass
     
     def pan(self,x,y):
-        rz,rx,ry = self.render.cam.getHpr()
-        cam = np.array(self.render.cam.getPos())
+        rz,rx,ry = self.base.cam.getHpr()
+        cam = np.array(self.base.cam.getPos())
         cam_target = self.cam_target
         
-        len = self.render.camNode.getLens(0)
-        width,height = self.disp_region.getPixelSize(0)
+        len = self.base.camNode.getLens(0)
+        width,height = self.context.viewport_size
 
-        direction_in_image = p3d.core.LPoint2f(x/width,y/height)
-        direction_in_camera = p3d.core.LPoint3f(0,0,0)
-        direction2_in_camera = p3d.core.LPoint3f(0,0,0)
+        direction_in_image = LPoint2(x/width,y/height)
+        direction_in_camera = LPoint3(0,0,0)
+        direction2_in_camera = LPoint3(0,0,0)
         len.extrude(direction_in_image,direction_in_camera,direction2_in_camera)
         
         distance = np.linalg.norm(cam - cam_target) * 2
         direction_in_camera = Rotation.from_euler('xyz',[0,0,rz],True).apply([direction_in_camera[0],-direction_in_camera[2],0]) * distance
         cam += direction_in_camera
         self.cam_target += direction_in_camera
-        self.render.cam.setPos(cam[0],cam[1],cam[2])
+        self.base.cam.setPos(cam[0],cam[1],cam[2])
 
     def zoom(self,factor):
-        origin = np.array(self.render.cam.get_pos())
+        origin = np.array(self.base.cam.get_pos())
         target = self.cam_target
         direction = target - origin
         x,y,z = origin - factor * direction * 0.1
-        self.render.cam.set_pos(x,y,z)
+        self.base.cam.set_pos(x,y,z)
     
+    def pick(self,x,y):
+        width,height = self.context.viewport_size
+        x = (x - width / 2) / (width / 2)
+        y = (y - height / 2) / (height / 2)
+
+        self.pickerRay.setFromLens(self.base.camNode,x,-y)
+        self.picker.traverse(self.base.render)
+    
+        if not self.pq.getNumEntries():
+            return None
+        
+        self.pq.sortEntries()
+        collision_entry = self.pq.getEntry(0)
+        geomNode = collision_entry.getIntoNodePath()
+        node = geomNode.getParent().getParent()
+        pos = collision_entry.getInteriorPoint(geomNode)
+        id = node.getPythonTag('owner_id')
+        link_index = node.getPythonTag('owner_link_index')
+        return pos,id,link_index

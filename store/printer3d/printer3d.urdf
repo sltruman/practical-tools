@@ -1,0 +1,1626 @@
+<?xml version="1.0" ?>
+<robot name="printer3d">
+	<link name="link_printer3d">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="1"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="printer3d.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="printer3d.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_axis_y" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_axis_y"/>
+		<origin xyz="0.0 0.009 0.12" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_axis_y">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="axis_y.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="axis_y.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_place" type="fixed">
+		<parent link="link_axis_y"/>
+		<child link="link_place"/>
+		<origin xyz="0.0 0.048 0.12" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_place">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="place.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="place.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_axis_z" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_axis_z"/>
+		<origin xyz="-0.273 0.044 0.422" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_axis_z">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="axis_z.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="axis_z.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_axis_x" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_axis_x"/>
+		<origin xyz="0.01 0.023 0.501" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_axis_x">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="axis_x.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="axis_x.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Druckkopf" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Druckkopf"/>
+		<origin xyz="-0.001 0.023 0.538" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Druckkopf">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Druckkopf.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Druckkopf.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Fan blades" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Fan blades"/>
+		<origin xyz="-0.001 -0.006 0.535" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_Fan blades">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Fan blades.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Fan blades.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Fan housing" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Fan housing"/>
+		<origin xyz="-0.001 -0.006 0.535" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Fan housing">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Fan housing.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Fan housing.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Fan2.Blades" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Fan2.Blades"/>
+		<origin xyz="0.044 0.015 0.539" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Fan2.Blades">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Fan2.Blades.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Fan2.Blades.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Fan2.gehäuse1" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Fan2.gehäuse1"/>
+		<origin xyz="0.024 0.016 0.539" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Fan2.gehäuse1">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Fan2.gehäuse1.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Fan2.gehäuse1.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Gondel-anschlussgummi" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Gondel-anschlussgummi"/>
+		<origin xyz="-0.017 0.023 0.563" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Gondel-anschlussgummi">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Gondel-anschlussgummi.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Gondel-anschlussgummi.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Gondel.001" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Gondel.001"/>
+		<origin xyz="0.0 0.016 0.545" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Gondel.001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Gondel.001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Gondel.001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_gondel.Bolt.009" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_gondel.Bolt.009"/>
+		<origin xyz="0.013 0.027 0.545" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_gondel.Bolt.009">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="gondel.Bolt.009.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="gondel.Bolt.009.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Haube" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Haube"/>
+		<origin xyz="-0.001 0.01 0.535" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Haube">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Haube.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Haube.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.Fan1.Gondel" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Kabel.Fan1.Gondel"/>
+		<origin xyz="0.012 0.039 0.518" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.Fan1.Gondel">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.Fan1.Gondel.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.Fan1.Gondel.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.Fan2.Gondel" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Kabel.Fan2.Gondel"/>
+		<origin xyz="0.014 0.039 0.518" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.Fan2.Gondel">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.Fan2.Gondel.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.Fan2.Gondel.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.Heizung.Gondel" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Kabel.Heizung.Gondel"/>
+		<origin xyz="0.012 0.042 0.518" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.Heizung.Gondel">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.Heizung.Gondel.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.Heizung.Gondel.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.Nevelierung.Gondel" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Kabel.Nevelierung.Gondel"/>
+		<origin xyz="0.012 0.044 0.518" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.Nevelierung.Gondel">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.Nevelierung.Gondel.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.Nevelierung.Gondel.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Nevelierungsschalter" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Nevelierungsschalter"/>
+		<origin xyz="0.017 0.042 0.529" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Nevelierungsschalter">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Nevelierungsschalter.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Nevelierungsschalter.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_pinch_roller" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_pinch_roller"/>
+		<origin xyz="-0.111 0.017 0.139" rpy="0.0 0.027419122548830915 0.0"/>
+	</joint>
+	<link name="link_pinch_roller">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="pinch_roller.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="pinch_roller.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Rollen.Gondel" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_Rollen.Gondel"/>
+		<origin xyz="0.022 0.061 0.567" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Rollen.Gondel">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Rollen.Gondel.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Rollen.Gondel.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_scchlitten" type="fixed">
+		<parent link="link_axis_x"/>
+		<child link="link_scchlitten"/>
+		<origin xyz="-0.001 0.056 0.54" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_scchlitten">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="scchlitten.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="scchlitten.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Bolt.003" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Bolt.003"/>
+		<origin xyz="-0.226 0.151 0.617" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Bolt.003">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Bolt.003.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Bolt.003.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Extruder" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Extruder"/>
+		<origin xyz="-0.182 0.158 0.597" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Extruder">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Extruder.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Extruder.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Feder" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Feder"/>
+		<origin xyz="-0.187 0.176 0.603" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Feder">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Feder.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Feder.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Galgen.Horizontral" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Galgen.Horizontral"/>
+		<origin xyz="-0.2 0.049 0.545" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Galgen.Horizontral">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Galgen.Horizontral.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Galgen.Horizontral.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.Fan.001" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Kabel.Fan.001"/>
+		<origin xyz="-0.253 0.123 0.602" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.Fan.001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.Fan.001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.Fan.001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.Fan.002" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Kabel.Fan.002"/>
+		<origin xyz="-0.253 0.114 0.603" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.Fan.002">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.Fan.002.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.Fan.002.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.Heizung" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Kabel.Heizung"/>
+		<origin xyz="-0.253 0.123 0.591" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.Heizung">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.Heizung.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.Heizung.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.Nevelierung" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Kabel.Nevelierung"/>
+		<origin xyz="-0.253 0.114 0.591" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.Nevelierung">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.Nevelierung.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.Nevelierung.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.schritmotor.X" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Kabel.schritmotor.X"/>
+		<origin xyz="-0.253 0.148 0.585" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.schritmotor.X">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.schritmotor.X.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.schritmotor.X.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Kabel.Schrittmotor.Filament" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Kabel.Schrittmotor.Filament"/>
+		<origin xyz="-0.253 0.156 0.585" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Kabel.Schrittmotor.Filament">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Kabel.Schrittmotor.Filament.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Kabel.Schrittmotor.Filament.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Klammern.vertikal" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Klammern.vertikal"/>
+		<origin xyz="0.0 0.048 0.132" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Klammern.vertikal">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Klammern.vertikal.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Klammern.vertikal.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Motor.Horizontal" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Motor.Horizontal"/>
+		<origin xyz="-0.227 0.044 0.545" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Motor.Horizontal">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Motor.Horizontal.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Motor.Horizontal.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Motor.Horizontal.Bolt.001" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Motor.Horizontal.Bolt.001"/>
+		<origin xyz="-0.22 0.044 0.545" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Motor.Horizontal.Bolt.001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Motor.Horizontal.Bolt.001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Motor.Horizontal.Bolt.001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Motor.Vorschub" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Motor.Vorschub"/>
+		<origin xyz="-0.182 0.158 0.59" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Motor.Vorschub">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Motor.Vorschub.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Motor.Vorschub.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Muffen" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Muffen"/>
+		<origin xyz="0.0 0.048 0.132" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Muffen">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Muffen.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Muffen.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_PCB.oben" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_PCB.oben"/>
+		<origin xyz="-0.252 0.135 0.574" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_PCB.oben">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="PCB.oben.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="PCB.oben.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Plug.000" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Plug.000"/>
+		<origin xyz="-0.253 0.156 0.585" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Plug.000">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Plug.000.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Plug.000.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Plug.001" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Plug.001"/>
+		<origin xyz="-0.253 0.148 0.585" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Plug.001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Plug.001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Plug.001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Plug.002" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Plug.002"/>
+		<origin xyz="-0.253 0.122 0.592" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Plug.002">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Plug.002.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Plug.002.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Plug.003" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Plug.003"/>
+		<origin xyz="-0.253 0.122 0.603" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Plug.003">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Plug.003.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Plug.003.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Plug.004" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Plug.004"/>
+		<origin xyz="-0.253 0.131 0.603" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Plug.004">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Plug.004.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Plug.004.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Plug.005" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Plug.005"/>
+		<origin xyz="-0.253 0.13 0.592" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Plug.005">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Plug.005.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Plug.005.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Rollen" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Rollen"/>
+		<origin xyz="0.0 0.048 0.039" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Rollen">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Rollen.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Rollen.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Schelle" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Schelle"/>
+		<origin xyz="-0.239 0.068 0.574" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Schelle">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Schelle.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Schelle.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Schlitten.vertikal.Bolt.001" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Schlitten.vertikal.Bolt.001"/>
+		<origin xyz="-0.226 0.137 0.601" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Schlitten.vertikal.Bolt.001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Schlitten.vertikal.Bolt.001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Schlitten.vertikal.Bolt.001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Schlitten.vertikal.Bolt.005" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Schlitten.vertikal.Bolt.005"/>
+		<origin xyz="0.0 0.048 0.132" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Schlitten.vertikal.Bolt.005">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Schlitten.vertikal.Bolt.005.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Schlitten.vertikal.Bolt.005.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_trapezoid screw.X.000" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_trapezoid screw.X.000"/>
+		<origin xyz="-0.227 0.044 0.545" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_trapezoid screw.X.000">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="trapezoid screw.X.000.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="trapezoid screw.X.000.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Umlenkrolle" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Umlenkrolle"/>
+		<origin xyz="-0.226 0.151 0.617" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Umlenkrolle">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Umlenkrolle.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Umlenkrolle.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Umlenkrolle.winkel" type="fixed">
+		<parent link="link_axis_z"/>
+		<child link="link_Umlenkrolle.winkel"/>
+		<origin xyz="-0.226 0.138 0.604" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Umlenkrolle.winkel">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Umlenkrolle.winkel.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Umlenkrolle.winkel.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Bolt" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Bolt"/>
+		<origin xyz="0.0 0.048 0.078" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_Bolt">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Bolt.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Bolt.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Bolt.001" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Bolt.001"/>
+		<origin xyz="-0.169 0.093 0.715" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_Bolt.001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Bolt.001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Bolt.001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Bolt.002" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Bolt.002"/>
+		<origin xyz="-0.098 0.093 0.715" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_Bolt.002">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Bolt.002.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Bolt.002.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Case back" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Case back"/>
+		<origin xyz="0.0 0.048 0.078" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_Case back">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Case back.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Case back.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_casing" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_casing"/>
+		<origin xyz="0.0 0.048 0.078" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_casing">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="casing.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="casing.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Decal.SD-Card" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Decal.SD-Card"/>
+		<origin xyz="0.251 -0.118 0.073" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Decal.SD-Card">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Decal.SD-Card.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Decal.SD-Card.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Decal.TF Card" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Decal.TF Card"/>
+		<origin xyz="0.251 -0.086 0.052" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Decal.TF Card">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Decal.TF Card.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Decal.TF Card.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Decal.USB-Port" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Decal.USB-Port"/>
+		<origin xyz="0.251 -0.147 0.063" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_Decal.USB-Port">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Decal.USB-Port.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Decal.USB-Port.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Fan blades.001" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Fan blades.001"/>
+		<origin xyz="-0.244 -0.11 0.048" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_Fan blades.001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Fan blades.001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Fan blades.001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_filament cap" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_filament cap"/>
+		<origin xyz="-0.133 0.181 0.908" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_filament cap">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="filament cap.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="filament cap.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Filament.Arm" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Filament.Arm"/>
+		<origin xyz="-0.133 0.093 0.826" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_Filament.Arm">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Filament.Arm.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Filament.Arm.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Filament.Rol" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Filament.Rol"/>
+		<origin xyz="-0.133 0.136 0.908" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_Filament.Rol">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Filament.Rol.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Filament.Rol.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_IEC connector" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_IEC connector"/>
+		<origin xyz="-0.0 0.309 0.04" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_IEC connector">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="IEC connector.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="IEC connector.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_pcb below.002" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_pcb below.002"/>
+		<origin xyz="-0.238 0.136 0.088" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_pcb below.002">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="pcb below.002.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="pcb below.002.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_power conektor" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_power conektor"/>
+		<origin xyz="0.015 0.302 0.044" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_power conektor">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="power conektor.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="power conektor.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_trapezoid screw.Y.000" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_trapezoid screw.Y.000"/>
+		<origin xyz="-0.064 0.253 0.083" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_trapezoid screw.Y.000">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="trapezoid screw.Y.000.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="trapezoid screw.Y.000.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_trapezoid screw.Y.001" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_trapezoid screw.Y.001"/>
+		<origin xyz="0.064 0.253 0.083" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_trapezoid screw.Y.001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="trapezoid screw.Y.001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="trapezoid screw.Y.001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_trapezoid screw.Z.000" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_trapezoid screw.Z.000"/>
+		<origin xyz="0.0 0.047 0.078" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_trapezoid screw.Z.000">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="trapezoid screw.Z.000.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="trapezoid screw.Z.000.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_trapezoid screw.Z.001" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_trapezoid screw.Z.001"/>
+		<origin xyz="0.0 0.047 0.078" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_trapezoid screw.Z.001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="trapezoid screw.Z.001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="trapezoid screw.Z.001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_Trennwand" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_Trennwand"/>
+		<origin xyz="-0.175 0.233 0.017" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_Trennwand">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="Trennwand.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="Trennwand.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_U trapezoid" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_U trapezoid"/>
+		<origin xyz="0.0 0.048 0.078" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_U trapezoid">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="U trapezoid.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="U trapezoid.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_U trapezoid001" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_U trapezoid001"/>
+		<origin xyz="0.0 0.048 0.078" rpy="0.0 0.0 0.0"/>
+	</joint>
+	<link name="link_U trapezoid001">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="U trapezoid001.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="U trapezoid001.obj"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_USB-Port" type="fixed">
+		<parent link="link_printer3d"/>
+		<child link="link_USB-Port"/>
+		<origin xyz="0.238 -0.149 0.052" rpy="0.0 -0.0 0.0"/>
+	</joint>
+	<link name="link_USB-Port">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0"/>
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+		</inertial>
+		<visual>
+			<geometry>
+				<mesh filename="USB-Port.obj"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="USB-Port.obj"/>
+			</geometry>
+		</collision>
+	</link>
+</robot>

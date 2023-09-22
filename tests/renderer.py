@@ -1,39 +1,43 @@
-from math import pi, sin, cos
+import numpy as np
+import math as m
+import matplotlib.pyplot as p
+from mpl_toolkits.mplot3d import Axes3D
+from scipy.spatial.transform import Rotation
 
-from direct.showbase.ShowBase import ShowBase
-from direct.task import Task
-class MyApp(ShowBase):
-    def __init__(self):
-        ShowBase.__init__(self)
+origin = np.array([0,0,0])
+cam = np.array([0,-1,0])
+axis = np.array([0,0,1])
 
-        # Load the environment model.
-        self.scene = self.loader.loadModel("models/environment")
-        # Reparent the model to render.
-        self.scene.reparentTo(self.render)
+graph = p.figure(0)
+view = graph.add_subplot(projection='3d')
+p.show(block=False)
+p.ion()
 
-        # Apply scale and position transforms on the model.
-        self.scene.setScale(0.25, 0.25, 0.25)
-        self.scene.setPos(-8, 42, -1)
+h = 0; v = 0
+while True:
+    h -= 1
+    v -= 1
 
-        obj = self.loader.loadModel("practistyle/data/pybullet_objects/plane.obj")
-        # Reparent the model to render.
-        obj.reparentTo(self.render)
+    if v < -89:
+        v = 0
+        h = 0
 
-        # Add the spinCameraTask procedure to the task manager.
-        self.taskMgr.add(self.spinCameraTask, "SpinCameraTask")
-        self.p = -45
-        
-        self.cam.setPos(0,0,200)
-        self.cam.setHpr(0,self.p,0)
-        
+    print(h,v)
 
+    r = Rotation.from_rotvec(np.array([0,0,1]) * h,True) * Rotation.from_rotvec(np.array([1,0,0]) * v,True)
+    cam2 = r.apply(cam)
 
-    # Define a procedure to move the camera.
-    def spinCameraTask(self, task):
-        self.p+=0.1
-        self.cam.setHpr(0,self.p,0)
-        return Task.cont
+    cam2_norm = cam2 / np.linalg.norm(cam2)
+    cosy = axis.dot(cam2_norm) / np.linalg.norm(cam2_norm) / np.linalg.norm(axis)
+    
+    view.cla()
+    view.scatter([-2,2,-2,2],[-2,2,-2,2],[-2,-2,2,2])
+    view.text(origin[0],origin[1],origin[2],f'{cosy}')
+    view.plot([origin[0],cam2[0]],[origin[1],cam2[1]],[origin[2],cam2[2]])
+    view.plot([origin[0],axis[0]],[origin[1],axis[1]],[origin[2],axis[2]])
 
+    graph.canvas.draw()
+    graph.canvas.flush_events()
+    # input()
 
-app = MyApp()
-app.run()
+p.ioff()

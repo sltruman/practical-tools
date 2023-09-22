@@ -19,11 +19,28 @@ urdf = os.path.join(basedir,obj_base.name+'.urdf')
 
 # 创建根节点 
 robot = et.Element('robot',dict(name=obj_base.name))
-link_base = et.SubElement(robot,'link',dict(name='link_'+obj_base.name))
-inertial = et.SubElement(link_base,'inertial')
+
+name = obj_base.name
+filename = name + '.obj'
+
+link = et.SubElement(robot,'link',dict(name='link_'+obj_base.name))
+inertial = et.SubElement(link,'inertial')
 et.SubElement(inertial,'origin',dict(xyz='0 0 0',rpy='0 0 0'))
-et.SubElement(inertial,'mass',dict(value='0'))
+et.SubElement(inertial,'mass',dict(value='1'))
 et.SubElement(inertial,'inertia',dict(ixx='0',ixy='0',ixz='0',iyy='0',iyz='0',izz='0'))
+visual = et.SubElement(link,'visual')
+geometry = et.SubElement(visual,'geometry')
+et.SubElement(geometry,'mesh',dict(filename=filename))
+
+collision = et.SubElement(link,'collision')
+geometry = et.SubElement(collision,'geometry')
+et.SubElement(geometry,'mesh',dict(filename=filename))
+
+filepath = os.path.join(basedir,filename)
+bpy.ops.export_scene.obj(filepath = filepath,use_selection = True,
+                         axis_forward='Y',axis_up='Z',
+                         use_triangles = True,use_materials = True)
+obj_base.select_set(False)
 
 locations = list()
 def export_obj(root_node,parent_obj):
@@ -38,13 +55,17 @@ def export_obj(root_node,parent_obj):
         et.SubElement(joint,'child',dict(link='link_'+obj.name))
         et.SubElement(joint,'origin',dict(xyz=f'{x} {y} {z}',rpy=f'{rx} {ry} {rz}'))
         link = et.SubElement(root_node,'link',dict(name='link_'+obj.name))
+        inertial = et.SubElement(link,'inertial')
+        et.SubElement(inertial,'origin',dict(xyz='0 0 0',rpy='0 0 0'))
+        et.SubElement(inertial,'mass',dict(value='0.1'))
+        et.SubElement(inertial,'inertia',dict(ixx='0',ixy='0',ixz='0',iyy='0',iyz='0',izz='0'))
         visual = et.SubElement(link,'visual')
         geometry = et.SubElement(visual,'geometry')
         et.SubElement(geometry,'mesh',dict(filename=filename))
         
         collision = et.SubElement(link,'collision')
         geometry = et.SubElement(collision,'geometry')
-        et.SubElement(geometry,'mesh',dict(filename=filename))
+        et.SubElement(geometry,'mesh',dict(filename4=filename))
         
         location = obj.location.copy()
         locations.append(location)
@@ -52,14 +73,12 @@ def export_obj(root_node,parent_obj):
         obj.select_set(True)
         bpy.ops.export_scene.obj(filepath = filepath,use_selection = True,
                                  axis_forward='Y',axis_up='Z',
-                                 use_triangles = True,use_materials = True)
+                                 use_triangles = True,group_by_material = True)
         obj.select_set(False)
         export_obj(root_node,obj)
         location = locations.pop()
         obj.location = location
 
-
-export_obj(robot,obj_base)
 
 tree = et.ElementTree(robot)
 rough_str = et.tostring(robot, 'utf-8')
@@ -67,3 +86,5 @@ reparsed = xml.parseString(rough_str)
 f = open(urdf, 'w', encoding='utf-8')
 f.write(reparsed.toprettyxml(indent='\t'))
 f.close()
+
+obj_base.select_set(True)

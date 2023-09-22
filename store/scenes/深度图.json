@@ -1,0 +1,28 @@
+{
+    "active_objects": [{
+            "kind":"Placer",
+            "name":"placer",
+            "base":"./objects/tray/tray.urdf",
+            "pos":[0,-0.5,0.001],
+            "rot":[0,0,0],
+            "center":[0.0,-0.5,0.25],
+            "interval":0.1,
+            "amount":30,
+            "workpiece":"./workpieces/lego/lego.urdf"
+        }, {
+            "kind":"Camera3D",
+            "name":"camera",
+            "base":"./cameras/camera3d/camera3d.urdf",
+            "pos":[-0.032747,-0.564563,1.1767],
+            "rot":[0.0,0.0,-1.57]
+        }
+    ],
+
+    "workflow":{
+        "run":"1",
+        "declare":{
+            "1":{"kind":"Packer","fun":"generate","name":"placer","next":"2"},
+            "2":{"kind":"Camera","fun":"capture","name":"camera"}
+        }
+    }
+}

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="4.00" />
+  
+  <object class="GtkApplicationWindow" id="app_window">
+    <property name="visible">True</property>
+    <property name="default-width">1024</property>
+    <property name="default-height">768</property>
+    <property name="show-menubar">True</property>
+
+    <child type="titlebar">
+      <object class="GtkHeaderBar" id="header">
+        <property name="show-title-buttons">yes</property>
+        <child>
+          <object class="GtkButton" id="start">
+            <property name="visible">True</property>
+            <property name="icon-name">media-playback-start-symbolic</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="stop">
+            <property name="visible">False</property>
+            <property name="icon-name">media-playback-stop-symbolic</property>
+          </object>
+        </child>
+        <child type="title">
+          <object class="GtkLabel">
+            <property name="label">Digitwl Twin</property>
+          </object>
+        </child>
+
+        <child type="end">
+          <object class="GtkToggleButton" id="anchor">
+            <property name="visible">False</property>
+            <property name="icon-name">view-pin-symbolic</property>
+          </object>
+        </child>
+        <child type="end">
+          <object class="GtkToggleButton" id="edit">
+            <property name="visible">False</property>
+            <property name="icon-name">insert-object</property>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <!-- 主视图，显示覆盖层 -->
+    <child>
+      <object class="GtkStack" id="views">
+        <!-- <property name="transition-type">crossfade</property> -->
+        <child>
+          <object class="GtkOverlay" id="scene_view">
+            <child>
+              <object class="GtkDrawingArea" id="simulation">
+              </object>
+            </child>
+
+            <!-- 
+            <child type="overlay">
+                <object class="GtkScrolledWindow" id="right_side_pannel">
+                  <property name="halign">end</property>
+                  <property name="opacity">0.9</property>
+                  <property name="has-frame">1</property>
+                  <property name="hscrollbar-policy">never</property>
+                  <property name="visible">False</property>
+                  <property name="max-content-width">50</property>
+                  <child>
+                      <object class="GtkViewport" id="right_side_pannel_content">
+                        <property name="scroll-to-focus">1</property>
+                        <child>
+                        </child>
+                      </object>
+                  </child>
+                </object>
+            </child>
+
+            <child type="overlay">
+                <object class="GtkScrolledWindow" id="bottom_side_pannel">
+                  <property name="valign">end</property>
+                  <property name="opacity">0.9</property>
+                  <property name="has-frame">1</property>
+                  <property name="vscrollbar-policy">never</property>
+                  <property name="visible">True</property>
+                  <property name="max-content-width">50</property>
+                  <child>
+                      <object class="GtkViewport" id="bottom_side_pannel_content">
+                        <property name="scroll-to-focus">1</property>
+                        <child>
+                        </child>
+                      </object>
+                  </child>
+                </object>
+            </child> -->
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+
+</interface>

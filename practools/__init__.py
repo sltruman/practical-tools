@@ -6,6 +6,7 @@ from .camera import Camera3D,Camera3DReal
 from .editor import Editor
 from .stacker import Stacker
 from .active_obj import ActiveObject
+from .printer3d import Printer3D,G50Printer3D
 from .cube import Cube
 from .cylinder import Cylinder
 from .box import Box 

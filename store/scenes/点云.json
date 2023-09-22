@@ -1,0 +1,19 @@
+{
+    "ground_z": -0.55,
+    "active_objects": [{
+            "kind":"Camera3D",
+            "name":"camera",
+            "base":"./cameras/camera3d/camera3d.urdf",
+            "pos":[-0.032747,-0.564563,1.1767],
+            "rot":[0.0,0.0,-1.57],
+            "fov": 20,
+            "forcal": 0.01,
+            "sample_rate": 20
+        }
+    ],
+
+    "workflow": {
+        "run":null,
+        "declare":{}
+    }
+}

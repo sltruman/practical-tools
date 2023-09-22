@@ -46,31 +46,11 @@ class Editor:
         if id not in self.scene.active_objs: return dict(name='',id=-1,pos=pos)
         return dict(name=self.scene.active_objs[id].name,id=id,pos=pos)
         
-    def move(self,name,pos):
-        pass
-
-    def select(self,name):
-        return self.scene.active_objs_by_name[name].properties()
-
-    def add(self,base,pos=[0,0,0],rot=[0,0,0],extra_params={}):
-        object_info = {
-            "base":base,
-            "pos":pos,
-            "rot":rot
-        }
-
-        object_info.update(extra_params)
-
-        try:
-            active_obj = eval(f'ActiveObject(**object_info)')
-        except:
-            tb.print_exc()
-            return {}
-        
-        self.scene.active_objs[active_obj.id] = active_obj
+    def add(self,name,active_obj):
+        self.scene.active_objs[name] = active_obj
         return active_obj.properties()
 
     def remove(self,name):
-        active_obj = self.scene.active_objs_by_name[name]
+        active_obj = self.scene.active_objs[name]
         del self.scene.active_objs[active_obj.id]
-        active_obj.remove()
+        return active_obj

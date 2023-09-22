@@ -1,0 +1,41 @@
+{
+    "ground_z": -0.7,
+    "active_objects": [
+        {
+            "kind":"Robot",
+            "name":"robot",
+            "base":"./robots/gp12/gp12.urdf",
+            "pos":[0,0,0],
+            "rot":[0,0,3.14],
+            "reset_joint_poses":[0,-0.925,-1.0123,-0.192,-1.2043,-1.57],
+            "joint_damping":[ 0, 1, 0.9, 0.8, 0.7, 0.0],
+            "end_effector":"./end_effectors/gripper_gp12-straight/gripper_gp12-straight.urdf",
+            "speed":1.0
+        },
+        {
+            "kind":"Camera3DReal",
+            "name":"camera",
+            "base":"./cameras/camera3d/camera3d_inv.urdf",
+            "pos":[-0.032747,-0.564563,1.1767],
+            "rot":[0.0,0.0,-1.57]
+        }
+    ],
+
+    "workflow": {
+        "run":"1",
+        "declare":{
+            "1":{"kind":"Camera3DReal","fun":"capture","name":"camera", "next":"2"},
+            "2":{"kind":"Vision","fun":"detect","name":"PickLight","next":"3"},
+            "3":{"kind":"Robot","fun":"pick_move","name":"robot","next":"4"},
+            "4":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.0,0.0,0.5,0,0,0]
+                },"next":"5"},
+            "5":{"kind":"Robot","fun":"move","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.5,-0.2,0.5,0,0,0]
+                },"next":"6"},
+            "6":{"kind":"Robot","fun":"move","name":"robot","args":{"home": true},"next":"1"}
+        }
+    }
+}

@@ -1,0 +1,69 @@
+{
+    "active_objects": [
+        {
+            "kind":"Robot",
+            "name":"robot",
+            "base":"./robots/ur5/ur5.urdf",
+            "pos":[0,0.1,0],
+            "rot":[0,0,3.14],
+            "reset_joint_poses":[-1.57,0.0,-0.3925,-0.785,1.57,0],
+            "joint_damping":[ 0, 1, 0.9, 0.8, 0.7, 0.0],
+            "end_effector":"./end_effectors/gripper_ur5/gripper_ur5.urdf",
+            "speed":1.0
+        },
+        {
+            "kind":"Placer",
+            "name":"placer",
+            "base":"./objects/tray/tray.urdf",
+            "pos":[0,-0.5,0.001],
+            "rot":[0,0,0], 
+            "center":[0.0,-0.5,0.25],
+            "interval":0.1,
+            "amount":10,
+            "workpiece":"./workpieces/suction/suction.urdf",
+            "workpiece_texture":""
+        }, 
+        {
+            "kind":"Camera3D",
+            "name":"camera",
+            "base":"./cameras/camera3d/camera3d.urdf",
+            "pos":[-0.032747,-0.564563,1.1767],
+            "rot":[0,0.0,0.0]
+        }
+    ],
+
+    "workflow":{
+        "run":"1",
+        "declare":{
+            "1":{"kind":"Placer","fun":"generate","name":"placer", "next":"2"},
+            "2":{
+                "kind":"Camera3D","fun":"pose_recognize","name":"camera", "next":"3",
+                "alt":[{"next":"7","err": "failed"}]
+            },
+            "3":{"kind":"Robot","fun":"pick_plan","name":"robot","args":{
+                "pick_poses":[
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,0]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-0.785]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-1.57]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-2.355]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,-3.14]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,2.355]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,1.57]},
+                    {"pos":[0.0,0.0,0.01],"rot":[0,1.57,0.785]}
+                ]
+            },"next":"4"},
+            "4":{"kind":"Robot","fun":"plan_move","name":"robot","next":"5"},
+            "5":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup":true},"next":"6"},
+            "6":{"kind":"Robot","fun":"move_relatively","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.0,0.0,0.35,0,0,0]
+                },"next":"7"},
+            "7":{"kind":"Robot","fun":"move","name":"robot","args":{
+                    "mode":"point",
+                    "point":[0.3,0.1,0.3,0,0,0]
+                },"next":"8"},
+            "8":{"kind":"Robot","fun":"do","name":"robot","args":{"pickup": false},"next":"9"},
+            "9":{"kind":"Robot","fun":"move","name":"robot","args":{"home": true},"next":"2"}
+        }
+    }
+}

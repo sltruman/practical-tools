@@ -8,7 +8,6 @@ class ActiveObject:
         self.data_dir = data_dir
         self.profile = kwargs
 
-        if 'name' in kwargs: self.name = kwargs['name']
         self.base = kwargs['base']
         self.pos = kwargs['pos']
         self.rot = kwargs['rot']
@@ -17,7 +16,7 @@ class ActiveObject:
         self.set_base(self.base)
         pass
 
-    def remove(self):
+    def __del__(self):
         self.actions.clear()
         if 'id' in vars(self): p.removeBody(self.id)
         pass
@@ -27,7 +26,7 @@ class ActiveObject:
 
     def properties(self):
         return dict(kind='ActiveObject',
-                    name=self.name if 'name' in vars(self) else self.id,
+                    id=self.id,
                     base=self.base,
                     pos=self.pos,
                     rot=self.rot,
@@ -56,7 +55,6 @@ class ActiveObject:
         if 'id' in vars(self): p.removeBody(self.id)
         self.id = p.loadURDF(base, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
         p.resetBasePositionAndOrientation(self.id,self.pos,p.getQuaternionFromEuler(self.rot))
-        if 'name' not in vars(self): self.name = self.id
     
     def get_pose(self):
         return self.pos,self.rot
