@@ -3,12 +3,14 @@ import math as m
 import numpy as np
 from scipy.spatial.transform import Rotation
 from panda3d.core import FrameBufferProperties,WindowProperties,GraphicsPipe,GraphicsOutput,\
-                        Texture,LPoint2,LPoint3,\
+                        Texture,LPoint2,LPoint3,Vec3,\
                         CollisionRay,CollisionTraverser,CollisionHandlerQueue,\
-                        CollisionNode,BitMask32
+                        CollisionNode,BitMask32,DepthTestAttrib,RenderAttrib,\
+                        DirectionalLight,Shader,AmbientLight,Spotlight
 
 from direct.showbase.ShowBase import ShowBase
 from direct.directtools.DirectSelection import SelectionRay
+from direct.actor import Actor
 
 class Viewer:
     cam_target = np.array([0.0,0.0,0.0])
@@ -21,22 +23,54 @@ class Viewer:
 
     def __del__(self):
         pass
+
+    def setupSkySphere(self):
+        self.skySphere = self.base.loader.loadModel("resources/skybox/skybox.bam")
+        self.skySphere.reparentTo(self.base.render)
+        self.skySphere.setBin('background', 1) 
+        self.skySphere.setDepthWrite(False) 
+        self.skySphere.setShaderOff() 
+        self.skySphere.setAlphaScale(0)
     
     def run(self,context):
         self.base = base = ShowBase(fStartDirect=True,windowType='offscreen')
+        
+        panda = base.loader.loadModel("models/panda")
+        panda.reparentTo(base.render)
+        panda.setScale(0.01,0.01,0.01)
+
         base.cam.setPos(0,0,10)
         base.cam.setHpr(0,-89,0)
-        
-        # dlight = DirectionalLight('dlight')
-        # dlight.setColor((1, 1, 1, 1))
-        # dlnp = self.base.render.attachNewNode(dlight)
-        # dlnp.setHpr(0, -90, 0)
-        # base.render.setLight(dlnp)
 
-        # shader = Shader.load(Shader.SL_GLSL,
-        #              vertex="myshader.vert",
-        #              fragment="myshader.frag")
-        # self.base.render.setShader(shader)
+        shader = Shader.load(Shader.SLGLSL, "resources/skybox/skybox.vert", "resources/skybox/skybox.frag")
+        sky_texture = base.loader.loadCubeMap("resources/skybox/Twilight_#.jpg")
+
+        skybox = base.loader.loadModel("resources/skybox/skybox.egg")
+        print(base.render.getMat())
+        skybox.reparentTo(base.render)
+        skybox.setShader(shader)
+        skybox.setShaderInput("TexSkybox", sky_texture)
+        skybox.setAttrib(DepthTestAttrib.make(RenderAttrib.MLessEqual))
+
+        ambientLight = base.render.attachNewNode(AmbientLight("ambientLight"))
+        ambientLight.node().setColor((0.37, 0.37, 0.43, 1.0))
+
+        sun = base.render.attachNewNode(DirectionalLight("sun"))
+        sun.node().setDirection((0, 5, -10))
+        sun.node().setShadowCaster(True)
+        sun.setPos(0, -5, 10)
+        sun.lookAt(0, 0, 0)
+
+        base.render.setLight(ambientLight)
+        base.render.setLight(sun)
+        base.render.setShaderAuto()
+
+        # self.setupSkySphere()
+
+        # skybox = base.loader.loadModel('resources/skybox/skybox.bam')
+        # skybox.set_scale(40000)
+        # skybox.reparent_to(base.render)
+        # skybox.set_bin("unsorted", 10000)
 
         self.picker = CollisionTraverser()
         self.pq = CollisionHandlerQueue()
