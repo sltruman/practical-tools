@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="ActorBar" parent="GtkBox">
+        <style>
+            <class name="bar"/>
+        </style>
+        <property name="opacity">0.8</property>
+        <property name="spacing">5</property>
+        
+        <child>
+            <object class="GtkImage">
+                <style>
+                    <class name="actor"/>
+                </style>
+                <property name="width-request">60</property>
+                <property name="height-request">60</property>
+                <property name="file">C:/Users/SLTru/OneDrive/图片/已保存的图片/-3472b8cc90d3e6e.jpg</property>
+            </object>
+        </child>
+        <child>
+            <object class="GtkImage">
+                <style>
+                    <class name="actor"/>
+                </style>
+                <property name="width-request">60</property>
+                <property name="height-request">60</property>
+                <property name="file">C:/Users/SLTru/OneDrive/图片/已保存的图片/-3472b8cc90d3e6e.jpg</property>
+            </object>
+        </child>
+    </template>
+</interface>

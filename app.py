@@ -2,26 +2,48 @@ import os
 os.environ['PATH'] = 'C:/gtk-build/gtk/x64/release/bin;' + os.environ['PATH']
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-import sys
-from practools import Scene,Editor,Viewer,ActiveObject,G50Printer3D
-
 import gi
-
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, GObject, Gio, Gdk, GdkPixbuf
 
+import sys
+sys.path.append('.')
+from practools.scene import Scene
+from practools.editor import Editor
+from practools.viewer import Viewer
+from practools.actor import *
+
 import time
-import cv2
 import numpy as np
 
+
+@Gtk.Template(filename='actor_bar.ui')
+class ActorBar (Gtk.Box):
+    __gtype_name__ = "ActorBar"
+    
+    def __init__(self):
+        pass
+
+    def shrink(self):
+        pass
+
+    def expand(self):   
+        pass
+
 class App(Gtk.Application):
-    builder = Gtk.Builder.new_from_file('./app.ui')
+    builder = Gtk.Builder.new_from_file('app.ui')
+    provider = Gtk.CssProvider.new()
+    provider.load_from_path('app.css')
+
     window = builder.get_object('app_window')
     button_start = builder.get_object('start')
     button_stop = builder.get_object('stop')
     button_edit = builder.get_object('edit')
     button_anchor = builder.get_object('anchor')
     area = builder.get_object('simulation')
+    actorbar = builder.get_object('actorbar')
+    Gtk.StyleContext.add_provider_for_display(actorbar.get_display(),provider,Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
     scene = Scene()
     editor = Editor(scene)
     viewer = Viewer(scene)
@@ -29,10 +51,9 @@ class App(Gtk.Application):
     def __init__(self):
         super().__init__(application_id="xyz.practistyle.PracticalRoom")
         GLib.set_application_name('Practical Room')
+
         obj = ActiveObject(self.scene,base='store/plane/plane.urdf',pos=[0,0,0],rot=[0,0,0])
         self.editor.add('s',obj)
-        self.printer3d = G50Printer3D(self.scene,base='store/printer3d/printer3d.urdf',pos=[0,0,0],rot=[0,0,0])
-        self.editor.add('a',self.printer3d)
 
     def do_activate(self):
         self.add_window(self.window)
@@ -106,7 +127,7 @@ class App(Gtk.Application):
             self.viewer.rotate(self.last_pos[0] - x,self.last_pos[1] - y)
             self.last_pos = x,y
         else:
-            del self.last_pos   
+            del self.last_pos
 
     def on_area_panned(self,receiver,x,y,flag):
         if flag == 'begin': self.last_pos = 0,0
@@ -135,6 +156,6 @@ class App(Gtk.Application):
 
     def on_button_export(self,*args):
         pass
-    
+
 exit_status = App().run(sys.argv)
 sys.exit(exit_status)

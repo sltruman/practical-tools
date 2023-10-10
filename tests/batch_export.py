@@ -13,8 +13,6 @@ if not objs:
 
 obj_base = objs[0]
 basedir = os.path.join(os.path.dirname(bpy.data.filepath),obj_base.name)
-if os.path.exists(basedir): shutil.rmtree(basedir)
-os.mkdir(basedir)
 urdf = os.path.join(basedir,obj_base.name+'.urdf')
 
 # 创建根节点 
@@ -65,7 +63,7 @@ def export_obj(root_node,parent_obj):
         
         collision = et.SubElement(link,'collision')
         geometry = et.SubElement(collision,'geometry')
-        et.SubElement(geometry,'mesh',dict(filename4=filename))
+        et.SubElement(geometry,'mesh',dict(filename=filename))
         
         location = obj.location.copy()
         locations.append(location)
@@ -79,6 +77,7 @@ def export_obj(root_node,parent_obj):
         location = locations.pop()
         obj.location = location
 
+export_obj(robot,obj_base)
 
 tree = et.ElementTree(robot)
 rough_str = et.tostring(robot, 'utf-8')
