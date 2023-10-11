@@ -1,3 +1,4 @@
+/* actor_bar.ui */
 .bar {
     background-color: #FFFFFF;
     border-radius: 1mm;
@@ -5,10 +6,10 @@
 }
 
 .actor {
-    border:black solid 0.4mm;
+    border:black solid 0.2mm;
 }
 
 .actor:hover {
-    border:skyblue solid 0.4mm;
+    border:skyblue solid 0.2mm;
 }
 

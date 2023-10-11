@@ -57,53 +57,18 @@
 
             <!-- 右侧属性栏 -->
             <child type="overlay">
-                <object class="GtkScrolledWindow" id="right_side_pannel">
+                <object class="PropertyPanel" id="right_side_pannel">
                   <property name="halign">end</property>
-                  <property name="hscrollbar-policy">never</property>
-                  <property name="visible">True</property>
-                  <child>
-                      <object class="GtkViewport" id="right_side_pannel_content">
-                        <property name="scroll-to-focus">1</property>
-                        <child>
-                          <!-- <object class="GtkBox">
-                            <child>
-                              <object class="GtkToggleButton">
-                                <style>
-                                  <class name="my-special-button-class"/>
-                                  <class name="dark-button"/>
-                                </style>
-                                <property name="label">sdfasdf</property>
-                                <child>
-                                  <object class="GtkImage">
-                                    <property name="pixel-size">50</property>
-                                    <property name="file">C:/Users/SLTru/OneDrive/图片/已保存的图片/-3472b8cc90d3e6e.jpg</property>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                          </object> -->
-                            
-                          <object class="GtkListBox" id="camera3d_properties">
-                            <property name="opacity">0.8</property>
-                            <property name="selection-mode">none</property>
-                            <property name="show-separators">1</property>
-                            <property name="width-request">400</property>
-                            <style>
-                                <class name="rich-list" />
-                            </style>
-                          </object>
-                        
-                        </child>
-                      </object>
-                  </child>
+                  <property name="visible">False</property>
                 </object>
             </child>
 
             <!-- 底部工具栏 -->
             <child type="overlay">
-              <object class="ActorBar" id="actorbar">              
+              <object class="ActorBar" id="bottom_side_pannel">              
                 <property name="halign">center</property>
                 <property name="valign">end</property>
+                <property name="visible">True</property>
               </object>
             </child>
           </object>

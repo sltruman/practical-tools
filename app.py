@@ -8,26 +8,41 @@ from gi.repository import GLib, Gtk, GObject, Gio, Gdk, GdkPixbuf
 
 import sys
 sys.path.append('.')
-from practools.scene import Scene
-from practools.editor import Editor
-from practools.viewer import Viewer
+from practools.core import *
+from practools.operator import *
 from practools.actor import *
 
 import time
 import numpy as np
 
+@Gtk.Template(filename='property_panel.ui')
+class PropertyPanel (Gtk.ScrolledWindow):
+    __gtype_name__ = "PropertyPanel"
+    
+    def __init__(self):
+        pass
+
+    def shrink(self):
+        self.set_visible(False)
+        pass
+
+    def expand(self):
+        self.set_visible(True)
+        pass
 
 @Gtk.Template(filename='actor_bar.ui')
-class ActorBar (Gtk.Box):
+class ActorBar (Gtk.ScrolledWindow):
     __gtype_name__ = "ActorBar"
     
     def __init__(self):
         pass
 
     def shrink(self):
+        self.set_visible(False)
         pass
 
-    def expand(self):   
+    def expand(self):
+        self.set_visible(True)
         pass
 
 class App(Gtk.Application):
@@ -41,8 +56,9 @@ class App(Gtk.Application):
     button_edit = builder.get_object('edit')
     button_anchor = builder.get_object('anchor')
     area = builder.get_object('simulation')
-    actorbar = builder.get_object('actorbar')
-    Gtk.StyleContext.add_provider_for_display(actorbar.get_display(),provider,Gtk.STYLE_PROVIDER_PRIORITY_USER)
+    bottom_side_pannel = builder.get_object('bottom_side_pannel')
+    right_side_pannel = builder.get_object('right_side_pannel')
+    Gtk.StyleContext.add_provider_for_display(bottom_side_pannel.get_display(),provider,Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
     scene = Scene()
     editor = Editor(scene)
@@ -117,7 +133,14 @@ class App(Gtk.Application):
             if self.begin_pos[0] == x and self.begin_pos[1] == y:
                 x,y=x/self.factor - self.image_offset_x,y/self.factor - self.image_offset_y
                 info_detected = self.viewer.pick(x,y)
-                print(info_detected)
+
+                if info_detected:
+                    self.bottom_side_pannel.shrink()
+                    self.right_side_pannel.expand()
+                else:
+                    self.bottom_side_pannel.expand()
+                    self.right_side_pannel.shrink()
+
             del self.begin_pos
 
     def on_area_rotated(self,receiver,x,y,flag):
@@ -151,10 +174,13 @@ class App(Gtk.Application):
         self.button_start.set_visible(True)
         self.button_stop.set_visible(False)
 
-    def on_button_import(self,*args):
+    def on_button_import_clicked(self,*args):
         pass
 
-    def on_button_export(self,*args):
+    def on_button_export_clicked(self,*args):
+        pass
+
+    def on_bottom_side_pannel_clicked(self,*args):
         pass
 
 exit_status = App().run(sys.argv)

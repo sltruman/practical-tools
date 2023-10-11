@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PropertyPanel" parent="GtkScrolledWindow">
+        <property name="hscrollbar-policy">never</property>
+        <property name="opacity">0.8</property>
+        <child>
+            <object class="GtkViewport">
+                <property name="scroll-to-focus">1</property>
+                <child>
+                    <object class="GtkListBox">
+                        <style>
+                            <class name="rich-list" />
+                        </style>
+                        <property name="selection-mode">none</property>
+                        <property name="show-separators">1</property>
+                        <property name="width-request">400</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>

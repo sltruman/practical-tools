@@ -192,4 +192,6 @@ class Viewer:
         pos = collision_entry.getInteriorPoint(geomNode)
         id = node.getPythonTag('owner_id')
         link_index = node.getPythonTag('owner_link_index')
+        if not id:
+            return None
         return pos,id,link_index
