@@ -1,10 +1,1 @@
-recursive-include practistyle/data/cameras *.*
-recursive-include practistyle/data/containers *.*
-recursive-include practistyle/data/end_effectors *.*
-recursive-include practistyle/data/engines *.*
-recursive-include practistyle/data/objects *.*
-recursive-include practistyle/data/pybullet_objects *.*
-recursive-include practistyle/data/robots *.*
-recursive-include practistyle/data/scenes *.*
-recursive-include practistyle/data/workpiece_textures *.*
-recursive-include practistyle/data/workpieces *.*
+recursive-include practools/store *.*

@@ -1,7 +1,8 @@
 import pybullet as p
 import os
+import pygfx as gfx
 
-class ActiveObject:
+class ActiveObject(gfx.WorldObject):
     def __init__(self,data_dir='',**kwargs):
         self.actions = list()
         self.result = None,
@@ -25,15 +26,14 @@ class ActiveObject:
         return self.properties()
 
     def properties(self):
-        return dict(kind='ActiveObject',
+        return dict(kind=type(self),
                     id=self.id,
                     base=self.base,
                     pos=self.pos,
                     rot=self.rot,
-                    links=self.get_links(),
-                    user_data=self.user_data if 'user_data' in vars(self) else '')
+                    links=self.get_links())
     
-    def update(self,dt):
+    def update(self):
         self.pos,orn = p.getBasePositionAndOrientation(self.id)
         self.rot = p.getEulerFromQuaternion(orn)
         
@@ -74,9 +74,6 @@ class ActiveObject:
 
     def get_rot(self):
         return self.rot
-
-    def set_user_data(self,value):
-        self.user_data = value
 
     def get_links(self):
         links = []

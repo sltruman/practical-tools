@@ -856,7 +856,13 @@ placer = scene.active_objs_by_name['placer']
 placer.generate()
 ```
 
-## 物体.雕刻机
+## 物体.三维打印机
+
+
+
+
+
+
 
 
 

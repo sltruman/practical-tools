@@ -2,15 +2,6 @@ import os
 import math as m
 import numpy as np
 from scipy.spatial.transform import Rotation
-from panda3d.core import FrameBufferProperties,WindowProperties,GraphicsPipe,GraphicsOutput,\
-                        Texture,LPoint2,LPoint3,Vec3,\
-                        CollisionRay,CollisionTraverser,CollisionHandlerQueue,\
-                        CollisionNode,BitMask32,DepthTestAttrib,RenderAttrib,\
-                        DirectionalLight,Shader,AmbientLight,Spotlight
-
-from direct.showbase.ShowBase import ShowBase
-from direct.directtools.DirectSelection import SelectionRay
-from direct.actor import Actor
 
 class Viewer:
     cam_target = np.array([0.0,0.0,0.0])

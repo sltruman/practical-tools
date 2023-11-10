@@ -1,6 +1,4 @@
 import os
-os.environ['PATH'] = 'C:/gtk-build/gtk/x64/release/bin;' + os.environ['PATH']
-os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 import gi
 gi.require_version("Gtk", "4.0")
@@ -68,9 +66,6 @@ class App(Gtk.Application):
         super().__init__(application_id="xyz.practistyle.PracticalRoom")
         GLib.set_application_name('Practical Room')
 
-        obj = ActiveObject(self.scene,base='store/plane/plane.urdf',pos=[0,0,0],rot=[0,0,0])
-        self.editor.add('s',obj)
-
     def do_activate(self):
         self.add_window(self.window)
         self.area.set_draw_func(self.draw)
@@ -111,7 +106,7 @@ class App(Gtk.Application):
 
         aspect_ratio = 1. * self.scene.viewport_size[0] / self.scene.viewport_size[1]
         aspect_ratio2 = 1. * area_w / area_h
-        self.factor = 1.0
+        self.factor = 1.0   
         if aspect_ratio > aspect_ratio2: self.factor = 1. * area_w / self.scene.viewport_size[0]
         else: self.factor = 1. * area_h / self.scene.viewport_size[1]
         cr.scale(self.factor,self.factor)
