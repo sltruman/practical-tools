@@ -16,17 +16,17 @@
 
 ### 示例
 
-获取一堆工件的深度图：`python3 examples/depth_image.py`
+获取一堆工件的深度图：`python3 examples/depth_image.py` （项目重构中，不可用）
 
-获取一堆工件的标注图：`python3 examples/labeled_image.py`
+获取一堆工件的标注图：`python3 examples/labeled_image.py` （项目重构中，不可用）
 
-混合拆垛演示：`python3 examples/ordered_picking.py`
+混合拆垛演示：`python3 examples/ordered_picking.py` （项目重构中，不可用）
 
-无序抓取演示：`python3 examples/unordered_picking.py`
+无序抓取演示：`python3 examples/unordered_picking.py` （项目重构中，不可用）
 
-虚拟相机拍摄点云：`python3 examples/point_cloud.py`
+虚拟相机拍摄点云：`python3 examples/point_cloud.py` （项目重构中，不可用）
 
-标定： `python3 examples/calibration.py`
+标定： `python3 examples/calibration.py` （项目重构中，不可用）
 
 # 2. 功能列表
 
