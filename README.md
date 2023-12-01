@@ -10,9 +10,9 @@
 
 ## 安装
 
-包：`pip3 install practical-room`
+包：`pip3 install practical-tools`
 
-源代码：`https://github.com/sltruman/practical-room`
+源代码：`https://github.com/sltruman/practical-tools`
 
 ### 示例
 
