@@ -10,13 +10,12 @@ class Scene(gfx.Scene):
   num_frame = 0
 
   def __init__(self):
-    super().__init__()  
+    super().__init__()
     id = bullet.connect(bullet.DIRECT)
     bullet.setPhysicsEngineParameter(erp=1,contactERP=1,frictionERP=1)
     bullet.setGravity(0, 0, -9.81)
     
   def __del__(self):
-    # bullet.resetSimulation()
     pass
 
   def update(self):
@@ -27,7 +26,9 @@ class Scene(gfx.Scene):
         fun(*args)
         self.actions.pop(0)
 
-    for obj in self.active_objs.values():
-      obj.update()
+    
+    for obj in self.children:
+      if 'update' in vars(obj):
+        obj.update()
 
     bullet.stepSimulation()

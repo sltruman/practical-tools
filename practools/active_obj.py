@@ -2,24 +2,23 @@ import pybullet as p
 import os
 import pygfx as gfx
 
-class ActiveObject(gfx.WorldObject):
-    def __init__(self,data_dir='',**kwargs):
+class ActiveObject(gfx.Mesh):
+    def __init__(self,**kwargs):
+        super().__init__()
+
         self.actions = list()
         self.result = None,
-        self.data_dir = data_dir
-        self.profile = kwargs
 
         self.base = kwargs['base']
-        self.pos = kwargs['pos']
-        self.rot = kwargs['rot']
-        self.user_data = self.profile['user_data'] if 'user_data' in self.profile else ''
+        self.pos = kwargs['position']
+        self.rot = kwargs['euler']
 
         self.set_base(self.base)
         pass
 
     def __del__(self):
         self.actions.clear()
-        if 'id' in vars(self): p.removeBody(self.id)
+        if 'urdf_id' in vars(self): p.removeBody(self.urdf_id)
         pass
  
     def get_properties(self):
@@ -30,11 +29,10 @@ class ActiveObject(gfx.WorldObject):
                     id=self.id,
                     base=self.base,
                     pos=self.pos,
-                    rot=self.rot,
-                    links=self.get_links())
+                    rot=self.rot)
     
     def update(self):
-        self.pos,orn = p.getBasePositionAndOrientation(self.id)
+        self.pos,orn = p.getBasePositionAndOrientation(self.urdf_id)
         self.rot = p.getEulerFromQuaternion(orn)
         
         if not self.actions: return
@@ -44,24 +42,40 @@ class ActiveObject(gfx.WorldObject):
         pass
 
     def idle(self):
-         return 0 == len(self.actions)
+        return 0 == len(self.actions)
 
     def restore(self):
         self.actions.clear()
         pass
-
+    
     def set_base(self,base):
         self.base = base
-        if 'id' in vars(self): p.removeBody(self.id)
-        self.id = p.loadURDF(base, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
+        if 'urdf_id' in vars(self): p.removeBody(self.urdf_id)
+
+        visual = os.path.join(self.base,'visual.glb')
+        physical = os.path.join(self.base,'physical.urdf')
+
+        if os.path.exists(visual):
+            meshes = gfx.load_meshes(visual)
+            self.add(*meshes)
+            
+        if os.path.exists(physical):
+            self.urdf_id = p.loadURDF(base, self.pos, p.getQuaternionFromEuler(self.rot),useFixedBase=True)
+
         p.resetBasePositionAndOrientation(self.id,self.pos,p.getQuaternionFromEuler(self.rot))
+
+    def set_env_map(self,env_tex):
+        for m in self.children:
+            m.geometry.texcoords1 = m.geometry.texcoords
+            m.material.env_map = env_tex
+        pass
     
     def get_pose(self):
         return self.pos,self.rot
     
     def set_pos(self,pos):
         self.pos = pos
-        p.resetBasePositionAndOrientation(self.id,pos,p.getQuaternionFromEuler(self.rot))
+        p.resetBasePositionAndOrientation(self.urdf_id,pos,p.getQuaternionFromEuler(self.rot))
         pass
 
     def get_pos(self):
@@ -69,21 +83,8 @@ class ActiveObject(gfx.WorldObject):
 
     def set_rot(self,rot):
         self.rot = rot
-        p.resetBasePositionAndOrientation(self.id,self.pos,p.getQuaternionFromEuler(rot))
+        p.resetBasePositionAndOrientation(self.urdf_id,self.pos,p.getQuaternionFromEuler(rot))
         pass
 
     def get_rot(self):
         return self.rot
-
-    def get_links(self):
-        links = []
-        shapes = p.getVisualShapeData(self.id)
-        _,_,_,_,base,_,_,_ = shapes[0]
-        pos,orn = p.getBasePositionAndOrientation(self.id)
-        links.append(dict(base=base.decode(),pos=pos,rot=p.getEulerFromQuaternion(orn)))
-
-        for i in range(p.getNumJoints(self.id)):
-            _,_,_,_,pos,orn = p.getLinkState(self.id,i)
-            _,_,_,_,base,_,_,_ = shapes[i+1]
-            links.append(dict(base=base.decode(),pos=pos,rot=p.getEulerFromQuaternion(orn)))
-        return links

@@ -7,7 +7,6 @@ from gi.repository import GLib, Gtk, GObject, Gio, Gdk, GdkPixbuf
 import sys
 sys.path.append('.')
 from practools.core import *
-from practools.operator import *
 from practools.actor import *
 
 import time
@@ -60,7 +59,6 @@ class App(Gtk.Application):
 
     scene = Scene()
     editor = Editor(scene)
-    viewer = Viewer(scene)
 
     def __init__(self):
         super().__init__(application_id="xyz.practistyle.PracticalRoom")
@@ -97,24 +95,24 @@ class App(Gtk.Application):
     
     def update(self):
         self.scene.update()
-        self.viewer.update()
         GLib.idle_add(self.area.queue_draw)
 
     def draw(self, receiver, cr, area_w, area_h): 
         cr.set_source_rgb(40 / 255,40 / 255,40 / 255)
         cr.paint()
 
-        aspect_ratio = 1. * self.scene.viewport_size[0] / self.scene.viewport_size[1]
+        size = self.editor.canvas.get_physical_size()
+        aspect_ratio = 1. * size[0] / size[1]
         aspect_ratio2 = 1. * area_w / area_h
         self.factor = 1.0   
-        if aspect_ratio > aspect_ratio2: self.factor = 1. * area_w / self.scene.viewport_size[0]
-        else: self.factor = 1. * area_h / self.scene.viewport_size[1]
+        if aspect_ratio > aspect_ratio2: self.factor = 1. * area_w / size[0]
+        else: self.factor = 1. * area_h / size[1]
         cr.scale(self.factor,self.factor)
 
-        self.image_offset_x = image_x = (area_w / self.factor - self.scene.viewport_size[0]) / 2
-        self.image_offset_y = image_y = (area_h / self.factor - self.scene.viewport_size[1]) / 2
+        self.image_offset_x = image_x = (area_w / self.factor - size[0]) / 2
+        self.image_offset_y = image_y = (area_h / self.factor - size[1]) / 2
 
-        image = GdkPixbuf.Pixbuf.new_from_data(self.viewer.viewport_color_texture,GdkPixbuf.Colorspace.RGB,True,8,self.scene.viewport_size[0],self.scene.viewport_size[1],self.scene.viewport_size[0]*4)
+        image = GdkPixbuf.Pixbuf.new_from_data(self.editor.viewport_snapshot().tobytes(),GdkPixbuf.Colorspace.RGB,True,8,size[0],size[1],size[0]*4)
         Gdk.cairo_set_source_pixbuf(cr,image,image_x,image_y)
         cr.paint()
         
@@ -142,7 +140,7 @@ class App(Gtk.Application):
         if flag == 'begin':
             self.last_pos = 0,0
         elif flag == 'update':
-            self.viewer.rotate(self.last_pos[0] - x,self.last_pos[1] - y)
+            self.editor.viewport_rotate(self.last_pos[0] - x,self.last_pos[1] - y)
             self.last_pos = x,y
         else:
             del self.last_pos
@@ -150,20 +148,16 @@ class App(Gtk.Application):
     def on_area_panned(self,receiver,x,y,flag):
         if flag == 'begin': self.last_pos = 0,0
         elif flag == 'update':
-            self.viewer.pan(self.last_pos[0] - x,self.last_pos[1] - y)
+            self.editor.viewport_pan(self.last_pos[0] - x,self.last_pos[1] - y)
             self.last_pos = x,y
         else: del self.last_pos
     
     def on_area_zoomed(self,*args):
-        self.viewer.zoom(args[2])
+        self.editor.viewport_zoom(args[2])
 
     def on_button_start_clicked(self,*args):
         self.button_start.set_visible(False)
         self.button_stop.set_visible(True)
-
-        with open('C:/Users/SLTru/Desktop/圆锥体_G50_6_Ender-PLA_31m.gcode', 'r') as f:
-            gcode = f.read()
-            self.printer3d.print(gcode)
 
     def on_button_stop_clicked(self,*args):
         self.button_start.set_visible(True)

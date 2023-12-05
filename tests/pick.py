@@ -1,22 +1,10 @@
-import sys
-from direct.showbase.ShowBase import ShowBase
-from panda3d.core import *
-import simplepbr
+import pylinalg as la
+from scipy.spatial.transform import Rotation
+import numpy as np
 
-class MyApp(ShowBase):
-    def __init__(self):
-        ShowBase.__init__(self)
-        simplepbr.init()
+R = Rotation.from_euler('xyz',[1.57,0,3.14])
+out1 = R.as_quat()
+print(out1  )
 
-        # quit when esc is pressed
-        self.accept('escape',sys.exit)
-
-        #base.disableMouse()
-        # load the box model
-        box = self.loader.loadModel("./casing.glb")
-        box.reparentTo(render)
-
-
-
-app = MyApp()
-app.run()
+out2 = la.quat_from_euler([1.57,-0,3.14])
+print(np.round(out2,3))

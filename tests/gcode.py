@@ -61,7 +61,7 @@ def set_pinch_roller_pose(W):
     pass
 
 if __name__ == "__main__":
-    # global cur_pos,cur_speed,cur_time,axis_x,axis_y,axis_z
+    # global cur_pos,cur_spe`ed,cur_time,axis_x,axis_y,axis_z
     # cur_extrusion_length = 0
     # cur_pos = [0,0,0]
     # cur_speed = 1500

@@ -24,7 +24,7 @@
         </child>
         <child type="title">
           <object class="GtkLabel">
-            <property name="label">Digitwl Twin</property>
+            <property name="label">场景仿真</property>
           </object>
         </child>
 

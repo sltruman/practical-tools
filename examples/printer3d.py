@@ -15,18 +15,17 @@ cube_size = env_img.shape[1]
 env_img.shape = 6, cube_size, cube_size, env_img.shape[-1]
 
 # Create environment map
-env_tex = gfx.Texture(
-    env_img, dim=2, size=(cube_size, cube_size, 6), generate_mipmaps=True
-)
+env_tex = gfx.Texture(env_img, dim=2, size=(cube_size, cube_size, 6), generate_mipmaps=True)
 
 # Apply env map to skybox
 background = gfx.Background(None, gfx.BackgroundSkyboxMaterial(map=env_tex))
 background.world.up=(0,0,1)
+
 scene.add(background)
 
 # Load meshes, and apply env map
 # Note that this lights the helmet already
-gltf_path = "C:/Users/SLTru/Desktop/practical-tools/store/printer3d/room.glb"
+gltf_path = "C:/Users/SLTru/Desktop/practical-tools/practools/store/env/Room/visual.glb"
 meshes = gfx.load_meshes(gltf_path)
 
 for m in meshes:
